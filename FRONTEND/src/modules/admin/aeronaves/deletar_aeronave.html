@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html></html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Aeronave</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_aeronave.css">
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+
+        //FUNCOES VALIDACAO
+
+        function selecionouAeronaveDeletar(){
+
+            
+
+          let resultado = false; 
+          var aeronaveSelecionada = document.getElementById("aeronaveDropdown").value;
+
+          console.log(aeronaveSelecionada)
+          if (aeronaveSelecionada !== "Escolha uma aeronave"){
+          resultado = true;
+          }
+          return resultado;
+          }
+
+
+          // Função para buscar dados da API e exibir na página
+          async function listarAeronaves() {
+          const response = await fetch('http://localhost:3000/listarAeronaves');
+          const data = await response.json();
+
+          if (data.status === 'SUCCESS') {
+              const aeronavesDiv = document.getElementById('aeronaves');
+              const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+              const aeronaves = data.payload;
+
+              // Opcao padrao
+              const defaultOption = document.createElement('option');
+              defaultOption.textContent = 'Escolha uma aeronave';
+              defaultOption.value = "Escolha uma aeronave";
+              defaultOption.disabled = true;
+              defaultOption.selected = true;
+              aeronavesDropdown.appendChild(defaultOption);
+
+              // Popular o dropdown
+              aeronaves.forEach(aeronave => {
+              
+                  const option = document.createElement('option');
+                  option.value = JSON.stringify(aeronave); // Todos os dados da aeronave como string JSON
+                  const CODIGO = aeronave[0];
+                  const FABRICANTE = aeronave[1];
+                  const MODELO = aeronave[2];
+                  option.textContent = [CODIGO,FABRICANTE,MODELO];
+                  aeronavesDropdown.appendChild(option);
+
+              });
+
+
+              
+              aeronavesDropdown.addEventListener('change', handleDropdownChange);
+
+              const firstAeronave = [0,'N/A','N/A', 'N/A', 0, 0, 0];
+              displayAeronaves(aeronavesDiv, firstAeronave);
+              
+          } else {
+              console.error('Erro ao buscar dados de aeronaves:', data.message);
+          }
+          }
+
+          function showStatusMessage(msg, error){
+          var pStatus = document.getElementById("status");
+          if (error === true){
+          pStatus.className = "statusError";
+          }else{
+          pStatus.className = "statusSuccess";
+          }
+          pStatus.textContent = msg;
+          }
+
+          function fetchInserir(body) {
+          const requestOptions = {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+          };
+
+          return fetch('http://localhost:3000/excluirAeronave', requestOptions)
+          .then(T => T.json())
+          }
+
+
+          function deletarAeronave(){
+
+          if(!selecionouAeronaveDeletar()){
+              showStatusMessage("Selecione uma aeronave para deletar...", true);  
+              return;
+              }
+
+
+
+
+          const aeronave = document.getElementById("aeronaveDropdown").value;
+          const aeronaveObj = JSON.parse(aeronave);
+          const codigo = aeronaveObj[0];
+
+
+          console.log(codigo)
+
+         
+          fetchInserir({
+          codigo: codigo
+          })
+          .then(resultado => {
+            
+            if(resultado.status === "SUCCESS"){
+              showStatusMessage("Aeronave deletada... ", false);
+            }else{
+              showStatusMessage("Erro ao deletar aeronave...: " + message, true);
+              console.log(resultado.message);
+            }
+          })
+          .catch(()=>{
+            showStatusMessage("Erro técnico ao deletar... Contate o suporte.", true);
+            console.log("Falha grave ao cadastrar.")
+          });
+
+          }
+
+
+          // Funcao pra gerenciar o dropdown
+          function handleDropdownChange() {
+          const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+          const selectedAeronaveData = JSON.parse(aeronavesDropdown.value);
+          const aeronavesDiv = document.getElementById('aeronaves');
+
+          displayAeronaves(aeronavesDiv, selectedAeronaveData);
+          }
+
+          // Funcao mostrando informacao da aeronave
+          const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :"];
+          function displayAeronaves(container, aeronave) {
+          container.innerHTML = '';
+          if (aeronave) {
+              const table = document.createElement('table');
+              const tableBody = document.createElement('tbody');
+              for (const key in aeronave) {
+                  const row = tableBody.insertRow();
+                  const cell1 = row.insertCell(0);
+                  const cell2 = row.insertCell(1);
+                  cell1.textContent = nomes[key];
+                  cell2.textContent = aeronave[key];
+              }
+              
+              table.appendChild(tableBody);
+              container.appendChild(table);
+          }
+          }
+
+          // Chamar a função para listar aeronaves quando a página carregar
+          window.onload = listarAeronaves;
+                
+    </script>
+
+</head>
+<style>
+    align-right {
+        text-align: right;
+    }
+    .statusError{
+         color:red;
+      }
+    .statusSuccess{
+        color:blue;
+      }
+</style>
+<body class="center-content">
+    <div class="container">
+        <h1>Excluir aeronave</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+
+              <label for="aeronaveDropdown">Escolha uma aeronave:</label>
+              <select id="aeronaveDropdown"></select>
+              
+              <div id="aeronaves"></div>
+
+            <div class="btn-group">
+              <button type="button" class="btn" onclick="deletarAeronave()">Deletar</button>
+              <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+</body>
+</html>

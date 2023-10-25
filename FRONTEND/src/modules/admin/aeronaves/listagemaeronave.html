@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Aeronaves</title>
+</head>
+<body>
+    <h1>Lista de Aeronaves</h1>
+    
+    
+    <label for="aeronaveDropdown">Escolha uma aeronave:</label>
+    <select id="aeronaveDropdown"></select>
+    
+    <div id="aeronaves"></div>
+
+    <script>
+        // Função para buscar dados da API e exibir na página
+        async function listarAeronaves() {
+            const response = await fetch('http://localhost:3000/listarAeronaves');
+            const data = await response.json();
+
+            if (data.status === 'SUCCESS') {
+                const aeronavesDiv = document.getElementById('aeronaves');
+                const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+                const aeronaves = data.payload;
+
+                // Add a default option with a placeholder text
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = 'Escolha uma aeronave';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                aeronavesDropdown.appendChild(defaultOption);
+
+                // Populate the dropdown (select) element with aircraft information
+                aeronaves.forEach(aeronave => {
+                
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(aeronave); // Store the entire aircraft data as JSON string
+                    const CODIGO = aeronave[0];
+                    const FABRICANTE = aeronave[1];
+                    const MODELO = aeronave[2];
+                    option.textContent = [CODIGO,FABRICANTE,MODELO];
+                    aeronavesDropdown.appendChild(option);
+
+                });
+
+
+                // Add an event listener to the dropdown to handle selection changes
+                aeronavesDropdown.addEventListener('change', handleDropdownChange);
+                
+            } else {
+                console.error('Erro ao buscar dados de aeronaves:', data.message);
+            }
+        }
+
+        // Function to handle dropdown selection change
+        function handleDropdownChange() {
+            const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+            const selectedAeronaveData = JSON.parse(aeronavesDropdown.value);
+            const aeronavesDiv = document.getElementById('aeronaves');
+
+            displayAeronaves(aeronavesDiv, selectedAeronaveData);
+        }
+
+        // Function to display aircraft information
+        const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :"];
+        function displayAeronaves(container, aeronave) {
+            container.innerHTML = '';
+            if (aeronave) {
+                const table = document.createElement('table');
+                const tableBody = document.createElement('tbody');
+                for (const key in aeronave) {
+                    const row = tableBody.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+                    cell1.textContent = nomes[key];
+                    cell2.textContent = aeronave[key];
+                }
+                
+                table.appendChild(tableBody);
+                container.appendChild(table);
+            }
+        }
+
+        // Chamar a função para listar aeronaves quando a página carregar
+        window.onload = listarAeronaves;
+    </script>
+</body>
+</html>

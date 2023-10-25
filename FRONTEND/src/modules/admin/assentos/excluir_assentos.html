@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apagar assentos</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_assentos.css">
+
+    <style>
+        .statusError{
+           color:red;
+        }
+        .statusSuccess{
+          color:blue;
+        }
+      </style>
+
+    <script>
+        var pesquisouAssentos = 0;
+        var qtdAssentos = 0;
+        const assentosOcupados = [];
+       
+        function assentoValido(){
+        const assentoDigitado = document.getElementById("assento").value;
+        let resultado = false;
+        let flag = 0;
+
+        assentosOcupados.forEach(assento => {
+            if(assentoDigitado == assento){
+                flag = 1;
+            }
+        });
+        if(flag == 0){
+            resultado = false;
+        }
+        if (flag == 1){
+            resultado = true;
+        }
+        return resultado;
+      }
+
+        function assentoFazSentido(){
+        let resultado = false;
+        const assentoDigitado = document.getElementById("assento").value;
+
+        const aeronaveInfo = document.getElementById("aeronaveDropdown").value;
+        const aeronaveObj = JSON.parse(aeronaveInfo);
+        const numAssentos = aeronaveObj[5];
+
+        if (!isNaN(assentoDigitado) && assentoDigitado >= 0 && assentoDigitado <= numAssentos) {
+  
+        return true;
+    } else {
+        
+        return false;
+    }
+      }
+
+        function selecionouAeronave(){
+            let resultado = false; 
+            var listaAeronaves = document.getElementById("aeronaveDropdown");
+            var valorSelecionado = listaAeronaves.value;
+  
+            if (valorSelecionado !== "Escolha uma aeronave"){
+            resultado = true;
+            }
+            return resultado;
+        }
+           
+        function buscouAssentos(){
+            let resultado = false;
+
+            if (pesquisouAssentos == 1){
+                resultado = true;
+            }
+            return resultado;
+        }
+        
+        function assentoNull(){
+            let resultado = false;
+            const assentoDigitado = document.getElementById("assento").value;
+            if (assentoDigitado.length != 0){
+                resultado = true;
+            }
+            return resultado;
+        }
+        
+        function naoHaAssentos(){
+            let resultado = false;
+            
+            if (assentosOcupados.length != 0){
+                resultado = true;
+            }
+            return resultado;
+        }
+        
+
+        
+        function adicionarAssentoOcupado(numeroAssento) {
+        if (!assentosOcupados.includes(numeroAssento)) {
+            assentosOcupados.push(numeroAssento);
+        }
+}
+
+      
+        async function listarAeronaves() {
+            const response = await fetch('http://localhost:3000/listarAeronaves');
+            const data = await response.json();
+
+            if (data.status === 'SUCCESS') {
+                const aeronavesDiv = document.getElementById('aeronaves');
+                const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+                const aeronaves = data.payload;
+
+              
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = 'Escolha uma aeronave';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                aeronavesDropdown.appendChild(defaultOption);
+
+                
+                aeronaves.forEach(aeronave => {
+                
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(aeronave); 
+                    const CODIGO = aeronave[0];
+                    const FABRICANTE = aeronave[1];
+                    const MODELO = aeronave[2];
+                    option.textContent = [CODIGO,FABRICANTE,MODELO];
+                    aeronavesDropdown.appendChild(option);
+
+                });
+
+
+               
+                aeronavesDropdown.addEventListener('change', handleDropdownChange);
+                const firstAeronave = [0,'N/A','N/A', 'N/A', 0, 0, 0];
+                displayAeronaves(aeronavesDiv, firstAeronave);
+                
+            } else {
+                console.error('Erro ao buscar dados de aeronaves:', data.message);
+            }
+        }
+    
+
+        async function listarAssentos() {
+
+            if(!selecionouAeronave()){
+          showStatusMessage("Selecione a Aeronave...", true);  
+          return;
+        }
+        
+        assentosOcupados.clear;
+
+            const response = await fetch('http://localhost:3000/listarAssentos');
+            const data = await response.json();
+
+            if (data.status === 'SUCCESS') {
+                pesquisouAssentos = 1;
+                const aeronaveInfo = document.getElementById("aeronaveDropdown").value;
+                const aeronaveObj = JSON.parse(aeronaveInfo);
+                const codigo = aeronaveObj[0];
+                qtdAssentos = aeronaveObj[5];
+
+                const assentos = data.payload;
+                
+
+                assentos.forEach(assento => {
+                    if (assento[0] == codigo){
+                        const numAssento = assento[1];
+                        adicionarAssentoOcupado(numAssento);
+                        
+                    }
+                    
+                });
+
+            assentosOcupados.sort((a, b) => a - b);
+
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = '';
+
+            if (assentosOcupados.length > 0) {
+                resultadoDiv.innerHTML = 'ASSENTOS OCUPADOS: ' + assentosOcupados.join(' | ');
+            } else {
+                resultadoDiv.innerHTML = 'Nenhum assento ocupado para aeronave selecionada.';
+            }
+
+            const qtdAssentosDiv = document.getElementById('comparaAssentos');
+            qtdAssentosDiv.textContent = 'Assentos Ocupados: ' + assentosOcupados.length + ' de ' + qtdAssentos;
+
+            
+            } else {
+                console.error('Erro ao buscar dados de aeronaves:', data.message);
+            }
+
+            assentoValido();
+        }
+
+
+
+        function showStatusMessage(msg, error){
+        var pStatus = document.getElementById("status");
+        if (error === true){
+          pStatus.className = "statusError";
+        }else{
+          pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+      }
+
+
+      
+
+      
+      
+        function fetchInserirUnico(body) {
+        const requestOptions = {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/excluirAssentoUnico', requestOptions)
+        .then(T => T.json())
+      }
+
+      function fetchInserirTodos(body) {
+        const requestOptions = {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/excluirTodosAssentos', requestOptions)
+        .then(T => T.json())
+      }
+
+      
+      function ApagarAssentoUnico(){
+        
+
+
+        if(!buscouAssentos()){
+          showStatusMessage("Busque os assentos...", true);  
+          return;
+        }
+
+        if(!assentoNull()){
+          showStatusMessage("Digite um assento...", true);  
+          return;
+        }
+
+        if(!assentoValido()){
+          showStatusMessage("Assento não está reservado...", true);  
+          return;
+        }
+
+        if(!assentoFazSentido()){
+          showStatusMessage("Assento não encontrado...", true);  
+          return;
+        }
+
+
+
+
+
+        const aeronaveInfo = document.getElementById("aeronaveDropdown").value;
+        const aeronaveObj = JSON.parse(aeronaveInfo);
+        
+        const codigo = aeronaveObj[0];
+
+        const assento = document.getElementById("assento").value;
+
+    
+        fetchInserirUnico({
+            aeronave: codigo, 
+            assento: assento
+            })
+            .then(resultado => {
+            
+              if(resultado.status === "SUCCESS"){
+                showStatusMessage("assento apagado... ", false);
+              }else{
+                showStatusMessage("Erro ao apagar assento...: " + message, true);
+                console.log(resultado.message);
+              }
+            })
+            .catch(()=>{
+              showStatusMessage("Erro técnico ao apagar... Contate o suporte.", true);
+              console.log("Falha grave ao cadastrar.")
+            });
+        listarAssentos();
+        
+      }
+    
+      function ApagarTodosAssentos(){
+        
+
+
+        if(!buscouAssentos()){
+          showStatusMessage("Busque os assentos...", true);  
+          return;
+        }
+
+        if(!naoHaAssentos()){
+          showStatusMessage("Não há nenhum assento reservado...", true);  
+          return;
+        }
+
+
+
+
+
+
+        const aeronaveInfo = document.getElementById("aeronaveDropdown").value;
+        const aeronaveObj = JSON.parse(aeronaveInfo);
+        
+        const codigo = aeronaveObj[0];
+
+        const assento = document.getElementById("assento").value;
+
+
+        
+        fetchInserirTodos({
+            aeronave: codigo
+            })
+            .then(resultado => {
+              
+              if(resultado.status === "SUCCESS"){
+                showStatusMessage("assentos deletados... ", false);
+              }else{
+                showStatusMessage("Erro ao deletar assentos...: " + message, true);
+                console.log(resultado.message);
+              }
+            })
+            .catch(()=>{
+              showStatusMessage("Erro técnico ao deletar... Contate o suporte.", true);
+              console.log("Falha grave ao cadastrar.")
+            });
+        listarAssentos();
+        
+      }
+    
+
+       
+        function handleDropdownChange() {
+            const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+            const selectedAeronaveData = JSON.parse(aeronavesDropdown.value);
+            const aeronavesDiv = document.getElementById('aeronaves');
+
+            displayAeronaves(aeronavesDiv, selectedAeronaveData);
+        }
+
+     
+        const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :"];
+        function displayAeronaves(container, aeronave) {
+            container.innerHTML = '';
+            if (aeronave) {
+                const table = document.createElement('table');
+                const tableBody = document.createElement('tbody');
+                for (const key in aeronave) {
+                    const row = tableBody.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+                    cell1.textContent = nomes[key];
+                    cell2.textContent = aeronave[key];
+                }
+                
+                table.appendChild(tableBody);
+                container.appendChild(table);
+            }
+        }
+
+        
+        window.onload = listarAeronaves;
+
+
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Apagar assentos reservados</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+                <label for="aeronaveDropdown">Escolha uma aeronave:</label>
+                <select id="aeronaveDropdown"></select>
+                <p></p>
+                <div id="aeronaves"></div>
+              <div class="btn-group">
+                <button 
+                type="button" class="btn btn-listar" onclick="listarAssentos()"
+                id="btnListar" name="btnListar">Buscar</button>
+              </div>
+              <p></p>
+              <div id="comparaAssentos"></div>
+              <p></p>
+                <p></p>
+                <div id="resultado"></div>
+                <p></p>
+                <label for="assento">Assento:</label>
+                <input type="number" id="assento" name="assento" required>
+                </p>
+
+              
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="ApagarAssentoUnico()">Apagar único assento</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <div class="form-group">
+            <p>CUIDADO!</p>
+            <p>Este botão apagará todos os assentos reservados da aeronave selecionada</p>
+            <p id="status" class="statusError"></p>
+            </div>
+
+            <div class="btn-group">
+              <button type="button" class="btn" onclick="ApagarTodosAssentos()">Apagar TODOS OS ASSENTOS</button>
+          </div>
+
+            <div>
+
+        </form>
+    </div>
+
+
+</body>
+</html>

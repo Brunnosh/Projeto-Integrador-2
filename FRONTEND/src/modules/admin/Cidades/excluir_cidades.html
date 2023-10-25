@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Cidade</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_cidades.css">
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+        //FUNCOES VALIDACAO
+
+        function selecionouCidadeDeletar(){
+
+            
+
+let resultado = false; 
+var cidadeSelecionada = document.getElementById("cidadeDropdown").value;
+
+console.log(cidadeSelecionada)
+if (cidadeSelecionada !== "Escolha uma cidade"){
+resultado = true;
+}
+return resultado;
+}
+
+
+
+async function listarCidades() {
+const response = await fetch('http://localhost:3000/listarCidades');
+const data = await response.json();
+
+if (data.status === 'SUCCESS') {
+    const cidadesDiv = document.getElementById('cidade');
+    const cidadesDropdown = document.getElementById('cidadeDropdown');
+    const cidades = data.payload;
+
+ 
+    const defaultOption = document.createElement('option');
+    defaultOption.textContent = 'Escolha uma cidade';
+    defaultOption.value = "Escolha uma cidade";
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    cidadesDropdown.appendChild(defaultOption);
+
+   
+    cidades.forEach(cidade => {
+    
+        const option = document.createElement('option');
+        option.value = JSON.stringify(cidade); 
+        const CODIGO = cidade[0];
+        const NOME = cidade[1];
+        option.textContent = [CODIGO,NOME];
+        cidadesDropdown.appendChild(option);
+
+    });
+
+
+    
+    cidadesDropdown.addEventListener('change', handleDropdownChange);
+
+    const firstAeronave = [0,'N/A'];
+    displayCidades(cidadesDiv, firstAeronave);
+    
+} else {
+    console.error('Erro ao buscar dados de aeronaves:', data.message);
+}
+}
+
+function showStatusMessage(msg, error){
+var pStatus = document.getElementById("status");
+if (error === true){
+pStatus.className = "statusError";
+}else{
+pStatus.className = "statusSuccess";
+}
+pStatus.textContent = msg;
+}
+
+function fetchInserir(body) {
+const requestOptions = {
+method: 'DELETE',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(body)
+};
+
+return fetch('http://localhost:3000/excluirCidade', requestOptions)
+.then(T => T.json())
+}
+
+
+function deletarCidade(){
+
+if(!selecionouCidadeDeletar()){
+    showStatusMessage("Selecione uma cidade para deletar...", true);  
+    return;
+    }
+
+
+
+
+const cidade = document.getElementById("cidadeDropdown").value;
+const cidadeObj = JSON.parse(cidade);
+const codigo = cidadeObj[0];
+
+
+console.log(codigo)
+
+
+fetchInserir({
+codigo: codigo
+})
+.then(resultado => {
+
+  if(resultado.status === "SUCCESS"){
+    showStatusMessage("cidade deletado... ", false);
+  }else{
+    showStatusMessage("Erro ao deletar cidade...: " + message, true);
+    console.log(resultado.message);
+  }
+})
+.catch(()=>{
+  showStatusMessage("Erro técnico ao deletar... Contate o suporte.", true);
+  console.log("Falha grave ao cadastrar.")
+});
+
+}
+
+
+
+function handleDropdownChange() {
+const cidadesDropdown = document.getElementById('cidadeDropdown');
+const selectedCidadeData = JSON.parse(cidadesDropdown.value);
+const cidadesDiv = document.getElementById('cidade');
+
+displayCidades(cidadesDiv, selectedCidadeData);
+}
+
+
+const nomes = ["Codigo :", "Nome : "];
+function displayCidades(container, cidade) {
+container.innerHTML = '';
+if (cidade) {
+    const table = document.createElement('table');
+    const tableBody = document.createElement('tbody');
+    for (const key in cidade) {
+        const row = tableBody.insertRow();
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+        cell1.textContent = nomes[key];
+        cell2.textContent = cidade[key];
+    }
+    
+    table.appendChild(tableBody);
+    container.appendChild(table);
+}
+}
+
+
+window.onload = listarCidades;
+
+    </script>
+
+
+    <style>
+        .statusError{
+        color:red;
+        }
+        .statusSuccess{
+        color:blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Cidade</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+              <label for="cidadeDropdown">Escolha uma cidade:</label>
+              <select id="cidadeDropdown"></select>
+              
+              <div id="cidade"></div>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="deletarCidade()">Excluir</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>

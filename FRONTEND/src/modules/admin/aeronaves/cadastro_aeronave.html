@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html></html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Aeronave</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_aeronave.css">
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+
+              // verifica se o ano é valido
+      function anoValido(){
+        let resultado = false;
+        // obter o texto preenchido no campo anoFab
+        var strAno = document.getElementById("ano_fabricacao").value;
+        const ano = parseInt(strAno);
+        console.log("Ano aeronave: " + ano.toString());
+        if (ano >= 1990 && ano <= 2026){
+          resultado = true;
+        }
+        return resultado; 
+      }
+
+      // verifica se o campo total de assentos é numerico e válido
+      function totalAssentosValido(){
+        let resultado = false;
+        const strAssentos = document.getElementById("assentos").value;
+        const assentos = parseInt(strAssentos);
+        if (assentos > 0){
+          resultado = true;
+        }
+        return resultado; 
+      }
+
+      // funcao que verifica se selecionou ou não o fabricante.
+      function selecionouFabricante(){
+        let resultado = false; 
+        var listaFabricantes = document.getElementById("fabricante");
+        var valorSelecionado = listaFabricantes.value;
+        // se quiséssemos obter o TEXTO selecionado. 
+        // var text = listaFabricantes.options[listaFabricantes.selectedIndex].text;
+        if (valorSelecionado !== "0"){
+          resultado = true;
+        }
+        return resultado;
+      }
+
+      // funcao que verifica se preencheu o modelo.
+      function preencheuModelo(){
+        let resultado = false;
+        const modeloInformado = document.getElementById("modelo").value;
+        if(modeloInformado.length > 0){
+          resultado = true;
+        }
+        return resultado;
+      }
+
+      // funcao para verificar se preencheu o registro de referencia. 
+      function preencheuRegistro(){
+        let resultado = false;
+        const registroReferencia = document.getElementById("referencia").value;
+        if(registroReferencia.length > 0){
+          resultado = true;
+        }
+        return resultado;
+      }
+
+      // funcao para exibir mensagem de status... seja qual for. 
+      function showStatusMessage(msg, error){
+        var pStatus = document.getElementById("status");
+        if (error === true){
+          pStatus.className = "statusError";
+        }else{
+          pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+      }
+
+      function fetchInserir(body) {
+        const requestOptions = {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/inserirAeronave', requestOptions)
+        .then(T => T.json())
+      }
+
+      
+      function inserirAeronave(){
+
+        if(!selecionouFabricante()){
+          showStatusMessage("Selecione o fabricante...", true);  
+          return;
+        }
+
+        if(!preencheuModelo()){
+          showStatusMessage("Preencha o modelo...", true);
+          return;
+        }
+
+        if(!preencheuRegistro()){
+          showStatusMessage("Preencha o registro da aeronave...", true);
+          return;
+        }
+
+        if(!anoValido()){
+          showStatusMessage("Ano deve de 1990 até 2026...", true);
+          return;
+        }
+
+        if(!totalAssentosValido()){
+          showStatusMessage("Preencha corretamente o total de assentos.", true);
+          return;
+        }
+
+
+        const fabricante = document.getElementById("fabricante").value;
+        const modelo = document.getElementById("modelo").value;
+        const anoFab = document.getElementById("ano_fabricacao").value;
+        const registro = document.getElementById("referencia").value;
+        const totalAssentos = document.getElementById("assentos").value;
+        const disponivel = document.getElementById("disponivel").value;
+
+       
+        fetchInserir({
+            marca: fabricante, 
+            modelo: modelo,
+            anoFab: anoFab, 
+            qtdeAssentos: totalAssentos,
+            registro: registro,
+            disponivel: disponivel })
+            .then(resultado => {
+              
+              if(resultado.status === "SUCCESS"){
+                showStatusMessage("Aeronave cadastrada... ", false);
+              }else{
+                showStatusMessage("Erro ao cadastrar aeronave...: " + message, true);
+                console.log(resultado.message);
+              }
+            })
+            .catch(()=>{
+              showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+              console.log("Falha grave ao cadastrar.")
+            });
+        
+      }
+    
+    </script>
+
+</head>
+<style>
+    align-right {
+        text-align: right;
+    }
+    .statusError{
+         color:red;
+      }
+    .statusSuccess{
+        color:blue;
+      }
+</style>
+<body class="center-content">
+    <div class="container">
+        <h1>Cadastro de Aeronave</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+                <label for="fabricante">Fabricante:</label>
+                <select id="fabricante" name="fabricante">
+                    <option value="0" selected>Selecione o fabricante</option>
+                    <option value="Boeing">Boeing</option>
+                    <option value="Airbus">Airbus</option>
+                    <option value="Embraer">Embraer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="modelo">Modelo:</label>
+                <input type="text" id="modelo" name="modelo" required>
+            </div>
+            <div class="form-group">
+                <label for="referencia">Registro:</label>
+                <input type="text" id="referencia" name="referencia" required>
+            </div>
+            <div class="form-group">
+                <label for="ano_fabricacao">Ano de Fabricação:</label>
+                <input type="number" id="ano_fabricacao" name="ano_fabricacao" maxlength="4">
+            </div>
+            <div class="form-group">
+                <label for="assentos">Total de Assentos (Passageiro):</label>
+                <input type="number" id="assentos" name="assentos" maxlength="4">
+            </div>
+            <div class="form-group">
+                <label for="disponivel">Avião disponivel? (0 para sim, 1 para não):</label>
+                <input type="number" id="disponivel" name="disponivel" maxlength="4">
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="inserirAeronave()">Cadastrar</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+</body>
+</html>

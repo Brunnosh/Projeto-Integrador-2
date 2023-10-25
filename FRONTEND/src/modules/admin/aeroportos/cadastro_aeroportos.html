@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Aeroporto</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_aeroportos.css">
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+
+        
+        //FUNCOES VALIDACAO
+        function selecionouCidade(){
+        let resultado = false; 
+        var listacidades = document.getElementById("cidadeDropdown");
+        var valorSelecionado = listacidades.value;
+        // se quiséssemos obter o TEXTO selecionado. 
+        // var text = listaFabricantes.options[listaFabricantes.selectedIndex].text;
+        if (valorSelecionado !== "Escolha uma cidade"){
+          resultado = true;
+        }
+        return resultado;
+      }
+
+        function preencheuNome(){
+            let resultado = false;
+            const modeloInformado = document.getElementById("nome").value;
+            if(modeloInformado.length > 0){
+            resultado = true;
+            }
+            return resultado;
+        }
+
+
+
+        // Função para buscar dados da API e exibir na página
+        async function listarCidades() {
+            const response = await fetch('http://localhost:3000/listarCidades');
+            const data = await response.json();
+
+            if (data.status === 'SUCCESS') {
+                const cidadesDiv = document.getElementById('cidade');
+                const cidadesDropdown = document.getElementById('cidadeDropdown');
+                const cidades = data.payload;
+
+               
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = 'Escolha uma cidade';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                cidadesDropdown.appendChild(defaultOption);
+
+                cidades.forEach(cidade => {
+                    const option = document.createElement('option');
+                    option.value = cidade[1]; 
+                    const nome = cidade[1];
+                    option.textContent = nome; 
+                    cidadesDropdown.appendChild(option);
+                });
+
+              
+                cidadesDropdown.addEventListener('change', handleDropdownChange);
+
+                
+            } else {
+                console.error('Erro ao buscar dados de cidades:', data.message);
+            }
+        }
+
+  
+        function handleDropdownChange(event) {
+            const selectedCidadeData = event.target.value;
+           
+        }
+
+        // Chamar a função para listar cidades quando a página carregar
+        window.onload = async () => {
+        await listarCidades();
+    };
+
+
+
+    // FUNCOES PARA INSERIR O TRECHO
+
+    function showStatusMessage(msg, error) {
+            var pStatus = document.getElementById("status");
+            if (error === true) {
+                pStatus.className = "statusError";
+            } else {
+                pStatus.className = "statusSuccess";
+            }
+            pStatus.textContent = msg;
+        }
+
+        function fetchInserir(body) {
+            const requestOptions = {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            };
+
+            return fetch('http://localhost:3000/inserirAeroporto', requestOptions)
+                .then(response => response.json())
+                .catch(error => {
+                    showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+                    console.log("Falha grave ao cadastrar:", error);
+                });
+        }
+
+
+
+        function inserirAeroporto() {
+
+            
+        if(!selecionouCidade()){
+          showStatusMessage("Selecione a Cidade do aeroporto...", true);  
+          return;
+        }
+        if(!preencheuNome()){
+          showStatusMessage("Preencha o nome do aeroporto...", true);  
+          return;
+        }
+
+
+            const cidadeaeroporto = document.getElementById("cidadeDropdown").value;
+            const nomeaeroporto = document.getElementById("nome").value;
+           
+            fetchInserir({
+              cidadeaeroporto: cidadeaeroporto,
+              nomeaeroporto: nomeaeroporto
+
+            }).then(resultado => {
+                
+                if (resultado.status === "SUCCESS") {
+                    showStatusMessage("Aeroporto cadastrado...", false);
+                } else {
+                    showStatusMessage("Erro ao cadastrar Aeroporto: " + resultado.message, true);
+                    console.log(resultado.message);
+                }
+            });
+        }
+    
+
+   
+
+
+
+    </script>
+
+
+    <style>
+        .statusError{
+        color:red;
+        }
+        .statusSuccess{
+        color:blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Aeroporto</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+                <label for="cidadeDropdown">Cidade:</label>
+                <select id="cidadeDropdown"></select>
+                
+                <div id="cidade"></div>
+                <p></p>
+                <label for="nome">Nome do Aeroporto:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="inserirAeroporto()">Cadastrar</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "core-js": "^3.33.0",
+    "date-and-time": "^3.0.3"
+  }
+}

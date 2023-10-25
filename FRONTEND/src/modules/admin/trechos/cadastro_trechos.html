@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Trechos</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_trechos.css">
+
+    <style>
+        .statusError{
+           color:red;
+        }
+        .statusSuccess{
+          color:blue;
+        }
+      </style>
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+
+        const todosaeroportos = "";
+
+//FUNCOES VALIDACAO
+function selecionouCidade1(){
+let resultado = false; 
+var listacidades1 = document.getElementById("cidadeDropdown1");
+var valorSelecionado = listacidades1.value;
+
+if (valorSelecionado !== "Escolha uma cidade"){
+  resultado = true;
+}
+return resultado;
+}
+function selecionouCidade2(){
+  let resultado = false; 
+  var listacidades2 = document.getElementById("cidadeDropdown2");
+  var valorSelecionado = listacidades2.value;
+
+  if (valorSelecionado !== "Escolha uma cidade"){
+    resultado = true;
+  }
+  return resultado;
+}
+function selecionouAeroporto1(){
+  let resultado = false; 
+  var listaAeroportos1 = document.getElementById("aeroportoDropdown1");
+  var valorSelecionado = listaAeroportos1.value;
+
+  if (valorSelecionado !== "Escolha um aeroporto"){
+    resultado = true;
+  }
+  return resultado;
+}
+function selecionouAeroporto2(){
+  let resultado = false; 
+  var listaAeroportos2 = document.getElementById("aeroportoDropdown2");
+  var valorSelecionado = listaAeroportos2.value;
+
+  if (valorSelecionado !== "Escolha um aeroporto"){
+    resultado = true;
+  }
+  return resultado;
+}
+function correspondenciaPartida(){
+  let resultado = false; 
+  var valoresAeroportoPartida = document.getElementById("aeroportoDropdown1").value;
+  var cidadeaeroporto = valoresAeroportoPartida.split(',')[1];
+  var cidadeselecionada = document.getElementById("cidadeDropdown1").value;
+
+  if (cidadeaeroporto == cidadeselecionada){
+    resultado = true;
+  }
+  return resultado;
+}
+function correspondenciaChegada(){
+  let resultado = false; 
+  var valoresAeroportoChegada = document.getElementById("aeroportoDropdown2").value;
+  var cidadeaeroporto = valoresAeroportoChegada.split(',')[1];
+  var cidadeselecionada = document.getElementById("cidadeDropdown2").value;
+
+  if (cidadeaeroporto == cidadeselecionada){
+    resultado = true;
+  }
+  return resultado;
+}
+
+
+// Função para buscar dados da API e exibir na página
+
+async function listarCidades() {
+    const response = await fetch('http://localhost:3000/listarCidades');
+    const data = await response.json();
+
+    if (data.status === 'SUCCESS') {
+
+
+
+        const cidadesDiv1 = document.getElementById('cidades1');
+        const cidadesDropdown1 = document.getElementById('cidadeDropdown1');
+        const cidadesDiv2 = document.getElementById('cidades2');
+        const cidadesDropdown2 = document.getElementById('cidadeDropdown2');
+        const cidades = data.payload;
+        
+
+        
+        const defaultOption1 = document.createElement('option');
+        defaultOption1.textContent = 'Escolha uma cidade';
+        defaultOption1.disabled = true;
+        defaultOption1.selected = true;
+        cidadesDropdown1.appendChild(defaultOption1);
+
+        
+        const defaultOption2 = document.createElement('option');
+        defaultOption2.textContent = 'Escolha uma cidade';
+        defaultOption2.disabled = true;
+        defaultOption2.selected = true;
+        cidadesDropdown2.appendChild(defaultOption2);
+
+       
+        cidades.forEach(cidade => {
+            const option1 = document.createElement('option');
+            option1.value = cidade[1];
+            const nome1 = cidade[1];
+            option1.textContent = nome1; 
+            cidadesDropdown1.appendChild(option1);
+        });
+
+        
+        cidades.forEach(cidade => {
+            const option2 = document.createElement('option');
+            option2.value = cidade[1]; 
+            const nome2 = cidade[1];
+            option2.textContent = nome2; 
+            cidadesDropdown2.appendChild(option2);
+        });
+
+        
+        cidadesDropdown1.addEventListener('change', handleDropdownChange);
+        cidadesDropdown2.addEventListener('change', handleDropdownChange);
+        
+    } else {
+        console.error('Erro ao buscar dados de cidades:', data.message);
+    }
+}
+async function listarAeroportos() {
+const response = await fetch('http://localhost:3000/listarAeroportos');
+const data = await response.json();
+
+if (data.status === 'SUCCESS') {
+const aeroportosDiv1 = document.getElementById('aeroportos1');
+const aeroportosDropdown1 = document.getElementById('aeroportoDropdown1');
+const aeroportosDiv2 = document.getElementById('aeroportos2');
+const aeroportosDropdown2 = document.getElementById('aeroportoDropdown2');
+const aeroportos = data.payload;
+
+
+const defaultOption1 = document.createElement('option');
+defaultOption1.textContent = 'Escolha um aeroporto';
+defaultOption1.disabled = true;
+defaultOption1.selected = true;
+aeroportosDropdown1.appendChild(defaultOption1);
+
+
+const defaultOption2 = document.createElement('option');
+defaultOption2.textContent = 'Escolha um aeroporto';
+defaultOption2.disabled = true;
+defaultOption2.selected = true;
+aeroportosDropdown2.appendChild(defaultOption2);
+
+ 
+aeroportos.forEach(aeroporto => {
+    const option1 = document.createElement('option');
+    option1.value = [aeroporto[1], aeroporto[2]]; 
+    const nome1 = [aeroporto[1], aeroporto[2]];
+    option1.textContent = nome1; 
+    aeroportosDropdown1.appendChild(option1);
+});
+
+
+aeroportos.forEach(aeroporto => {
+    const option2 = document.createElement('option');
+    option2.value = [aeroporto[1], aeroporto[2]]; 
+    const nome2 = [aeroporto[1], aeroporto[2]];
+    option2.textContent = nome2; 
+    aeroportosDropdown2.appendChild(option2);
+});
+
+
+aeroportosDropdown1.addEventListener('change', handleDropdownChange);
+aeroportosDropdown2.addEventListener('change', handleDropdownChange);
+
+} else {
+console.error('Erro ao buscar dados de aeroportos:', data.message);
+}
+}
+
+
+function handleDropdownChange(event) {
+    const selectedCidadeData = event.target.value;
+    const selectedAeroportoData = event.target.value;
+   
+}
+
+
+window.onload = async () => {
+await listarCidades();
+await listarAeroportos();
+};
+
+
+
+// FUNCOES PARA INSERIR O TRECHO
+
+function showStatusMessage(msg, error) {
+    var pStatus = document.getElementById("status");
+    if (error === true) {
+        pStatus.className = "statusError";
+    } else {
+        pStatus.className = "statusSuccess";
+    }
+    pStatus.textContent = msg;
+}
+
+function fetchInserir(body) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    };
+
+    return fetch('http://localhost:3000/inserirTrecho', requestOptions)
+        .then(response => response.json())
+        .catch(error => {
+            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+            console.log("Falha grave ao cadastrar:", error);
+        });
+}
+
+
+
+function inserirTrecho() {
+
+    
+if(!selecionouCidade1()){
+  showStatusMessage("Selecione a Cidade de Partida...", true);  
+  return;
+}
+if(!selecionouCidade2()){
+  showStatusMessage("Selecione a Cidade de chegada...", true);  
+  return;
+}
+if(!selecionouAeroporto1()){
+  showStatusMessage("Selecione o Aeroporto de partida...", true);  
+  return;
+}
+if(!selecionouAeroporto2()){
+  showStatusMessage("Selecione o Aeroporto de chegada...", true);  
+  return;
+}
+if(!correspondenciaPartida()){
+  showStatusMessage("Aeroporto de partida não condiz com cidade ...", true);  
+  return;
+}
+if(!correspondenciaChegada()){
+  showStatusMessage("Aeroporto de chegada não condiz com cidade...", true);  
+  return;
+}
+
+
+
+    
+    const valoresAeroportoPartida = document.getElementById("aeroportoDropdown1").value;
+    const valoresAeroportoChegada = document.getElementById("aeroportoDropdown2").value;
+   
+    const cidadePartida = document.getElementById("cidadeDropdown1").value;
+    const cidadeChegada = document.getElementById("cidadeDropdown2").value;
+    const aeroportoPartida = valoresAeroportoPartida.split(',')[0];
+    const aeroportoChegada = valoresAeroportoChegada.split(',')[0];
+    const trecho = cidadePartida + ": " + aeroportoPartida + " --> " + cidadeChegada + ": " + aeroportoChegada;
+   
+    
+    fetchInserir({
+        cidadepartida: cidadePartida,
+        cidadechegada: cidadeChegada,
+        aeroportopartida: aeroportoPartida,
+        aeroportochegada: aeroportoChegada,
+        trecho: trecho
+    }).then(resultado => {
+        
+        if (resultado.status === "SUCCESS") {
+            showStatusMessage("Trecho cadastrado...", false);
+        } else {
+            showStatusMessage("Erro ao cadastrar Trecho: " + resultado.message, true);
+            console.log(resultado.message);
+        }
+    });
+}
+
+
+
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Trechos</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+                <label for="cidadeDropdown1">Cidade de Partida:</label>
+                <select id="cidadeDropdown1"></select>
+                
+                <div id="cidades1"></div>
+            </div>
+            <div class="form-group">
+                <label for="cidadeDropdown2">Cidade de chegada:</label>
+                <select id="cidadeDropdown2"></select>
+                
+                <div id="cidades2"></div>
+            </div>
+            <label for="aeroportoDropdown1">Aeroporto de partida:</label>
+            <select id="aeroportoDropdown1"></select>
+                
+            <div id="aeroportos1"></div>
+            <p></p>
+            <label for="aeroportoDropdown2">Aeroporto de chegada:</label>
+            <select id="aeroportoDropdown2"></select>
+                
+            <div id="aeroportos2"></div>
+
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="inserirTrecho()">Cadastrar</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>

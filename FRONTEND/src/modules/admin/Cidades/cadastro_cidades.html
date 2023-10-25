@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Cidade</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_cidades.css">
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+
+        
+        
+        function preencheuNome(){
+            let resultado = false;
+            const modeloInformado = document.getElementById("nome").value;
+            if(modeloInformado.length > 0){
+            resultado = true;
+            }
+            return resultado;
+        }
+
+  
+      function showStatusMessage(msg, error){
+        var pStatus = document.getElementById("status");
+        if (error === true){
+          pStatus.className = "statusError";
+        }else{
+          pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+      }
+
+      function fetchInserir(body) {
+        const requestOptions = {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/inserirCidade', requestOptions)
+        .then(T => T.json())
+      }
+
+      
+      function inserirCidade(){
+
+        if(!preencheuNome()){
+          showStatusMessage("Preencha o nome da cidade...", true);  
+          return;
+        }
+
+    
+        const nomecidade = document.getElementById("nome").value;
+
+      
+        fetchInserir({
+            nomecidade: nomecidade 
+            })
+            .then(resultado => {
+              
+              if(resultado.status === "SUCCESS"){
+                showStatusMessage("Cidade cadastrada... ", false);
+              }else{
+                showStatusMessage("Erro ao cadastrar Cidade...: " + message, true);
+                console.log(resultado.message);
+              }
+            })
+            .catch(()=>{
+              showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+              console.log("Falha grave ao cadastrar.")
+            });
+        
+      }
+    
+
+   
+
+
+
+    </script>
+
+
+    <style>
+        .statusError{
+        color:red;
+        }
+        .statusSuccess{
+        color:blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Cidade</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+            
+                <label for="nome">Nome da Cidade:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="inserirCidade()">Cadastrar</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,3 @@
+Para fazer funcionar: abra essa pasta (MODULO 1 PI) no vscode, abra um terminal e dê "cd BACKEND", assim que estiver no backend digite no mesmo terminal "npm start", assim o backend estará iniciado.
+depois, é só utilizar o plugin do VScode (Live server) para vizualizar cada página (frontend/src/modules/admin).
+o arquivo .env localizado dentro da pasta "BACKEND" contem o login para o banco de dados com todas as tabelas.

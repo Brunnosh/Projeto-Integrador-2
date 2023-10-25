@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deletar de Aeroporto</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_aeroportos.css">
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+
+                //FUNCOES VALIDACAO
+
+        function selecionouAeroportoDeletar(){
+
+                    
+
+        let resultado = false; 
+        var aeroportoSelecionada = document.getElementById("aeroportoDropdown").value;
+
+        console.log(aeroportoSelecionada)
+        if (aeroportoSelecionada !== "Escolha um aeroporto"){
+        resultado = true;
+        }
+        return resultado;
+        }
+
+
+        // Função para buscar dados da API e exibir na página
+        async function listarAeroportos() {
+        const response = await fetch('http://localhost:3000/listarAeroportos');
+        const data = await response.json();
+
+        if (data.status === 'SUCCESS') {
+            const aeroportosDiv = document.getElementById('aeroporto');
+            const aeroportosDropdown = document.getElementById('aeroportoDropdown');
+            const aeroportos = data.payload;
+
+            const defaultOption = document.createElement('option');
+            defaultOption.textContent = 'Escolha um aeroporto';
+            defaultOption.value = "Escolha um aeroporto";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            aeroportosDropdown.appendChild(defaultOption);
+
+            
+            aeroportos.forEach(aeroporto => {
+            
+                const option = document.createElement('option');
+                option.value = JSON.stringify(aeroporto); 
+                const CODIGO = aeroporto[0];
+                const NOME = aeroporto[1];
+                const CIDADE = aeroporto[2];
+                option.textContent = [CODIGO,NOME,CIDADE];
+                aeroportosDropdown.appendChild(option);
+
+            });
+
+
+            aeroportosDropdown.addEventListener('change', handleDropdownChange);
+
+            const firstAeronave = [0,'N/A','N/A'];
+            displayAeroportos(aeroportosDiv, firstAeronave);
+            
+        } else {
+            console.error('Erro ao buscar dados de aeronaves:', data.message);
+        }
+        }
+
+        function showStatusMessage(msg, error){
+        var pStatus = document.getElementById("status");
+        if (error === true){
+        pStatus.className = "statusError";
+        }else{
+        pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+        }
+
+        function fetchInserir(body) {
+        const requestOptions = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/excluirAeroporto', requestOptions)
+        .then(T => T.json())
+        }
+
+
+        function deletarAeroporto(){
+
+        if(!selecionouAeroportoDeletar()){
+            showStatusMessage("Selecione uma aeroporto para deletar...", true);  
+            return;
+            }
+
+
+        const aeroporto = document.getElementById("aeroportoDropdown").value;
+        const aeroportoObj = JSON.parse(aeroporto);
+        const codigo = aeroportoObj[0];
+
+
+        console.log(codigo)
+
+       
+        fetchInserir({
+        codigo: codigo
+        })
+        .then(resultado => {
+        
+        if(resultado.status === "SUCCESS"){
+            showStatusMessage("Aeroporto deletado... ", false);
+        }else{
+            showStatusMessage("Erro ao deletar Aeroporto...: " + message, true);
+            console.log(resultado.message);
+        }
+        })
+        .catch(()=>{
+        showStatusMessage("Erro técnico ao deletar... Contate o suporte.", true);
+        console.log("Falha grave ao cadastrar.")
+        });
+
+        }
+
+
+        
+        function handleDropdownChange() {
+        const aeroportosDropdown = document.getElementById('aeroportoDropdown');
+        const selectedAeroportoData = JSON.parse(aeroportosDropdown.value);
+        const aeroportosDiv = document.getElementById('aeroporto');
+
+        displayAeroportos(aeroportosDiv, selectedAeroportoData);
+        }
+
+       n
+        const nomes = ["Codigo :", "Nome : ", "Cidade : "];
+        function displayAeroportos(container, aeroporto) {
+        container.innerHTML = '';
+        if (aeroporto) {
+            const table = document.createElement('table');
+            const tableBody = document.createElement('tbody');
+            for (const key in aeroporto) {
+                const row = tableBody.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                cell1.textContent = nomes[key];
+                cell2.textContent = aeroporto[key];
+            }
+            
+            table.appendChild(tableBody);
+            container.appendChild(table);
+        }
+        }
+
+        
+        window.onload = listarAeroportos;
+
+
+    </script>
+
+
+    <style>
+        .statusError{
+        color:red;
+        }
+        .statusSuccess{
+        color:blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Deletar de Aeroporto</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+
+            <label for="aeroportoDropdown">Escolha um aeroporto:</label>
+            <select id="aeroportoDropdown"></select>
+            
+            <div id="aeroporto"></div>
+
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="deletarAeroporto()">Deletar</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>

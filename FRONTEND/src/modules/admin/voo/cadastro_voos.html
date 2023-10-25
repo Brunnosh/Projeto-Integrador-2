@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Voos</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_voos.css">
+
+    <style>
+        .statusError{
+           color:red;
+        }
+        .statusSuccess{
+          color:blue;
+        }
+      </style>
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+
+
+               //FUNCOES PARA VALIDAÇÃO DE INFORMAÇÃO
+      
+        function selecionouTrecho(){
+        let resultado = false; 
+        var listaTrechos = document.getElementById("trechoDropdown");
+        var valorSelecionado = listaTrechos.value;
+      
+        if (valorSelecionado !== "Escolha um trecho"){
+          resultado = true;
+        }
+        return resultado;
+      }
+
+        function selecionouAeronave(){
+            let resultado = false; 
+            var listaAeronaves = document.getElementById("aeronaveDropdown");
+            var valorSelecionado = listaAeronaves.value;
+          
+            if (valorSelecionado !== "Escolha uma aeronave"){
+            resultado = true;
+            }
+            return resultado;
+        }
+        
+                	
+        function preencheuDia(){
+            let resultado = false; 
+            var dia = document.getElementById("dia").value;
+          
+            if (dia.length > 0){
+            resultado = true;
+            }
+            return resultado;
+        }
+
+        function preencheuHora(){
+            let resultado = false; 
+            var hora = document.getElementById("hora").value;
+          
+            
+            if (hora.length > 0){
+            resultado = true;
+            }
+            return resultado;
+        }
+
+
+
+        
+        async function listarAeronaves() {
+            const response = await fetch('http://localhost:3000/listarAeronaves');
+            const data = await response.json();
+
+            if (data.status === 'SUCCESS') {
+                const aeronavesDiv = document.getElementById('aeronaves');
+                const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+                const aeronaves = data.payload;
+
+                
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = 'Escolha uma aeronave';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                aeronavesDropdown.appendChild(defaultOption);
+
+               
+                aeronaves.forEach(aeronave => {
+                if (aeronave[6] == 0){
+                    const option = document.createElement('option');
+                    const CODIGO = aeronave[0];
+                    const FABRICANTE = aeronave[1];
+                    const MODELO = aeronave[2];
+                    option.value = JSON.stringify(aeronave);
+                    option.textContent = [CODIGO,FABRICANTE,MODELO];
+                    aeronavesDropdown.appendChild(option);
+                }
+
+                });
+
+
+                
+                aeronavesDropdown.addEventListener('change', handleDropdownChangeAeronave);
+
+                
+                
+                const firstAeronave = [0,'N/A','N/A', 'N/A', 0, 0, 0];
+                displayAeronaves(aeronavesDiv, firstAeronave);
+            } else {
+                console.error('Erro ao buscar dados de aeronaves:', data.message);
+            }
+        }
+
+        async function listarTrechos() {
+    const response = await fetch('http://localhost:3000/listarTrechos');
+    const data = await response.json();
+
+    if (data.status === 'SUCCESS') {
+        const trechosDiv = document.getElementById('trechos');
+        const trechosDropdown = document.getElementById('trechoDropdown');
+        const trechos = data.payload;
+
+        
+        const defaultOption = document.createElement('option');
+        defaultOption.textContent = 'Escolha um trecho';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        trechosDropdown.appendChild(defaultOption);
+
+        
+        trechos.forEach(trecho => {
+            const option = document.createElement('option');
+            option.value = trecho[5]; 
+            option.textContent = trecho[5];
+            trechosDropdown.appendChild(option);
+        
+
+        });
+
+
+       
+        trechosDropdown.addEventListener('change', handleDropdownChangeTrecho);
+
+    } else {
+        console.error('Erro ao buscar dados de trechos:', data.message);
+    }
+}
+
+        
+        function handleDropdownChangeAeronave() {
+            const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+            const selectedAeronaveData = JSON.parse(aeronavesDropdown.value);
+            const aeronavesDiv = document.getElementById('aeronaves');
+
+            displayAeronaves(aeronavesDiv, selectedAeronaveData);
+        }
+
+        function handleDropdownChangeTrecho(event) {
+            const selectedTrechoData = event.target.value;
+            
+        }
+
+        
+        function displayAeronaves(container, aeronave) {
+            const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :"];
+            container.innerHTML = '';
+            if (aeronave) {
+                const table = document.createElement('table');
+                const tableBody = document.createElement('tbody');
+                for (const key in aeronave) {
+                    const row = tableBody.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+                    cell1.textContent = nomes[key];
+                    cell2.textContent = aeronave[key];
+                }
+                
+                table.appendChild(tableBody);
+                container.appendChild(table);
+            }
+        }
+
+        
+        window.onload = async () => {
+        await listarAeronaves();
+        await listarTrechos();
+
+    };
+
+
+    // PARTE DO SCRIPT PARA CADASTRAR O VOO
+    
+
+    function showStatusMessage(msg, error){
+        var pStatus = document.getElementById("status");
+        if (error === true){
+          pStatus.className = "statusError";
+        }else{
+          pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+      }
+
+    function fetchInserir(body) {
+        const requestOptions = {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/inserirVoo', requestOptions)
+        .then(T => T.json())
+      }
+
+      
+      function inserirVoo(){
+        if(!selecionouAeronave()){
+          showStatusMessage("Selecione a Aeronave...", true);  
+          return;
+        }
+        if(!selecionouTrecho()){
+          showStatusMessage("Selecione o trecho...", true);  
+          return;
+        }
+        if(!preencheuDia()){
+          showStatusMessage("Preencha o dia...", true);  
+          return;
+        }
+        if(!preencheuHora()){
+          showStatusMessage("Preencha a hora...", true);  
+          return;
+        }
+
+
+        const aeronaveInfo = document.getElementById("aeronaveDropdown").value;
+        const aeronaveObj = JSON.parse(aeronaveInfo);
+        const codigo = aeronaveObj[0];
+
+
+       
+        const dia = document.getElementById("dia").value;
+        const horario = document.getElementById("hora").value;
+        const aeronave = codigo;
+        const trecho = document.getElementById("trechoDropdown").value;
+        const idavolta  = document.getElementById("ida_volta").checked ?  '1'  :  '0' ;
+
+        console.log(dia);
+        console.log(horario);
+
+        
+        fetchInserir({
+            dia: dia,
+            horario: horario,
+            aeronave: aeronave, 
+            trecho: trecho,
+            idavolta: idavolta
+            })
+            .then(resultado => {
+             
+              if(resultado.status === "SUCCESS"){
+                showStatusMessage("Voo cadastrado... ", false);
+              }else{
+                showStatusMessage("Erro ao cadastrar Voo...: " + message, true);
+                console.log(resultado.message);
+              }
+            })
+            .catch(()=>{
+              showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+              console.log("Falha grave ao cadastrar.")
+            });
+
+
+      }
+
+
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Voos</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+                <label for="aeronaveDropdown">Escolha uma aeronave:</label>
+                <select id="aeronaveDropdown"></select>
+                <p></p>
+                <div id="aeronaves"></div>
+            </div>
+
+            <label for="trechoDropdown">Escolha um trecho:</label>
+            <select id="trechoDropdown"></select>
+            <div id="trechos"></div>
+
+            <p></p>
+
+
+ 
+            <div class="form-group">
+                <label>Data:</label>
+                <input type="date" id="dia" name="dia" required>
+            </div>
+            <div class="form-group">
+                <label>Hora:</label>
+                <input type="time" id="hora" name="hora" required>
+            </div>
+            <div class="form-group">
+
+                <div class="radio-group">
+                    <label for="ida_volta">Voo ida e volta :</label>
+                    <input type="checkbox" id="ida_volta"/>
+                       
+                </div>
+            </div>
+            <p></p>
+            <p>Não é possível cadastrar mais de um voo com a mesma aeronave no mesmo dia</p>
+            <p>Nem dois voos ao mesmo tempo</p>
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="inserirVoo()">Cadastrar</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>
