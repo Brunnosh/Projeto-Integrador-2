@@ -1,11 +1,3 @@
-/***
- * >>>>>>> MUITA ATENÇÃO <<<<<<<<
- * Este código é extremamente repetitivo, para iniciantes.
- * Cabe a você estudante melhorá-lo. 
- * Colocarei uma lista de melhorias E CORREÇÕES
- * para que você realize.
- * No entanto, primeiro, coloque-o para funcionar.
- */
 
 // recursos/modulos necessarios.
 import express from "express";
@@ -715,8 +707,10 @@ app.delete("/excluirTrecho", async(req,res)=>{
 app.put("/inserirVoo", async(req,res)=>{
   
   // para inserir a aeronave temos que receber os dados na requisição.
-  const dia = req.body.dia as string;
-  const horario = req.body.horario as string;
+  const dia_ida = req.body.dia_ida as string;
+  const dia_volta = req.body.dia_volta as string;
+  const horario_ida = req.body.horario_ida as string;
+  const horario_volta = req.body.horario_volta as string;
   const aeronave = req.body.aeronave as number;
   const trecho = req.body.trecho as string; 
   const idavolta = req.body.idavolta as number; 
@@ -744,11 +738,11 @@ app.put("/inserirVoo", async(req,res)=>{
     });
 
     const cmdInsertVoo = `INSERT INTO VOOS 
-    (CODIGO_VOO, DIA, HORARIO, AERONAVE, TRECHO, IDAVOLTA)
+    (CODIGO_VOO, DIA_IDA, DIA_VOLTA, HORARIO_IDA, HORARIO_VOLTA, AERONAVE, TRECHO, IDAVOLTA)
     VALUES
-    (SEQ_VOOS.NEXTVAL, :1, :2, :3, :4, :5)`
+    (SEQ_VOOS.NEXTVAL, :1, :2, :3, :4, :5, :6, :7)`
 
-    const dados = [dia, horario, aeronave, trecho, idavolta];
+    const dados = [dia_ida, dia_volta, horario_ida, horario_volta, aeronave, trecho, idavolta];
     let resInsert = await conn.execute(cmdInsertVoo, dados);
     
     // importante: efetuar o commit para gravar no Oracle.

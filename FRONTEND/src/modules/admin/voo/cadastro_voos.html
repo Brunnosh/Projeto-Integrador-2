@@ -52,7 +52,7 @@
                 	
         function preencheuDia(){
             let resultado = false; 
-            var dia = document.getElementById("dia").value;
+            var dia = document.getElementById("dia_ida").value;
           
             if (dia.length > 0){
             resultado = true;
@@ -62,7 +62,7 @@
 
         function preencheuHora(){
             let resultado = false; 
-            var hora = document.getElementById("hora").value;
+            var hora = document.getElementById("hora_ida").value;
           
             
             if (hora.length > 0){
@@ -70,6 +70,28 @@
             }
             return resultado;
         }
+
+        function preencheuDiaVolta(){
+            let resultado = false; 
+            var dia_volta = document.getElementById("dia_volta").value;
+          
+            if (dia_volta.length > 0){
+            resultado = true;
+            }
+            return resultado;
+        }
+
+        function preencheuHoraVolta(){
+            let resultado = false; 
+            var hora_volta = document.getElementById("hora_volta").value;
+          
+            
+            if (hora_volta.length > 0){
+            resultado = true;
+            }
+            return resultado;
+        }
+
 
 
 
@@ -237,6 +259,15 @@
           return;
         }
 
+        if(!preencheuDiaVolta()){
+          showStatusMessage("Preencha o dia...", true);  
+          return;
+        }
+        if(!preencheuHoraVolta()){
+          showStatusMessage("Preencha a hora...", true);  
+          return;
+        }
+
 
         const aeronaveInfo = document.getElementById("aeronaveDropdown").value;
         const aeronaveObj = JSON.parse(aeronaveInfo);
@@ -244,19 +275,34 @@
 
 
        
-        const dia = document.getElementById("dia").value;
-        const horario = document.getElementById("hora").value;
+        const dia_ida = document.getElementById("dia_ida").value;
+        var dia_volta = document.getElementById("dia_volta").value;
+        const horario_ida = document.getElementById("hora_ida").value;
+        var horario_volta = document.getElementById("hora_volta").value;
         const aeronave = codigo;
         const trecho = document.getElementById("trechoDropdown").value;
         const idavolta  = document.getElementById("ida_volta").checked ?  '1'  :  '0' ;
 
-        console.log(dia);
-        console.log(horario);
+
+        console.log(dia_ida);
+        console.log(dia_volta);
+        console.log(horario_ida);
+        console.log(horario_volta);
+
+        if (idavolta == 0){
+          dia_volta = 0;
+          horario_volta = 0;
+
+        }
+
+
 
         
         fetchInserir({
-            dia: dia,
-            horario: horario,
+            dia_ida: dia_ida,
+            dia_volta: dia_volta,
+            horario_ida: horario_ida,
+            horario_volta: horario_volta,
             aeronave: aeronave, 
             trecho: trecho,
             idavolta: idavolta
@@ -302,13 +348,21 @@
 
  
             <div class="form-group">
-                <label>Data:</label>
-                <input type="date" id="dia" name="dia" required>
+                <label>Data Ida:</label>
+                <input type="date" id="dia_ida" name="dia_ida" required>
             </div>
             <div class="form-group">
-                <label>Hora:</label>
-                <input type="time" id="hora" name="hora" required>
+              <label>Data Volta:</label>
+              <input type="date" id="dia_volta" name="dia_volta" required>
+          </div>
+            <div class="form-group">
+                <label>Hora Ida:</label>
+                <input type="time" id="hora_ida" name="hora_ida" required>
             </div>
+            <div class="form-group">
+              <label>Hora Volta:</label>
+              <input type="time" id="hora_volta" name="hora_volta" required>
+          </div>
             <div class="form-group">
 
                 <div class="radio-group">
