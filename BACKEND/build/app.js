@@ -1,12 +1,4 @@
 "use strict";
-/***
- * >>>>>>> MUITA ATENÇÃO <<<<<<<<
- * Este código é extremamente repetitivo, para iniciantes.
- * Cabe a você estudante melhorá-lo.
- * Colocarei uma lista de melhorias E CORREÇÕES
- * para que você realize.
- * No entanto, primeiro, coloque-o para funcionar.
- */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -631,8 +623,10 @@ app.delete("/excluirTrecho", (req, res) => __awaiter(void 0, void 0, void 0, fun
 // servicos de backend(VOO)
 app.put("/inserirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // para inserir a aeronave temos que receber os dados na requisição.
-    const dia = req.body.dia;
-    const horario = req.body.horario;
+    const dia_ida = req.body.dia_ida;
+    const dia_volta = req.body.dia_volta;
+    const horario_ida = req.body.horario_ida;
+    const horario_volta = req.body.horario_volta;
     const aeronave = req.body.aeronave;
     const trecho = req.body.trecho;
     const idavolta = req.body.idavolta;
@@ -655,10 +649,10 @@ app.put("/inserirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function*
             connectionString: process.env.ORACLE_CONN_STR,
         });
         const cmdInsertVoo = `INSERT INTO VOOS 
-    (CODIGO_VOO, DIA, HORARIO, AERONAVE, TRECHO, IDAVOLTA)
+    (CODIGO_VOO, DIA_IDA, DIA_VOLTA, HORARIO_IDA, HORARIO_VOLTA, AERONAVE, TRECHO, IDAVOLTA)
     VALUES
-    (SEQ_VOOS.NEXTVAL, :1, :2, :3, :4, :5)`;
-        const dados = [dia, horario, aeronave, trecho, idavolta];
+    (SEQ_VOOS.NEXTVAL, :1, :2, :3, :4, :5, :6, :7)`;
+        const dados = [dia_ida, dia_volta, horario_ida, horario_volta, aeronave, trecho, idavolta];
         let resInsert = yield conn.execute(cmdInsertVoo, dados);
         // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
