@@ -68,7 +68,9 @@ app.put("/inserirAeronave", async(req,res)=>{
   const anoFab = req.body.anoFab as string;
   const qtdeAssentos = req.body.qtdeAssentos as number;
   const registro = req.body.registro as string; 
-  const disponivel = req.body.disponivel as number; 
+  const disponivel = req.body.disponivel as number;
+  const assentoslinha = req.body.assentoslinha as number; 
+  const assentoscorredor = req.body.assentoscorredor as number;  
 
   // correção: verificar se tudo chegou para prosseguir com o cadastro.
   // verificar se chegaram os parametros
@@ -93,11 +95,11 @@ app.put("/inserirAeronave", async(req,res)=>{
     });
 
     const cmdInsertAero = `INSERT INTO AERONAVES 
-    (CODIGO_AERONAVE, FABRICANTE, MODELO, REGISTRO, ANOFAB, NUMERO_ASSENTOS, DISPONIVEL)
+    (CODIGO_AERONAVE, FABRICANTE, MODELO, REGISTRO, ANOFAB, NUMERO_ASSENTOS, DISPONIVEL, assentos_linha, assentos_corredor)
     VALUES
-    (SEQ_AERONAVES.NEXTVAL, :1, :2, :3, :4, :5, :6)`
+    (SEQ_AERONAVES.NEXTVAL, :1, :2, :3, :4, :5, :6, :7, :8)`
 
-    const dados = [marca, modelo, registro, anoFab, qtdeAssentos, disponivel];
+    const dados = [marca, modelo, registro, anoFab, qtdeAssentos, disponivel, assentoslinha, assentoscorredor];
     let resInsert = await conn.execute(cmdInsertAero, dados);
     
     // importante: efetuar o commit para gravar no Oracle.

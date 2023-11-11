@@ -64,6 +64,8 @@ app.put("/inserirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
     const qtdeAssentos = req.body.qtdeAssentos;
     const registro = req.body.registro;
     const disponivel = req.body.disponivel;
+    const assentoslinha = req.body.assentoslinha;
+    const assentoscorredor = req.body.assentoscorredor;
     // correção: verificar se tudo chegou para prosseguir com o cadastro.
     // verificar se chegaram os parametros
     // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
@@ -83,10 +85,10 @@ app.put("/inserirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
             connectionString: process.env.ORACLE_CONN_STR,
         });
         const cmdInsertAero = `INSERT INTO AERONAVES 
-    (CODIGO_AERONAVE, FABRICANTE, MODELO, REGISTRO, ANOFAB, NUMERO_ASSENTOS, DISPONIVEL)
+    (CODIGO_AERONAVE, FABRICANTE, MODELO, REGISTRO, ANOFAB, NUMERO_ASSENTOS, DISPONIVEL, assentos_linha, assentos_corredor)
     VALUES
-    (SEQ_AERONAVES.NEXTVAL, :1, :2, :3, :4, :5, :6)`;
-        const dados = [marca, modelo, registro, anoFab, qtdeAssentos, disponivel];
+    (SEQ_AERONAVES.NEXTVAL, :1, :2, :3, :4, :5, :6, :7, :8)`;
+        const dados = [marca, modelo, registro, anoFab, qtdeAssentos, disponivel, assentoslinha, assentoscorredor];
         let resInsert = yield conn.execute(cmdInsertAero, dados);
         // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();

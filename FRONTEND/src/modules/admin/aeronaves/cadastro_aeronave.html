@@ -15,6 +15,20 @@
             alert("Cadastro cancelado");
         }
 
+        function atualizarStatusDisponibilidade() {
+        var checkbox = document.getElementById("disponivel");
+        var statusSpan = document.getElementById("statusDisponibilidade");
+
+        if (checkbox.checked) {
+            statusSpan.textContent = "Sim";
+        } else {
+            statusSpan.textContent = "Não";
+        }
+        }
+        window.onload = function () {
+        atualizarStatusDisponibilidade();
+        }
+
               // verifica se o ano é valido
       function anoValido(){
         let resultado = false;
@@ -72,6 +86,38 @@
         return resultado;
       }
 
+      function assentoslinhaValido(){
+        let resultado = false;
+        const strAssentos = document.getElementById("assentos").value;
+        const assentos = parseInt(strAssentos);
+        const strAssentoslinha = document.getElementById("assentos_linha").value;
+        const assentoslinha = parseInt(strAssentoslinha);
+        if (assentoslinha > 0){
+          if(assentoslinha < assentos){
+            resultado = true;
+          }
+          
+        }
+        return resultado; 
+      }
+
+      function assentoscorredorValido(){
+        let resultado = false;
+        const strAssentos = document.getElementById("assentos").value;
+        const assentos = parseInt(strAssentos);
+        const strAssentoscorredor = document.getElementById("assentos_corredor").value;
+        const assentoscorredor = parseInt(strAssentoscorredor);
+        if (assentoscorredor > 0){
+          if(assentoscorredor < assentos){
+            resultado = true;
+          }
+        }
+        return resultado; 
+      }
+
+
+
+
       // funcao para exibir mensagem de status... seja qual for. 
       function showStatusMessage(msg, error){
         var pStatus = document.getElementById("status");
@@ -121,6 +167,16 @@
           showStatusMessage("Preencha corretamente o total de assentos.", true);
           return;
         }
+        if(!assentoslinhaValido()){
+          showStatusMessage("Assentos por linha não pode ser maior que o total de assentos", true);
+          return;
+        }
+
+        if(!assentoscorredorValido()){
+          showStatusMessage("Assentos antes do corredor não pode ser maior que o total de assentos", true);
+          return;
+        }
+
 
 
         const fabricante = document.getElementById("fabricante").value;
@@ -128,7 +184,9 @@
         const anoFab = document.getElementById("ano_fabricacao").value;
         const registro = document.getElementById("referencia").value;
         const totalAssentos = document.getElementById("assentos").value;
-        const disponivel = document.getElementById("disponivel").value;
+        const disponivel  = document.getElementById("disponivel").checked ?  '1'  :  '0' ;
+        const assentoslinha = document.getElementById("assentos_linha").value;
+        const assentoscorredor = document.getElementById("assentos_corredor").value;
 
        
         fetchInserir({
@@ -137,7 +195,10 @@
             anoFab: anoFab, 
             qtdeAssentos: totalAssentos,
             registro: registro,
-            disponivel: disponivel })
+            disponivel: disponivel,
+            assentoslinha: assentoslinha,
+            assentoscorredor: assentoscorredor
+           })
             .then(resultado => {
               
               if(resultado.status === "SUCCESS"){
@@ -198,9 +259,23 @@
                 <input type="number" id="assentos" name="assentos" maxlength="4">
             </div>
             <div class="form-group">
-                <label for="disponivel">Avião disponivel? (0 para sim, 1 para não):</label>
-                <input type="number" id="disponivel" name="disponivel" maxlength="4">
-            </div>
+
+              <div class="radio-group">
+                  <label for="disponivel">Avião disponivel para voo?:</label>
+                  <input type="checkbox" id="disponivel" onchange="atualizarStatusDisponibilidade()"/>
+                  <span id="statusDisponibilidade"></span>   
+              </div>
+          </div>
+          <p>Detalhes do layout do avião</p>
+            <div class="form-group">
+              <label for="assentos_linha">Número de assentos por linha de assentos:</label>
+              <input type="number" id="assentos_linha" name="assentos_linha" maxlength="4">
+          </div>
+          <div class="form-group">
+            <label for="assentos_corredor">A cada quantos assentos há um corredor:</label>
+            <input type="number" id="assentos_corredor" name="assentos_corredor" maxlength="4">
+        </div>
+
 
             <div class="btn-group">
                 <button type="button" class="btn" onclick="inserirAeronave()">Cadastrar</button>
