@@ -129,7 +129,7 @@
 
                
                 aeronaves.forEach(aeronave => {
-                if (aeronave[6] == 0){
+                if (aeronave[6] == 1){
                     const option = document.createElement('option');
                     const CODIGO = aeronave[0];
                     const FABRICANTE = aeronave[1];
@@ -147,7 +147,7 @@
 
                 
                 
-                const firstAeronave = [0,'N/A','N/A', 'N/A', 0, 0, 0];
+                const firstAeronave = [0,'N/A','N/A', 'N/A', 0, 0, 0, 0, 0];
                 displayAeronaves(aeronavesDiv, firstAeronave);
             } else {
                 console.error('Erro ao buscar dados de aeronaves:', data.message);
@@ -205,7 +205,7 @@
 
         
         function displayAeronaves(container, aeronave) {
-            const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :"];
+            const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :", "Assentos por linha:", "Assentos antes do corredor:"];
             container.innerHTML = '';
             if (aeronave) {
                 const table = document.createElement('table');
