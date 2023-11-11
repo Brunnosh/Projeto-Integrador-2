@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Administrativo</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/inicio.css">
+</head>
+<body class="center-content">
+    <div class="container">
+        <h1>Menu Administrativo</h1>
+        
+        <div class="main-buttons">
+            <button class="btn" onclick="aeronaves()">Aeronaves</button>
+            <button class="btn" onclick="aeroportos()">Aeroportos</button>
+            <button class="btn" onclick="cidades()">Cidades</button>
+            <p></p>
+            <button class="btn" onclick="trechos()">Trechos</button>
+            <button class="btn" onclick="voos()">Voos</button>
+            <button class="btn" onclick="assentos()">Assentos</button>
+        </div>
+    </div>
+
+    <script>
+        function aeronaves() {
+            window.open('http://127.0.0.1:5500/FRONTEND/src/modules/admin/aeronaves/menuAERONAVES.html');
+            
+        }
+        function aeroportos() {
+            window.open('http://127.0.0.1:5500/FRONTEND/src/modules/admin/aeroportos/menuAEROPORTOS.html');
+            
+        }
+        function cidades() {
+            window.open('http://127.0.0.1:5500/FRONTEND/src/modules/admin/Cidades/menuCIDADES.html');
+            
+        }
+        function trechos() {
+            window.open('http://127.0.0.1:5500/FRONTEND/src/modules/admin/trechos/menuTRECHOS.html');
+            
+        }
+        function voos() {
+            window.open('http://127.0.0.1:5500/FRONTEND/src/modules/admin/voo/menuVOOS.html');
+            
+        }
+        function assentos() {
+            window.open('http://127.0.0.1:5500/FRONTEND/src/modules/admin/assentos/menuASSENTOS.html');
+            
+        }
+        
+
+    </script>
+</body>
+</html>
