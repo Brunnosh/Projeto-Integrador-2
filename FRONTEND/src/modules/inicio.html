@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao AirPucc</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/inicio.css">
+</head>
+<body class="center-content">
+    <div class="container">
+        <h1>Bem-vindo ao AirPucc</h1>
+        <p>Escolha como deseja entrar:</p>
+        <div class="main-buttons">
+            <button class="btn" onclick="entrarComoAdministrador()">Entrar como Administrador</button>
+            <button class="btn" onclick="entrarComoCliente()">Entrar como Cliente</button>
+        </div>
+    </div>
+
+    <script>
+        function entrarComoAdministrador() {
+            window.location.href = "http://127.0.0.1:5500/FRONTEND/src/modules/admin/menuADM.html";
+            alert("Entrando como Administrador");
+        }
+
+        function entrarComoCliente() {
+            window.location.href = "http://127.0.0.1:5500/FRONTEND/src/modules/cliente/menuCLIENTE.html"; 
+            alert("Entrando como Cliente");
+        }
+    </script>
+</body>
+</html>

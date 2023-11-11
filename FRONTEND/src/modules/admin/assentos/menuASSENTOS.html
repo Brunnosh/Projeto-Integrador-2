@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Assentos</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/inicio.css">
+</head>
+<body class="center-content">
+    <div class="container">
+        <h1>Menu Assentos</h1>
+        
+        <div class="main-buttons">
+            <button class="btn" onclick="cadastrar()">Reservar</button>
+            <button class="btn" onclick="deletar()">Liberar Reserva</button>
+        </div>
+    </div>
+
+    <script>
+        function cadastrar() {
+            window.open('http://127.0.0.1:5500/FRONTEND/src/modules/admin/assentos/cadastro_assentos.html');
+            
+        }
+        function deletar() {
+            window.open('http://127.0.0.1:5500/FRONTEND/src/modules/admin/assentos/excluir_assentos.html');
+            
+        }
+
+        
+
+    </script>
+</body>
+</html>
