@@ -24,6 +24,21 @@
             alert("Cadastro cancelado");
         }
 
+        function toggleVoltaOptions() {
+        
+        var checkbox = document.getElementById("ida_volta");
+        var dataVoltaGroup = document.getElementById("dataVoltaGroup");
+        var horaVoltaGroup = document.getElementById("horaVoltaGroup");
+
+       
+        if (checkbox.checked) {
+            dataVoltaGroup.style.display = "block";
+            horaVoltaGroup.style.display = "block";
+        } else {
+            dataVoltaGroup.style.display = "none";
+            horaVoltaGroup.style.display = "none";
+        }
+    }
 
                //FUNCOES PARA VALIDAÇÃO DE INFORMAÇÃO
       
@@ -332,12 +347,25 @@
     <div class="container">
         <h1>Cadastro de Voos</h1>
         <form id="cadastro-form">
+
+
+          
             <div class="form-group">
                 <label for="aeronaveDropdown">Escolha uma aeronave:</label>
                 <select id="aeronaveDropdown"></select>
                 <p></p>
                 <div id="aeronaves"></div>
             </div>
+
+            <div class="form-group">
+
+              <div class="radio-group">
+                  <label for="ida_volta">Voo ida e volta :</label>
+                  <input type="checkbox" id="ida_volta" onchange="toggleVoltaOptions()"/>
+                     
+              </div>
+          </div>
+
 
             <label for="trechoDropdown">Escolha um trecho:</label>
             <select id="trechoDropdown"></select>
@@ -351,26 +379,22 @@
                 <label>Data Ida:</label>
                 <input type="date" id="dia_ida" name="dia_ida" required>
             </div>
-            <div class="form-group">
-              <label>Data Volta:</label>
-              <input type="date" id="dia_volta" name="dia_volta" required>
-          </div>
+
             <div class="form-group">
                 <label>Hora Ida:</label>
                 <input type="time" id="hora_ida" name="hora_ida" required>
             </div>
-            <div class="form-group">
+
+            <div class="form-group" id="dataVoltaGroup" style="display: none;">
+              <label>Data Volta:</label>
+              <input type="date" id="dia_volta" name="dia_volta" required>
+          </div>
+
+            <div class="form-group" id="horaVoltaGroup" style="display: none;" >
               <label>Hora Volta:</label>
               <input type="time" id="hora_volta" name="hora_volta" required>
           </div>
-            <div class="form-group">
-
-                <div class="radio-group">
-                    <label for="ida_volta">Voo ida e volta :</label>
-                    <input type="checkbox" id="ida_volta"/>
-                       
-                </div>
-            </div>
+ 
             <p></p>
             <p>Não é possível cadastrar mais de um voo com a mesma aeronave no mesmo dia</p>
             <p>Nem dois voos ao mesmo tempo</p>
