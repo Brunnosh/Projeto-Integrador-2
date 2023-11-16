@@ -29,22 +29,25 @@
         var checkbox = document.getElementById("ida_volta");
         var dataVoltaGroup = document.getElementById("dataVoltaGroup");
         var horaVoltaGroup = document.getElementById("horaVoltaGroup");
+        var trechoVoltaGroup = document.getElementById("trechoVoltaGroup");
 
        
         if (checkbox.checked) {
             dataVoltaGroup.style.display = "block";
             horaVoltaGroup.style.display = "block";
+            trechoVoltaGroup.style.display = "block";
         } else {
             dataVoltaGroup.style.display = "none";
             horaVoltaGroup.style.display = "none";
+            trechoVoltaGroup.style.display = "block";
         }
     }
 
                //FUNCOES PARA VALIDAÇÃO DE INFORMAÇÃO
       
-        function selecionouTrecho(){
+        function selecionouTrechoIda(){
         let resultado = false; 
-        var listaTrechos = document.getElementById("trechoDropdown");
+        var listaTrechos = document.getElementById("trechoIdaDropdown");
         var valorSelecionado = listaTrechos.value;
       
         if (valorSelecionado !== "Escolha um trecho"){
@@ -86,25 +89,51 @@
             return resultado;
         }
 
+        function selecionouTrechoVolta(){
+        var checkbox = document.getElementById("ida_volta");
+        var resultado = "false"; 
+        var listaTrechos = document.getElementById("trechoVoltaDropdown");
+        var valorSelecionado = listaTrechos.value;
+
+        var trechoIda = document.getElementById("trechoIdaDropdown").value;
+        if(checkbox.checked){
+          if (valorSelecionado !== "Escolha um trecho" && valorSelecionado !== trechoIda){
+          resultado = "true";
+          }
+          if(valorSelecionado !== "Escolha um trecho" && valorSelecionado == trechoIda)
+          {
+          resultado = "igual";
+          }
+          return resultado;
+        }
+        
+      }
+
         function preencheuDiaVolta(){
+            var checkbox = document.getElementById("ida_volta");
             let resultado = false; 
             var dia_volta = document.getElementById("dia_volta").value;
-          
-            if (dia_volta.length > 0){
-            resultado = true;
+            if(checkbox.checked){
+              if (dia_volta.length > 0){
+              resultado = true;
+              }
+              return resultado;
             }
-            return resultado;
+
         }
 
         function preencheuHoraVolta(){
+            var checkbox = document.getElementById("ida_volta");
             let resultado = false; 
             var hora_volta = document.getElementById("hora_volta").value;
           
-            
-            if (hora_volta.length > 0){
+            if(checkbox.checked){
+              if (hora_volta.length > 0){
             resultado = true;
             }
             return resultado;
+            }
+
         }
 
 
@@ -159,30 +188,40 @@
     const data = await response.json();
 
     if (data.status === 'SUCCESS') {
-        const trechosDiv = document.getElementById('trechos');
-        const trechosDropdown = document.getElementById('trechoDropdown');
+        const trechosIdaDiv = document.getElementById('trechosIda');
+        const trechosIdaDropdown = document.getElementById('trechoIdaDropdown');
+        const trechosVoltaDropdown = document.getElementById('trechoVoltaDropdown');
         const trechos = data.payload;
 
         
-        const defaultOption = document.createElement('option');
-        defaultOption.textContent = 'Escolha um trecho';
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
-        trechosDropdown.appendChild(defaultOption);
-
+        const defaultOption1 = document.createElement('option');
+        const defaultOption2 = document.createElement('option');
+        defaultOption1.textContent = 'Escolha um trecho';
+        defaultOption1.disabled = true;
+        defaultOption1.selected = true;
+        defaultOption2.textContent = 'Escolha um trecho';
+        defaultOption2.disabled = true;
+        defaultOption2.selected = true;
+        trechosIdaDropdown.appendChild(defaultOption1);
+        trechosVoltaDropdown.appendChild(defaultOption2);
         
         trechos.forEach(trecho => {
-            const option = document.createElement('option');
-            option.value = trecho[5]; 
-            option.textContent = trecho[5];
-            trechosDropdown.appendChild(option);
+            const option1 = document.createElement('option');
+            option1.value = trecho[5]; 
+            option1.textContent = trecho[5];
+            trechosIdaDropdown.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = trecho[5]; 
+            option2.textContent = trecho[5];
+            trechosVoltaDropdown.appendChild(option2);
         
 
         });
 
-
-       
-        trechosDropdown.addEventListener('change', handleDropdownChangeTrecho);
+        trechosIdaDropdown.addEventListener('change', handleDropdownChangeTrecho);
+        trechosVoltaDropdown.addEventListener('change', handleDropdownChangeTrecho);
+        
 
     } else {
         console.error('Erro ao buscar dados de trechos:', data.message);
@@ -261,25 +300,35 @@
           showStatusMessage("Selecione a Aeronave...", true);  
           return;
         }
-        if(!selecionouTrecho()){
-          showStatusMessage("Selecione o trecho...", true);  
+        if(!selecionouTrechoIda()){
+          showStatusMessage("Selecione o trecho de Ida...", true);  
           return;
         }
+
         if(!preencheuDia()){
-          showStatusMessage("Preencha o dia...", true);  
+          showStatusMessage("Preencha o dia da partida...", true);  
           return;
         }
         if(!preencheuHora()){
-          showStatusMessage("Preencha a hora...", true);  
+          showStatusMessage("Preencha a hora da partida...", true);  
+          return;
+        }
+
+        if(selecionouTrechoVolta() == "false"){
+          showStatusMessage("Selecione o trecho de Volta...", true);  
+          return;
+        }
+        if(selecionouTrechoVolta() == "igual"){
+          showStatusMessage("Trecho de volta não pode ser o mesmo que o de ida...", true);  
           return;
         }
 
         if(!preencheuDiaVolta()){
-          showStatusMessage("Preencha o dia...", true);  
+          showStatusMessage("Preencha o dia da volta...", true);  
           return;
         }
         if(!preencheuHoraVolta()){
-          showStatusMessage("Preencha a hora...", true);  
+          showStatusMessage("Preencha a hora da volta...", true);  
           return;
         }
 
@@ -295,7 +344,8 @@
         const horario_ida = document.getElementById("hora_ida").value;
         var horario_volta = document.getElementById("hora_volta").value;
         const aeronave = codigo;
-        const trecho = document.getElementById("trechoDropdown").value;
+        const trechoida = document.getElementById("trechoIdaDropdown").value;
+        const trechovolta = document.getElementById("trechoVoltaDropdown").value;
         const idavolta  = document.getElementById("ida_volta").checked ?  '1'  :  '0' ;
 
 
@@ -319,7 +369,8 @@
             horario_ida: horario_ida,
             horario_volta: horario_volta,
             aeronave: aeronave, 
-            trecho: trecho,
+            trechoida: trechoida,
+            trechovolta: trechovolta,
             idavolta: idavolta
             })
             .then(resultado => {
@@ -366,11 +417,11 @@
               </div>
           </div>
 
-
-            <label for="trechoDropdown">Escolha um trecho:</label>
-            <select id="trechoDropdown"></select>
-            <div id="trechos"></div>
-
+            <div>
+            <label for="trechoIdaDropdown">Escolha o trecho de ida:</label>
+            <select id="trechoIdaDropdown"></select>
+            <div id="trechosIda"></div>
+          </div>
             <p></p>
 
 
@@ -384,6 +435,13 @@
                 <label>Hora Ida:</label>
                 <input type="time" id="hora_ida" name="hora_ida" required>
             </div>
+
+            <div id="trechoVoltaGroup" style="display: none;">
+            <label for="trechoVoltaDropdown">Escolha o trecho de volta:</label>
+            <select id="trechoVoltaDropdown"></select>
+            <div id="trechosVolta"></div>
+            </div>
+            <p></p>
 
             <div class="form-group" id="dataVoltaGroup" style="display: none;">
               <label>Data Volta:</label>

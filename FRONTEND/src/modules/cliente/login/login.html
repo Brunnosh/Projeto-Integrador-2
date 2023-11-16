@@ -61,20 +61,29 @@
 
       
       async function Login(){
-
-        console.log(document.getElementById("cpf").value);
-        
         const cpf = document.getElementById("cpf").value;
 
-        
         const response = await fetchInserir({
         cpf: cpf
         });
         const data = await response.json();
 
         if (data.status === "SUCCESS") {
-        console.log("Dados do usuário:", data.payload);
-        // Restante do código de sucesso aqui
+        const cliente = data.payload[0];
+
+        const senhaDoUsuario = cliente[3];
+
+        const senhadigitada = document.getElementById("senha").value;
+
+        console.log(senhadigitada);
+
+        if (senhaDoUsuario == senhadigitada){
+            alert("Login Efetuado com sucesso");
+            window.location.href = "/FRONTEND/src/modules/cliente/login/hublogin.html";
+
+        }else{showStatusMessage("Senha incorreta ", true);}
+
+        
         } 
         else {
         showStatusMessage("Erro ao criar conta " + data.message, true);

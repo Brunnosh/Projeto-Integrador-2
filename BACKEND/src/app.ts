@@ -348,6 +348,47 @@ app.get("/listarAeroportos", async(req,res)=>{
 
 });
 
+app.post("/listarAeroportosWhere", async(req,res)=>{
+
+  let cr: CustomResponse = {status: "ERROR", message: "", payload: undefined,};
+
+  try {
+    const connAttibs = {
+      user: process.env.ORACLE_DB_USER,
+      password: process.env.ORACLE_DB_PASSWORD,
+      connectionString: process.env.ORACLE_CONN_STR,
+    };
+
+    const connection = await oracledb.getConnection(connAttibs);
+
+    // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
+    const cidade_aeroporto = req.body.cidade_aeroporto;
+
+    // Usando a cláusula WHERE para filtrar por CPF
+    const result = await connection.execute(
+      "SELECT * FROM AEROPORTOS WHERE CIDADE_AEROPORTO = :cidade_aeroporto",
+      { cidade_aeroporto: { val: cidade_aeroporto } } // Configuração correta do bind para o parâmetro :cpf
+    );
+
+    await connection.close();
+
+    cr.status = "SUCCESS";
+    cr.message = "Dados obtidos";
+    cr.payload = result.rows;
+
+  } catch (e) {
+    if (e instanceof Error) {
+      cr.message = e.message;
+      console.log(e.message);
+    } else {
+      cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+    }
+  } finally {
+    res.send(cr);
+  }
+});
+
+
 app.delete("/excluirAeroporto", async(req,res)=>{
   // excluindo a aeronave pelo código dela:
   const codigo = req.body.codigo as number;
@@ -496,6 +537,7 @@ app.get("/listarCidades", async(req,res)=>{
   }
 
 });
+
 
 app.delete("/excluirCidade", async(req,res)=>{
   // excluindo a aeronave pelo código dela:
@@ -714,7 +756,8 @@ app.put("/inserirVoo", async(req,res)=>{
   const horario_ida = req.body.horario_ida as string;
   const horario_volta = req.body.horario_volta as string;
   const aeronave = req.body.aeronave as number;
-  const trecho = req.body.trecho as string; 
+  const trecho_ida = req.body.trechoida as string;
+  const trecho_volta = req.body.trechovolta as string;  
   const idavolta = req.body.idavolta as number; 
 
   // correção: verificar se tudo chegou para prosseguir com o cadastro.
@@ -740,11 +783,11 @@ app.put("/inserirVoo", async(req,res)=>{
     });
 
     const cmdInsertVoo = `INSERT INTO VOOS 
-    (CODIGO_VOO, DIA_IDA, DIA_VOLTA, HORARIO_IDA, HORARIO_VOLTA, AERONAVE, TRECHO, IDAVOLTA)
+    (CODIGO_VOO, DIA_IDA, DIA_VOLTA, HORARIO_IDA, HORARIO_VOLTA, AERONAVE, TRECHO_IDA, TRECHO_VOLTA, IDAVOLTA)
     VALUES
-    (SEQ_VOOS.NEXTVAL, :1, :2, :3, :4, :5, :6, :7)`
+    (SEQ_VOOS.NEXTVAL, :1, :2, :3, :4, :5, :6, :7, :8)`
 
-    const dados = [dia_ida, dia_volta, horario_ida, horario_volta, aeronave, trecho, idavolta];
+    const dados = [dia_ida, dia_volta, horario_ida, horario_volta, aeronave, trecho_ida, trecho_volta, idavolta];
     let resInsert = await conn.execute(cmdInsertVoo, dados);
     
     // importante: efetuar o commit para gravar no Oracle.
@@ -1168,8 +1211,6 @@ app.post("/loginCliente", async (req, res) => {
       cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
     }
   } finally {
-    console.log("funcionei");
-    console.log(cr.payload);
     res.send(cr);
   }
 });
