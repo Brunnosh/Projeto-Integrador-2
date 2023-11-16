@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html></html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/hublogin.css">
+
+    <script>
+        function comprapassagem() {
+            window.location.href = "/FRONTEND/src/modules/cliente/passagem/comprapassagem.html";
+        }
+        function voltar() {
+            window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
+        }
+
+    </script>
+
+</head>
+<style>
+    align-right {
+        text-align: right;
+    }
+    .statusError{
+         color:red;
+      }
+    .statusSuccess{
+        color:blue;
+      }
+</style>
+<body class="center-content">
+    <div class="container">
+        <h1>Bem Vindo a AIRPUC!</h1>
+        <form id="cadastro-form">
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="comprapassagem()">Comprar Passagem</button>
+                <button type="button" class="btn btn-cancel" onclick="voltar()">Voltar</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
