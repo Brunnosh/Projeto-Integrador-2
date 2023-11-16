@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Cidade</title>
-    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_cidades.css">
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_aeroportos.css">
 
     <script>
         function limparForm() {
@@ -16,7 +16,19 @@
         }
 
         
-        
+        //FUNCOES VALIDACAO
+        function selecionouPais(){
+        let resultado = false; 
+        var listacidades = document.getElementById("paisDropdown");
+        var valorSelecionado = listacidades.value;
+        // se quiséssemos obter o TEXTO selecionado. 
+        // var text = listaFabricantes.options[listaFabricantes.selectedIndex].text;
+        if (valorSelecionado !== "Escolha um pais"){
+          resultado = true;
+        }
+        return resultado;
+      }
+
         function preencheuNome(){
             let resultado = false;
             const modeloInformado = document.getElementById("nome").value;
@@ -26,58 +38,116 @@
             return resultado;
         }
 
-  
-      function showStatusMessage(msg, error){
-        var pStatus = document.getElementById("status");
-        if (error === true){
-          pStatus.className = "statusError";
-        }else{
-          pStatus.className = "statusSuccess";
+
+
+        // Função para buscar dados da API e exibir na página
+        async function listarPaises() {
+            const response = await fetch('http://localhost:3000/listarPais');
+            const data = await response.json();
+
+            if (data.status === 'SUCCESS') {
+                const paisDiv = document.getElementById('pais');
+                const paisDropdown = document.getElementById('paisDropdown');
+                const paises = data.payload;
+
+               
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = 'Escolha um pais';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                paisDropdown.appendChild(defaultOption);
+
+                paises.forEach(pais => {
+                    const option = document.createElement('option');
+                    option.value = pais[1]; 
+                    const nome = pais[1];
+                    option.textContent = nome; 
+                    paisDropdown.appendChild(option);
+                });
+
+              
+                paisDropdown.addEventListener('change', handleDropdownChange);
+
+                
+            } else {
+                console.error('Erro ao buscar dados de pais:', data.message);
+            }
         }
-        pStatus.textContent = msg;
-      }
 
-      function fetchInserir(body) {
-        const requestOptions = {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        };
+  
+        function handleDropdownChange(event) {
+            const selectedPaisData = event.target.value;
+           
+        }
 
-        return fetch('http://localhost:3000/inserirCidade', requestOptions)
-        .then(T => T.json())
-      }
+        // Chamar a função para listar cidades quando a página carregar
+        window.onload = async () => {
+        await listarPaises();
+    };
 
-      
-      function inserirCidade(){
 
+
+    // FUNCOES PARA INSERIR O TRECHO
+
+    function showStatusMessage(msg, error) {
+            var pStatus = document.getElementById("status");
+            if (error === true) {
+                pStatus.className = "statusError";
+            } else {
+                pStatus.className = "statusSuccess";
+            }
+            pStatus.textContent = msg;
+        }
+
+        function fetchInserir(body) {
+            const requestOptions = {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            };
+
+            return fetch('http://localhost:3000/inserirCidade', requestOptions)
+                .then(response => response.json())
+                .catch(error => {
+                    showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+                    console.log("Falha grave ao cadastrar:", error);
+                });
+        }
+
+
+
+        function inserirAeroporto() {
+
+            
+        if(!selecionouPais()){
+          showStatusMessage("Selecione um Pais...", true);  
+          return;
+        }
         if(!preencheuNome()){
           showStatusMessage("Preencha o nome da cidade...", true);  
           return;
         }
 
-    
-        const nomecidade = document.getElementById("nome").value;
 
-      
-        fetchInserir({
-            nomecidade: nomecidade 
-            })
-            .then(resultado => {
-              
-              if(resultado.status === "SUCCESS"){
-                showStatusMessage("Cidade cadastrada... ", false);
-              }else{
-                showStatusMessage("Erro ao cadastrar Cidade...: " + message, true);
-                console.log(resultado.message);
-              }
-            })
-            .catch(()=>{
-              showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-              console.log("Falha grave ao cadastrar.")
+            const paiscidade = document.getElementById("paisDropdown").value;
+            const nomecidade = document.getElementById("nome").value;
+
+            console.log(paiscidade,nomecidade)
+           
+            fetchInserir({
+              nomecidade: nomecidade,
+              paiscidade: paiscidade
+
+            }).then(resultado => {
+                
+                if (resultado.status === "SUCCESS") {
+                    showStatusMessage("Cidade cadastrado...", false);
+                } else {
+                    showStatusMessage("Erro ao cadastrar Cidade: " + resultado.message, true);
+                    console.log(resultado.message);
+                }
             });
-        
-      }
+        }
     
 
    
@@ -101,13 +171,17 @@
         <h1>Cadastro de Cidade</h1>
         <form id="cadastro-form">
             <div class="form-group">
-            
+                <label for="paisDropdown">Pais:</label>
+                <select id="paisDropdown"></select>
+                
+                <div id="pais"></div>
+                <p></p>
                 <label for="nome">Nome da Cidade:</label>
                 <input type="text" id="nome" name="nome" required>
             </div>
 
             <div class="btn-group">
-                <button type="button" class="btn" onclick="inserirCidade()">Cadastrar</button>
+                <button type="button" class="btn" onclick="inserirAeroporto()">Cadastrar</button>
                 <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
                 <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
             </div>

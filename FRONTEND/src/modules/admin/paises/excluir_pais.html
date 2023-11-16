@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excluir Pais</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_cidades.css">
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+        //FUNCOES VALIDACAO
+
+        function selecionouPaisDeletar(){
+
+            
+
+let resultado = false; 
+var cidadeSelecionada = document.getElementById("paisDropdown").value;
+
+console.log(cidadeSelecionada)
+if (cidadeSelecionada !== "Escolha um pais"){
+resultado = true;
+}
+return resultado;
+}
+
+
+
+async function listarPaises() {
+const response = await fetch('http://localhost:3000/listarPais');
+const data = await response.json();
+
+if (data.status === 'SUCCESS') {
+    const paisesDiv = document.getElementById('pais');
+    const paisesDropdown = document.getElementById('paisDropdown');
+    const paises = data.payload;
+
+ 
+    const defaultOption = document.createElement('option');
+    defaultOption.textContent = 'Escolha um pais';
+    defaultOption.value = "Escolha um pais";
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    paisesDropdown.appendChild(defaultOption);
+
+   
+    paises.forEach(pais => {
+    
+        const option = document.createElement('option');
+        option.value = JSON.stringify(pais); 
+        const CODIGO = pais[0];
+        const NOME = pais[1];
+        option.textContent = [CODIGO,NOME];
+        paisesDropdown.appendChild(option);
+
+    });
+
+
+    
+    paisesDropdown.addEventListener('change', handleDropdownChange);
+
+    const firstAeronave = [0,'N/A','N/A'];
+    displayCidades(paisesDiv, firstAeronave);
+    
+} else {
+    console.error('Erro ao buscar dados de aeronaves:', data.message);
+}
+}
+
+function showStatusMessage(msg, error){
+var pStatus = document.getElementById("status");
+if (error === true){
+pStatus.className = "statusError";
+}else{
+pStatus.className = "statusSuccess";
+}
+pStatus.textContent = msg;
+}
+
+function fetchInserir(body) {
+const requestOptions = {
+method: 'DELETE',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(body)
+};
+
+return fetch('http://localhost:3000/excluirPais', requestOptions)
+.then(T => T.json())
+}
+
+
+function deletarPais(){
+
+if(!selecionouPaisDeletar()){
+    showStatusMessage("Selecione uma cidade para deletar...", true);  
+    return;
+    }
+
+
+
+
+const cidade = document.getElementById("paisDropdown").value;
+const cidadeObj = JSON.parse(cidade);
+const codigo = cidadeObj[0];
+
+
+console.log(codigo)
+
+
+fetchInserir({
+codigo: codigo
+})
+.then(resultado => {
+
+  if(resultado.status === "SUCCESS"){
+    showStatusMessage("Pais deletado... ", false);
+  }else{
+    showStatusMessage("Erro ao deletar cidade...: " + message, true);
+    console.log(resultado.message);
+  }
+})
+.catch(()=>{
+  showStatusMessage("Erro técnico ao deletar... Contate o suporte.", true);
+  console.log("Falha grave ao cadastrar.")
+});
+
+}
+
+
+
+function handleDropdownChange() {
+const paisesDropdown = document.getElementById('paisDropdown');
+const selectedCidadeData = JSON.parse(paisesDropdown.value);
+const paisesDiv = document.getElementById('pais');
+
+displayCidades(paisesDiv, selectedCidadeData);
+}
+
+
+const nomes = ["Codigo :", "Nome : ", "Sigla :"];
+function displayCidades(container, cidade) {
+container.innerHTML = '';
+if (cidade) {
+    const table = document.createElement('table');
+    const tableBody = document.createElement('tbody');
+    for (const key in cidade) {
+        const row = tableBody.insertRow();
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+        cell1.textContent = nomes[key];
+        cell2.textContent = cidade[key];
+    }
+    
+    table.appendChild(tableBody);
+    container.appendChild(table);
+}
+}
+
+
+window.onload = listarPaises;
+
+    </script>
+
+
+    <style>
+        .statusError{
+        color:red;
+        }
+        .statusSuccess{
+        color:blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Excluir Pais</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+              <label for="paisDropdown">Escolha um pais:</label>
+              <select id="paisDropdown"></select>
+              
+              <div id="pais"></div>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="deletarPais()">Excluir</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>
