@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Administrativo</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/menucliente.css">
+</head>
+<body class="center-content">
+    <div class="container">
+        <h1>Bem Vindo a AIRPUC!</h1>
+        <button class="btn" onclick="cadastro()">Cadastro</button>
+        <button class="btn" onclick="login()">Login</button>
+    </div>
+
+    <script>
+
+        function cadastro() {
+            window.location.href = "/FRONTEND/src/modules/cliente/cadastro/cadastro.html";
+            
+        }
+        function login() {
+            window.location.href = "/FRONTEND/src/modules/cliente/login/login.html";
+            
+        }
+        
+
+    </script>
+</body>
+</html>

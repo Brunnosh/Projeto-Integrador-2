@@ -70,6 +70,16 @@ create table VOOS(
     constraint FK_trecho FOREIGN KEY (trecho) references TRECHOS (trecho) ON DELETE CASCADE
 );
 
+create table PASSAGEIROS(
+    nome varchar2(30),
+    cpf varchar2(14) PRIMARY KEY,
+    email varchar2(50),
+    senha varchar2(15)
+    
+);
+
+select * from PASSAGEIROS where cpf = '528.759.688-07';
+
 delete from voos;
 
 select * from voos;
