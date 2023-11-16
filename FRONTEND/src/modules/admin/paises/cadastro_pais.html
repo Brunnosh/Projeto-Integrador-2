@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Cidade</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_cidades.css">
+
+    <script>
+        function limparForm() {
+            document.getElementById("cadastro-form").reset();
+        }
+
+        function cancelarCadastro() {
+            alert("Cadastro cancelado");
+        }
+
+        
+        
+        function preencheuNome(){
+            let resultado = false;
+            const modeloInformado = document.getElementById("nome").value;
+            if(modeloInformado.length > 0){
+            resultado = true;
+            }
+            return resultado;
+        }
+
+        function preencheuSigla(){
+            let resultado = false;
+            const modeloInformado = document.getElementById("sigla").value;
+            if(modeloInformado.length > 0){
+            resultado = true;
+            }
+            return resultado;
+        }
+
+  
+      function showStatusMessage(msg, error){
+        var pStatus = document.getElementById("status");
+        if (error === true){
+          pStatus.className = "statusError";
+        }else{
+          pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+      }
+
+      function fetchInserir(body) {
+        const requestOptions = {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/inserirPais', requestOptions)
+        .then(T => T.json())
+      }
+
+      
+      function inserirPais(){
+
+        if(!preencheuNome()){
+          showStatusMessage("Preencha o nome do Pais...", true);  
+          return;
+        }
+
+        if(!preencheuSigla()){
+          showStatusMessage("Preencha o nome do Pais...", true);  
+          return;
+        }
+
+    
+        const nomepais = document.getElementById("nome").value;
+        const sigla = document.getElementById("sigla").value;
+
+      
+        fetchInserir({
+            nomepais: nomepais,
+            sigla: sigla 
+            })
+            .then(resultado => {
+              
+              if(resultado.status === "SUCCESS"){
+                showStatusMessage("Pais cadastrada... ", false);
+              }else{
+                showStatusMessage("Erro ao cadastrar Pais...: " + message, true);
+                console.log(resultado.message);
+              }
+            })
+            .catch(()=>{
+              showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+              console.log("Falha grave ao cadastrar.")
+            });
+        
+      }
+    
+
+   
+
+
+
+    </script>
+
+
+    <style>
+        .statusError{
+        color:red;
+        }
+        .statusSuccess{
+        color:blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Pais</h1>
+        <form id="cadastro-form">
+            <div class="form-group">
+            
+                <label for="nome">Nome do Pais:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            <div class="form-group">
+            
+              <label for="sigla">Sigla:</label>
+              <input type="text" id="sigla" name="sigla" required>
+          </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="inserirPais()">Cadastrar</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>

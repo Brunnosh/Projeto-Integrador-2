@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Paises</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/inicio.css">
+</head>
+<body class="center-content">
+    <div class="container">
+        <h1>Menu Paises</h1>
+        
+        <div class="main-buttons">
+            <button class="btn" onclick="cadastrar()">Cadastrar</button>
+            <button class="btn" onclick="deletar()">Deletar</button>
+        </div>
+    </div>
+
+    <script>
+        function cadastrar() {
+            window.open('/FRONTEND/src/modules/admin/paises/cadastro_pais.html');
+            
+        }
+        function deletar() {
+            window.open('/FRONTEND/src/modules/admin/paises/excluir_pais.html');
+            
+        }
+
+        
+
+    </script>
+</body>
+</html>

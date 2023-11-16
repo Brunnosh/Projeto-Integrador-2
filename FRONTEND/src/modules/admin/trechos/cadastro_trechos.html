@@ -16,6 +16,9 @@
       </style>
 
     <script>
+
+      
+
         function limparForm() {
             document.getElementById("cadastro-form").reset();
         }
@@ -27,14 +30,18 @@
         const todosaeroportos = "";
 
         function updatePreviewTrecho() {
-    const cidadePartida = document.getElementById("cidadeDropdown1").value;
-    const aeroportoPartida = document.getElementById("aeroportoDropdown1").value.split(',')[0];
-    const cidadeChegada = document.getElementById("cidadeDropdown2").value;
-    const aeroportoChegada = document.getElementById("aeroportoDropdown2").value.split(',')[0];
+          const valoresPaisPartida = document.getElementById("paisDropdown1").value;
+          const valoresPaisChegada = document.getElementById("paisDropdown2").value;
+          const paisPartida = valoresPaisPartida.split(',')[1];
+          const paisChegada = valoresPaisChegada.split(',')[1];         
+          const cidadePartida = document.getElementById("cidadeDropdown1").value;
+          const aeroportoPartida = document.getElementById("aeroportoDropdown1").value.split(',')[0];
+          const cidadeChegada = document.getElementById("cidadeDropdown2").value;
+          const aeroportoChegada = document.getElementById("aeroportoDropdown2").value.split(',')[0];
 
-    const previewDiv = document.getElementById("previewTrecho");
-    previewDiv.textContent = `${cidadePartida}: ${aeroportoPartida} --> ${cidadeChegada}: ${aeroportoChegada}`;
-}
+          const previewDiv = document.getElementById("previewTrecho");
+          previewDiv.textContent = `${paisPartida}:${cidadePartida}:${aeroportoPartida} --> ${paisChegada}:${cidadeChegada}: ${aeroportoChegada}`;
+        }
 
 
 
@@ -82,63 +89,165 @@ function selecionouAeroporto2(){
 
 
 // Função para buscar dados da API e exibir na página
-
-async function listarCidades() {
-    const response = await fetch('http://localhost:3000/listarCidades');
+async function listarPaises() {
+    const response = await fetch('http://localhost:3000/listarPais');
     const data = await response.json();
 
     if (data.status === 'SUCCESS') {
 
 
 
-        const cidadesDiv1 = document.getElementById('cidades1');
-        const cidadesDropdown1 = document.getElementById('cidadeDropdown1');
-        const cidadesDiv2 = document.getElementById('cidades2');
-        const cidadesDropdown2 = document.getElementById('cidadeDropdown2');
-        const cidades = data.payload;
+        const paisDiv1 = document.getElementById('pais1');
+        const paisDropdown1 = document.getElementById('paisDropdown1');
+        const paisDiv2 = document.getElementById('pais2');
+        const paisDropdown2 = document.getElementById('paisDropdown2');
+        const paises = data.payload;
         
 
         
         const defaultOption1 = document.createElement('option');
-        defaultOption1.textContent = 'Escolha uma cidade';
+        defaultOption1.textContent = 'Escolha um Pais';
         defaultOption1.disabled = true;
         defaultOption1.selected = true;
-        cidadesDropdown1.appendChild(defaultOption1);
+        paisDropdown1.appendChild(defaultOption1);
 
         
         const defaultOption2 = document.createElement('option');
-        defaultOption2.textContent = 'Escolha uma cidade';
+        defaultOption2.textContent = 'Escolha um Pais';
+        defaultOption2.value = ['Escolha um Pais','Escolha um Pais'];
         defaultOption2.disabled = true;
         defaultOption2.selected = true;
-        cidadesDropdown2.appendChild(defaultOption2);
+        paisDropdown2.appendChild(defaultOption2);
 
        
-        cidades.forEach(cidade => {
+        paises.forEach(pais => {
             const option1 = document.createElement('option');
-            option1.value = cidade[1];
-            const nome1 = cidade[1];
+            option1.value = [pais[1],pais[2]];
+            const nome1 = pais[1];
             option1.textContent = nome1; 
-            cidadesDropdown1.appendChild(option1);
+            paisDropdown1.appendChild(option1);
         });
 
         
-        cidades.forEach(cidade => {
+        paises.forEach(pais => {
             const option2 = document.createElement('option');
-            option2.value = cidade[1]; 
-            const nome2 = cidade[1];
+            option2.value = [pais[1],pais[2]]; 
+            const nome2 = pais[1];
             option2.textContent = nome2; 
-            cidadesDropdown2.appendChild(option2);
+            paisDropdown2.appendChild(option2);
         });
 
         
-        cidadesDropdown1.addEventListener('change', handleDropdownChangeIda);
-        cidadesDropdown2.addEventListener('change', handleDropdownChangeVolta);
+        paisDropdown1.addEventListener('change', handleDropdownChangeCidadeIda);
+        paisDropdown2.addEventListener('change', handleDropdownChangeCidadeVolta);
         
     } else {
         console.error('Erro ao buscar dados de cidades:', data.message);
     }
 }
 
+
+
+//Funcoes listar cidades depois de escolher pais
+async function listarCidadeIda(pais) {
+
+function fetchBuscar(body) {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  };
+
+  return fetch('http://localhost:3000/listarCidadesWhere', requestOptions)
+  .then(data => {
+  return data;
+  });
+}
+
+var pais_cidade = pais;
+
+const response = await fetchBuscar({
+  pais_cidade: pais_cidade
+  });
+const data = await response.json();
+
+if (data.status === "SUCCESS") {
+  const cidades = data.payload;
+
+  const cidadeDropdown1 = document.getElementById('cidadeDropdown1');
+  cidadeDropdown1.innerHTML = '';
+  const defaultOption = document.createElement('option');
+  defaultOption.textContent = 'Escolha uma cidade';
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  cidadeDropdown1.appendChild(defaultOption);
+
+  cidades.forEach(cidade => {
+    const option1 = document.createElement('option');
+    option1.value = cidade[2]; 
+    const nome1 = cidade[2];
+    option1.textContent = nome1; 
+    cidadeDropdown1.appendChild(option1);
+  });
+
+  cidadeDropdown1.addEventListener('change', handleDropdownChangeIda);
+  } 
+  else {
+  showStatusMessage("Erro ao buscar dados " + data.message, true);
+  console.log(resultado.message);
+  }
+}
+
+async function listarCidadeVolta(pais) {
+
+function fetchBuscar(body) {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  };
+
+  return fetch('http://localhost:3000/listarCidadesWhere', requestOptions)
+  .then(data => {
+  return data;
+  });
+}
+
+var pais_cidade = pais;
+
+const response = await fetchBuscar({
+  pais_cidade: pais_cidade
+  });
+const data = await response.json();
+
+if (data.status === "SUCCESS") {
+  const cidades = data.payload;
+
+  const cidadeDropdown2 = document.getElementById('cidadeDropdown2');
+  cidadeDropdown2.innerHTML = '';
+  const defaultOption = document.createElement('option');
+  defaultOption.textContent = 'Escolha uma cidade';
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  cidadeDropdown2.appendChild(defaultOption);
+
+  cidades.forEach(cidade => {
+    const option1 = document.createElement('option');
+    option1.value = cidade[2]; 
+    const nome1 = cidade[2];
+    option1.textContent = nome1; 
+    cidadeDropdown2.appendChild(option1);
+  });
+
+  cidadeDropdown2.addEventListener('change', handleDropdownChangeVolta);
+  } 
+  else {
+  showStatusMessage("Erro ao buscar dados " + data.message, true);
+  console.log(resultado.message);
+  }
+}
+
+//Funcoes listar aeroporto depois de escolher cidade
 async function listarAeroportosCidadeIda(cidade) {
 
       function fetchBuscar(body) {
@@ -238,6 +347,8 @@ if (data.status === "SUCCESS") {
         }
 }
 
+//
+//Funcoes para detectar mudanças no dropdown
 async function handleDropdownChangeIda(event) {
     const CidadeIdaData = event.target.value;
 
@@ -254,6 +365,30 @@ async function handleDropdownChangeVolta(event) {
    
 }
 
+async function handleDropdownChangeCidadeIda(event) {
+    const PaisIdaData = event.target.value.split(',')[0];
+
+    await listarCidadeIda(PaisIdaData);
+    updatePreviewTrecho();
+   
+}
+
+async function handleDropdownChangeCidadeVolta(event) {
+  const PaisVoltaData = event.target.value.split(',')[0];
+
+await listarCidadeVolta(PaisVoltaData);
+updatePreviewTrecho();
+
+}
+
+
+
+async function handleDropdownChangeCidades(event) {
+
+updatePreviewTrecho();
+
+}
+
 async function handleDropdownChangeAeroportos(event) {
 
     updatePreviewTrecho();
@@ -262,7 +397,7 @@ async function handleDropdownChangeAeroportos(event) {
 
 
 window.onload = async () => {
-await listarCidades();
+await listarPaises();
 };
 
 
@@ -317,18 +452,26 @@ if(!selecionouAeroporto2()){
 
 
 
-    
+    const valoresPaisPartida = document.getElementById("paisDropdown1").value;
+    const valoresPaisChegada = document.getElementById("paisDropdown2").value;
     const valoresAeroportoPartida = document.getElementById("aeroportoDropdown1").value;
     const valoresAeroportoChegada = document.getElementById("aeroportoDropdown2").value;
    
+
+    const siglaPaisPartida = valoresPaisPartida.split(',')[1];
+    const siglaPaisChegada = valoresPaisChegada.split(',')[1];
     const cidadePartida = document.getElementById("cidadeDropdown1").value;
     const cidadeChegada = document.getElementById("cidadeDropdown2").value;
     const aeroportoPartida = valoresAeroportoPartida.split(',')[0];
     const aeroportoChegada = valoresAeroportoChegada.split(',')[0];
-    const trecho = cidadePartida + ": " + aeroportoPartida + " --> " + cidadeChegada + ": " + aeroportoChegada;
+    const paispartida = valoresPaisPartida.split(',')[0];
+    const paischegada = valoresPaisChegada.split(',')[0];
+    const trecho = siglaPaisPartida + ":" + cidadePartida + ":" + aeroportoPartida + " --> " + siglaPaisChegada + ":" + cidadeChegada + ":" + aeroportoChegada;
    
     
     fetchInserir({
+        paispartida : paispartida,
+        paischegada : paischegada,
         cidadepartida: cidadePartida,
         cidadechegada: cidadeChegada,
         aeroportopartida: aeroportoPartida,
@@ -352,6 +495,14 @@ if(!selecionouAeroporto2()){
     <div class="container">
         <h1>Cadastro de Trechos</h1>
         <form id="cadastro-form">
+
+          <div class="form-group">
+            <label for="paisDropdown1">Pais de Partida:</label>
+            <select id="paisDropdown1"></select>
+            
+            <div id="pais1"></div>
+        </div>
+
             <div class="form-group">
                 <label for="cidadeDropdown1">Cidade de Partida:</label>
                 <select id="cidadeDropdown1"></select>
@@ -366,6 +517,13 @@ if(!selecionouAeroporto2()){
             <div id="aeroportos1"></div>
             </div>
             <p></p>
+
+            <div class="form-group">
+              <label for="paisDropdown2">Pais de Chegada:</label>
+              <select id="paisDropdown2"></select>
+              
+              <div id="pais2"></div>
+          </div>
 
             <div class="form-group">
                 <label for="cidadeDropdown2">Cidade de chegada:</label>
