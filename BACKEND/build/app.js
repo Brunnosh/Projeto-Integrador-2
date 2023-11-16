@@ -308,6 +308,38 @@ app.get("/listarAeroportos", (req, res) => __awaiter(void 0, void 0, void 0, fun
         res.send(cr);
     }
 }));
+app.post("/listarAeroportosWhere", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let cr = { status: "ERROR", message: "", payload: undefined, };
+    try {
+        const connAttibs = {
+            user: process.env.ORACLE_DB_USER,
+            password: process.env.ORACLE_DB_PASSWORD,
+            connectionString: process.env.ORACLE_CONN_STR,
+        };
+        const connection = yield oracledb_1.default.getConnection(connAttibs);
+        // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
+        const cidade_aeroporto = req.body.cidade_aeroporto;
+        // Usando a cláusula WHERE para filtrar por CPF
+        const result = yield connection.execute("SELECT * FROM AEROPORTOS WHERE CIDADE_AEROPORTO = :cidade_aeroporto", { cidade_aeroporto: { val: cidade_aeroporto } } // Configuração correta do bind para o parâmetro :cpf
+        );
+        yield connection.close();
+        cr.status = "SUCCESS";
+        cr.message = "Dados obtidos";
+        cr.payload = result.rows;
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            cr.message = e.message;
+            console.log(e.message);
+        }
+        else {
+            cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+        }
+    }
+    finally {
+        res.send(cr);
+    }
+}));
 app.delete("/excluirAeroporto", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // excluindo a aeronave pelo código dela:
     const codigo = req.body.codigo;
