@@ -105,7 +105,7 @@ drop table mapa_assentos;
 drop table passageiros;
 drop table voos;
 
-select * from voos;
+select * from trechos;
 
 //TABLES BUGADAS
 
