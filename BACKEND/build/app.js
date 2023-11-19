@@ -876,44 +876,87 @@ app.put("/inserirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function*
         payload: undefined,
     };
     let conn;
-    // conectando 
-    try {
-        conn = yield oracledb_1.default.getConnection({
-            user: process.env.ORACLE_DB_USER,
-            password: process.env.ORACLE_DB_PASSWORD,
-            connectionString: process.env.ORACLE_CONN_STR,
-        });
-        const cmdInsertVoo = `INSERT INTO VOOS
+    if (idavolta == 1) {
+        // conectando 
+        try {
+            conn = yield oracledb_1.default.getConnection({
+                user: process.env.ORACLE_DB_USER,
+                password: process.env.ORACLE_DB_PASSWORD,
+                connectionString: process.env.ORACLE_CONN_STR,
+            });
+            const cmdInsertVoo = `INSERT INTO VOOS
     (CODIGO_VOO, DIA_IDA, DIA_VOLTA, HORARIO_IDA, HORARIO_VOLTA, AERONAVE, TRECHO_IDA, TRECHO_VOLTA, IDAVOLTA)
     VALUES
     (SEQ_VOOS.NEXTVAL, :1, :2, :3, :4, :5, :6, :7, :8)`;
-        const dados = [dia_ida, dia_volta, horario_ida, horario_volta, aeronave, trecho_ida, trecho_volta, idavolta];
-        let resInsert = yield conn.execute(cmdInsertVoo, dados);
-        // importante: efetuar o commit para gravar no Oracle.
-        yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
-        const rowsInserted = resInsert.rowsAffected;
-        if (rowsInserted !== undefined && rowsInserted === 1) {
-            cr.status = "SUCCESS";
-            cr.message = "Voo Cadastrado";
+            const dados = [dia_ida, dia_volta, horario_ida, horario_volta, aeronave, trecho_ida, trecho_volta, idavolta];
+            let resInsert = yield conn.execute(cmdInsertVoo, dados);
+            // importante: efetuar o commit para gravar no Oracle.
+            yield conn.commit();
+            // obter a informação de quantas linhas foram inseridas. 
+            // neste caso precisa ser exatamente 1
+            const rowsInserted = resInsert.rowsAffected;
+            if (rowsInserted !== undefined && rowsInserted === 1) {
+                cr.status = "SUCCESS";
+                cr.message = "Voo Cadastrado";
+            }
+        }
+        catch (e) {
+            if (e instanceof Error) {
+                cr.message = e.message;
+                console.log(e.message);
+            }
+            else {
+                cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+            }
+        }
+        finally {
+            //fechar a conexao.
+            if (conn !== undefined) {
+                yield conn.close();
+            }
+            res.send(cr);
         }
     }
-    catch (e) {
-        if (e instanceof Error) {
-            cr.message = e.message;
-            console.log(e.message);
+    if (idavolta == 0) {
+        // conectando 
+        try {
+            conn = yield oracledb_1.default.getConnection({
+                user: process.env.ORACLE_DB_USER,
+                password: process.env.ORACLE_DB_PASSWORD,
+                connectionString: process.env.ORACLE_CONN_STR,
+            });
+            const cmdInsertVoo = `INSERT INTO VOOS
+    (CODIGO_VOO, DIA_IDA, DIA_VOLTA, HORARIO_IDA, HORARIO_VOLTA, AERONAVE, TRECHO_IDA, TRECHO_VOLTA, IDAVOLTA)
+    VALUES
+    (SEQ_VOOS.NEXTVAL, :1, SEQ_DIAVOLTAVAZIO.NEXTVAL, :2, SEQ_HORAVOLTAVAZIO.NEXTVAL, :3, :4, SEQ_TRECHOVOLTAVAZIO.NEXTVAL, :5)`;
+            const dados = [dia_ida, horario_ida, aeronave, trecho_ida, idavolta];
+            let resInsert = yield conn.execute(cmdInsertVoo, dados);
+            // importante: efetuar o commit para gravar no Oracle.
+            yield conn.commit();
+            // obter a informação de quantas linhas foram inseridas. 
+            // neste caso precisa ser exatamente 1
+            const rowsInserted = resInsert.rowsAffected;
+            if (rowsInserted !== undefined && rowsInserted === 1) {
+                cr.status = "SUCCESS";
+                cr.message = "Voo Cadastrado";
+            }
         }
-        else {
-            cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+        catch (e) {
+            if (e instanceof Error) {
+                cr.message = e.message;
+                console.log(e.message);
+            }
+            else {
+                cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+            }
         }
-    }
-    finally {
-        //fechar a conexao.
-        if (conn !== undefined) {
-            yield conn.close();
+        finally {
+            //fechar a conexao.
+            if (conn !== undefined) {
+                yield conn.close();
+            }
+            res.send(cr);
         }
-        res.send(cr);
     }
 }));
 app.get("/listarVoos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
