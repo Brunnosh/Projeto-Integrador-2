@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Cidade</title>
+    <title>Deletar Cidade</title>
     <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_cidades.css">
 
     <script>
@@ -55,7 +55,7 @@ if (data.status === 'SUCCESS') {
         const option = document.createElement('option');
         option.value = JSON.stringify(cidade); 
         const CODIGO = cidade[0];
-        const NOME = cidade[1];
+        const NOME = cidade[2];
         option.textContent = [CODIGO,NOME];
         cidadesDropdown.appendChild(option);
 
@@ -65,7 +65,7 @@ if (data.status === 'SUCCESS') {
     
     cidadesDropdown.addEventListener('change', handleDropdownChange);
 
-    const firstAeronave = [0,'N/A'];
+    const firstAeronave = [0,'N/A', 'N/A'];
     displayCidades(cidadesDiv, firstAeronave);
     
 } else {
@@ -143,7 +143,7 @@ displayCidades(cidadesDiv, selectedCidadeData);
 }
 
 
-const nomes = ["Codigo :", "Nome : "];
+const nomes = ["Codigo :", "Pais : ", "Nome :"];
 function displayCidades(container, cidade) {
 container.innerHTML = '';
 if (cidade) {
@@ -179,7 +179,7 @@ window.onload = listarCidades;
 </head>
 <body>
     <div class="container">
-        <h1>Cadastro de Cidade</h1>
+        <h1>Deletar Cidade</h1>
         <form id="cadastro-form">
             <div class="form-group">
               <label for="cidadeDropdown">Escolha uma cidade:</label>

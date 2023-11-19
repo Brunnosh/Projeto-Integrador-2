@@ -40,7 +40,7 @@ app.get("/listarAeronaves", async(req,res)=>{
       connectionString: process.env.ORACLE_CONN_STR,
     }
     const connection = await oracledb.getConnection(connAttibs);
-    let resultadoConsulta = await connection.execute("SELECT * FROM AERONAVES2");
+    let resultadoConsulta = await connection.execute("SELECT * FROM AERONAVES");
   
     await connection.close();
     cr.status = "SUCCESS"; 
@@ -94,7 +94,7 @@ app.put("/inserirAeronave", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdInsertAero = `INSERT INTO AERONAVES2 
+    const cmdInsertAero = `INSERT INTO AERONAVES 
     (CODIGO_AERONAVE, FABRICANTE, MODELO, REGISTRO, ANOFAB, NUMERO_ASSENTOS, DISPONIVEL, assentos_linha, assentos_corredor)
     VALUES
     (SEQ_AERONAVES.NEXTVAL, :1, :2, :3, :4, :5, :6, :7, :8)`
@@ -148,7 +148,7 @@ app.delete("/excluirAeronave", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdDeleteAero = `DELETE AERONAVES2 WHERE codigo_aeronave = :1`
+    const cmdDeleteAero = `DELETE AERONAVES WHERE codigo_aeronave = :1`
     const dados = [codigo];
 
     let resDelete = await connection.execute(cmdDeleteAero, dados);
@@ -215,7 +215,7 @@ app.put("/alterarAeronave", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdInsertAero = `UPDATE AERONAVES2 SET CODIGO_AERONAVE = :1, FABRICANTE = :2, MODELO = :3, REGISTRO = :4,
+    const cmdInsertAero = `UPDATE AERONAVES SET CODIGO_AERONAVE = :1, FABRICANTE = :2, MODELO = :3, REGISTRO = :4,
     ANOFAB = :5, NUMERO_ASSENTOS = :6, DISPONIVEL = :7
     WHERE CODIGO_AERONAVE = :1`
     
@@ -282,7 +282,7 @@ app.put("/inserirAeroporto", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdInsertAeroporto = `INSERT INTO AEROPORTOS2 
+    const cmdInsertAeroporto = `INSERT INTO AEROPORTOS 
     (CODIGO_AEROPORTO, NOME_AEROPORTO, CIDADE_AEROPORTO)
     VALUES
     (SEQ_AEROPORTOS.NEXTVAL, :1, :2)`
@@ -328,7 +328,7 @@ app.get("/listarAeroportos", async(req,res)=>{
       connectionString: process.env.ORACLE_CONN_STR,
     }
     const connection = await oracledb.getConnection(connAttibs);
-    let resultadoConsulta = await connection.execute("SELECT * FROM AEROPORTOS2");
+    let resultadoConsulta = await connection.execute("SELECT * FROM AEROPORTOS");
   
     await connection.close();
     cr.status = "SUCCESS"; 
@@ -366,7 +366,7 @@ app.post("/listarAeroportosWhere", async(req,res)=>{
 
     // Usando a cláusula WHERE para filtrar por CPF
     const result = await connection.execute(
-      "SELECT * FROM AEROPORTOS2 WHERE CIDADE_AEROPORTO = :cidade_aeroporto",
+      "SELECT * FROM AEROPORTOS WHERE CIDADE_AEROPORTO = :cidade_aeroporto",
       { cidade_aeroporto: { val: cidade_aeroporto } } // Configuração correta do bind para o parâmetro :cpf
     );
 
@@ -408,7 +408,7 @@ app.delete("/excluirAeroporto", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdDeleteAero = `DELETE AEROPORTOS2 WHERE codigo_aeroporto = :1`
+    const cmdDeleteAero = `DELETE AEROPORTOS WHERE codigo_aeroporto = :1`
     const dados = [codigo];
 
     let resDelete = await connection.execute(cmdDeleteAero, dados);
@@ -475,7 +475,7 @@ app.put("/inserirCidade", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdInsertCidade = `INSERT INTO CIDADES2 
+    const cmdInsertCidade = `INSERT INTO CIDADES 
     (CODIGO_cidade, PAIS_CIDADE, NOME_CIDADE)
     VALUES
     (SEQ_CIDADES.NEXTVAL, :1, :2)`
@@ -521,7 +521,7 @@ app.get("/listarCidades", async(req,res)=>{
       connectionString: process.env.ORACLE_CONN_STR,
     }
     const connection = await oracledb.getConnection(connAttibs);
-    let resultadoConsulta = await connection.execute("SELECT * FROM CIDADES2");
+    let resultadoConsulta = await connection.execute("SELECT * FROM CIDADES");
   
     await connection.close();
     cr.status = "SUCCESS"; 
@@ -559,7 +559,7 @@ app.post("/listarCidadesWhere", async(req,res)=>{
 
     // Usando a cláusula WHERE para filtrar por CPF
     const result = await connection.execute(
-      "SELECT * FROM CIDADES2 WHERE PAIS_CIDADE = :pais_cidade",
+      "SELECT * FROM CIDADES WHERE PAIS_CIDADE = :pais_cidade",
       { pais_cidade: { val: pais_cidade } } // Configuração correta do bind para o parâmetro :cpf
     );
 
@@ -600,7 +600,7 @@ app.delete("/excluirCidade", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdDeleteAero = `DELETE CIDADES2 WHERE codigo_cidade = :1`
+    const cmdDeleteAero = `DELETE CIDADES WHERE codigo_cidade = :1`
     const dados = [codigo];
 
     let resDelete = await connection.execute(cmdDeleteAero, dados);
@@ -665,7 +665,7 @@ app.put("/inserirPais", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdInserPais = `INSERT INTO PAISES2 
+    const cmdInserPais = `INSERT INTO PAISES 
     (CODIGO_PAIS, NOME_PAIS, SIGLA_PAIS)
     VALUES
     (SEQ_PAISES.NEXTVAL, :1, :2)`
@@ -711,7 +711,7 @@ app.get("/listarPais", async(req,res)=>{
       connectionString: process.env.ORACLE_CONN_STR,
     }
     const connection = await oracledb.getConnection(connAttibs);
-    let resultadoConsulta = await connection.execute("SELECT * FROM PAISES2");
+    let resultadoConsulta = await connection.execute("SELECT * FROM PAISES");
   
     await connection.close();
     cr.status = "SUCCESS"; 
@@ -750,7 +750,7 @@ app.delete("/excluirPais", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdDeleteAero = `DELETE PAISES2 WHERE codigo_pais = :1`
+    const cmdDeleteAero = `DELETE PAISES WHERE codigo_pais = :1`
     const dados = [codigo];
 
     let resDelete = await connection.execute(cmdDeleteAero, dados);
@@ -820,7 +820,7 @@ app.put("/inserirTrecho", async(req,res)=>{
     });
 
 
-    const cmdInsertTrecho = `INSERT INTO TRECHOS2 
+    const cmdInsertTrecho = `INSERT INTO TRECHOS 
     (CODIGO_TRECHO,PAIS_PARTIDA, PAIS_CHEGADA, CIDADE_PARTIDA, CIDADE_CHEGADA, AEROPORTO_PARTIDA, AEROPORTO_CHEGADA, TRECHO)
     VALUES
     (SEQ_TRECHOS.NEXTVAL, :1, :2, :3, :4, :5, :6, :7)`
@@ -866,7 +866,7 @@ app.get("/listarTrechos", async(req,res)=>{
       connectionString: process.env.ORACLE_CONN_STR,
     }
     const connection = await oracledb.getConnection(connAttibs);
-    let resultadoConsulta = await connection.execute("SELECT * FROM TRECHOS2");
+    let resultadoConsulta = await connection.execute("SELECT * FROM TRECHOS");
   
     await connection.close();
     cr.status = "SUCCESS"; 
@@ -884,6 +884,46 @@ app.get("/listarTrechos", async(req,res)=>{
     res.send(cr);  
   }
 
+});
+
+app.post("/listarTrechosWhere", async(req,res)=>{
+
+  let cr: CustomResponse = {status: "ERROR", message: "", payload: undefined,};
+
+  try {
+    const connAttibs = {
+      user: process.env.ORACLE_DB_USER,
+      password: process.env.ORACLE_DB_PASSWORD,
+      connectionString: process.env.ORACLE_CONN_STR,
+    };
+
+    const connection = await oracledb.getConnection(connAttibs);
+
+    // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
+    const cidade_chegada = req.body.cidade_chegada
+
+    // Usando a cláusula WHERE para filtrar por CPF
+    const result = await connection.execute(
+      "SELECT * FROM TRECHOS WHERE CIDADE_CHEGADA = :cidade_chegada",
+      { cidade_chegada: { val: cidade_chegada } } // Configuração correta do bind para o parâmetro :cpf
+    );
+
+    await connection.close();
+
+    cr.status = "SUCCESS";
+    cr.message = "Dados obtidos";
+    cr.payload = result.rows;
+
+  } catch (e) {
+    if (e instanceof Error) {
+      cr.message = e.message;
+      console.log(e.message);
+    } else {
+      cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+    }
+  } finally {
+    res.send(cr);
+  }
 });
 
 app.delete("/excluirTrecho", async(req,res)=>{
@@ -905,7 +945,7 @@ app.delete("/excluirTrecho", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdDeleteAero = `DELETE TRECHOS2 WHERE CODIGO_TRECHO = :1`
+    const cmdDeleteAero = `DELETE TRECHOS WHERE CODIGO_TRECHO = :1`
     const dados = [codigo];
 
     let resDelete = await connection.execute(cmdDeleteAero, dados);
@@ -954,6 +994,8 @@ app.put("/inserirVoo", async(req,res)=>{
   const trecho_volta = req.body.trechovolta as string;  
   const idavolta = req.body.idavolta as number; 
 
+
+
   // correção: verificar se tudo chegou para prosseguir com o cadastro.
   // verificar se chegaram os parametros
   // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
@@ -976,7 +1018,7 @@ app.put("/inserirVoo", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdInsertVoo = `INSERT INTO VOOS2 
+    const cmdInsertVoo = `INSERT INTO VOOS
     (CODIGO_VOO, DIA_IDA, DIA_VOLTA, HORARIO_IDA, HORARIO_VOLTA, AERONAVE, TRECHO_IDA, TRECHO_VOLTA, IDAVOLTA)
     VALUES
     (SEQ_VOOS.NEXTVAL, :1, :2, :3, :4, :5, :6, :7, :8)`
@@ -1022,7 +1064,7 @@ app.get("/listarVoos", async(req,res)=>{
       connectionString: process.env.ORACLE_CONN_STR,
     }
     const connection = await oracledb.getConnection(connAttibs);
-    let resultadoConsulta = await connection.execute("SELECT * FROM VOOS2");
+    let resultadoConsulta = await connection.execute("SELECT * FROM VOOS");
   
     await connection.close();
     cr.status = "SUCCESS"; 
@@ -1064,7 +1106,7 @@ app.delete("/excluirVoo", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdDeleteAero = `DELETE VOOS2 WHERE CODIGO_VOO = :1`
+    const cmdDeleteAero = `DELETE VOOS WHERE CODIGO_VOO = :1`
     const dados = [codigo];
 
     let resDelete = await connection.execute(cmdDeleteAero, dados);
@@ -1129,7 +1171,7 @@ app.put("/inserirAssento", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdInsertVoo = `INSERT INTO MAPA_ASSENTOS2
+    const cmdInsertVoo = `INSERT INTO MAPA_ASSENTOS
     (aeronave, banco, disponivel)
     VALUES
     (:1, :2, :3)`
@@ -1175,7 +1217,7 @@ app.get("/listarAssentos", async(req,res)=>{
       connectionString: process.env.ORACLE_CONN_STR,
     }
     const connection = await oracledb.getConnection(connAttibs);
-    let resultadoConsulta = await connection.execute("SELECT * FROM mapa_assentos2");
+    let resultadoConsulta = await connection.execute("SELECT * FROM mapa_assentos");
   
     await connection.close();
     cr.status = "SUCCESS"; 
@@ -1215,7 +1257,7 @@ app.delete("/excluirAssentoUnico", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdDeleteAssento = `DELETE FROM MAPA_ASSENTOS2 WHERE aeronave = :1 AND banco = :2`
+    const cmdDeleteAssento = `DELETE FROM MAPA_ASSENTOS WHERE aeronave = :1 AND banco = :2`
     const dados = [aeronave, assento];
 
     let resDelete = await connection.execute(cmdDeleteAssento, dados);
@@ -1268,7 +1310,7 @@ app.delete("/excluirTodosAssentos", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdDeleteAssento = `DELETE FROM MAPA_ASSENTOS2 WHERE aeronave = :1`
+    const cmdDeleteAssento = `DELETE FROM MAPA_ASSENTOS WHERE aeronave = :1`
     const dados = [aeronave];
 
     let resDelete = await connection.execute(cmdDeleteAssento, dados);
@@ -1335,7 +1377,7 @@ app.put("/inserirCliente", async(req,res)=>{
        connectionString: process.env.ORACLE_CONN_STR,
     });
 
-    const cmdInsertVoo = `INSERT INTO PASSAGEIROS2 
+    const cmdInsertVoo = `INSERT INTO PASSAGEIROS 
     (nome, cpf, email, senha)
     VALUES
     (:1, :2, :3, :4)`
@@ -1387,7 +1429,7 @@ app.post("/loginCliente", async (req, res) => {
 
     // Usando a cláusula WHERE para filtrar por CPF
     const result = await connection.execute(
-      "SELECT * FROM PASSAGEIROS2 WHERE CPF = :cpf",
+      "SELECT * FROM PASSAGEIROS WHERE CPF = :cpf",
       { cpf: { val: cpf } } // Configuração correta do bind para o parâmetro :cpf
     );
 

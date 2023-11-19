@@ -69,26 +69,29 @@
         const data = await response.json();
 
         if (data.status === "SUCCESS") {
-        const cliente = data.payload[0];
+            if(data.payload.length == 0){
+                showStatusMessage("Conta não existe", true);
+            }
+            const cliente = data.payload[0];
 
-        const senhaDoUsuario = cliente[3];
+            const senhaDoUsuario = cliente[3];
 
-        const senhadigitada = document.getElementById("senha").value;
+            const senhadigitada = document.getElementById("senha").value;
 
-        console.log(senhadigitada);
+            console.log(senhadigitada);
 
-        if (senhaDoUsuario == senhadigitada){
-            alert("Login Efetuado com sucesso");
-            window.location.href = "/FRONTEND/src/modules/cliente/login/hublogin.html";
+            if (senhaDoUsuario == senhadigitada){
+                alert("Login Efetuado com sucesso");
+                window.location.href = "/FRONTEND/src/modules/cliente/login/hublogin.html";
 
-        }else{showStatusMessage("Senha incorreta ", true);}
+            }else{showStatusMessage("Senha incorreta ", true);}
 
-        
-        } 
-        else {
-        showStatusMessage("Erro ao criar conta " + data.message, true);
-        console.log(resultado.message);
-        }
+            
+            } 
+            else {
+            showStatusMessage("Erro ao criar conta " + data.message, true);
+            console.log(resultado.message);
+            }
     }
         
       
