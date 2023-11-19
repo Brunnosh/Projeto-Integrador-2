@@ -17,9 +17,23 @@
 
     <script>
 
+    
     var todosvoos;
     var voosfiltrados;
     var trechospesquisado = [];
+
+    function selecionouVoo(){
+
+        let resultado = false; 
+        var vooSelecionada = document.getElementById("vooDropdown").value;
+
+        console.log(vooSelecionada)
+        if (vooSelecionada !== "Escolha um voo"){
+        resultado = true;
+        }
+        return resultado;
+    }
+
 
     function preencheuIda(){
         let resultado = false;
@@ -258,12 +272,30 @@
         voosDropdown.addEventListener('change', handleDropdownChange);
     }
 
-        window.onload = async () => {
+    window.onload = async () => {
+
         await listarVoos();
         await atualizaVooFiltrado();
         await buscaTodosInit();
 
     };
+    
+    function Continuar(){
+
+        if(!selecionouVoo()){
+        showStatusMessage("Selecione um voo...", true);  
+        return;
+        }
+
+
+
+        const vooValue = document.getElementById("vooDropdown").value
+        const vooOBJ = JSON.parse(vooValue);
+        sessionStorage.setItem("vooEscolhido", vooOBJ[0]);
+        console.log(vooOBJ)
+        window.location.href = "/FRONTEND/src/modules/cliente/passagem/comprapassagem2.html";
+    }
+
     </script>
 
 </head>
@@ -310,7 +342,7 @@
             </div>
 
             <div class="btn-group">
-                <button type="button" class="btn" onclick="">Continuar</button>
+                <button type="button" class="btn" onclick="Continuar()">Continuar</button>
                 <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
                 <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
             </div>
