@@ -900,12 +900,14 @@ app.post("/listarTrechosWhere", async(req,res)=>{
     const connection = await oracledb.getConnection(connAttibs);
 
     // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
+    const cidade_ida = req.body.cidade_ida
     const cidade_chegada = req.body.cidade_chegada
+    
 
     // Usando a cláusula WHERE para filtrar por CPF
     const result = await connection.execute(
-      "SELECT * FROM TRECHOS WHERE CIDADE_CHEGADA = :cidade_chegada",
-      { cidade_chegada: { val: cidade_chegada } } // Configuração correta do bind para o parâmetro :cpf
+      "SELECT * FROM TRECHOS WHERE CIDADE_PARTIDA = :cidade_partida AND CIDADE_CHEGADA = :cidade_chegada",
+      { cidade_chegada: { val: cidade_chegada }, cidade_partida: { val: cidade_ida } } // Configuração correta do bind para o parâmetro :cpf
     );
 
     await connection.close();
