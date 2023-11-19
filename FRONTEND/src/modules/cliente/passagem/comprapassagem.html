@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Passagem</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/comprar_passagem.css">
+
+    <style>
+        .statusError{
+           color:red;
+        }
+        .statusSuccess{
+          color:blue;
+        }
+      </style>
+
+    <script>
+
+    var todosvoos;
+    var voosfiltrados;
+    var trechospesquisado = [];
+
+    function fetchBuscar(body) {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/listarTrechosWhere', requestOptions)
+        .then(data => {
+        return data;
+        });
+    }
+
+    async function buscaTrecho() {
+
+        
+        var cidade_chegada = document.getElementById('destino').value;
+
+        const response = await fetchBuscar({
+            cidade_chegada: cidade_chegada
+        });
+        const data = await response.json();
+
+        if (data.status === "SUCCESS") {
+        const trechos = data.payload;
+        console.log(trechos)
+        trechos.forEach(trecho => {
+            trechospesquisado.push(trecho[7]);
+            atualizaVooFiltrado();
+        });
+        } 
+        else {
+        showStatusMessage("Erro ao buscar dados " + data.message, true);
+        console.log(resultado.message);
+        }
+    }
+
+    async function listarVoos() {
+        const response = await fetch('http://localhost:3000/listarVoos');
+        const data = await response.json();
+
+        if (data.status === 'SUCCESS') {
+            todosvoos = data.payload;
+            
+        } else {
+            console.error('Erro ao buscar dados de voo:', data.message);
+        }
+    }
+
+    function showStatusMessage(msg, error){
+        var pStatus = document.getElementById("status");
+        if (error === true){
+        pStatus.className = "statusError";
+        }else{
+        pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+    }
+
+    function handleDropdownChange() {
+        const voosDropdown = document.getElementById('vooDropdown');
+        const selectedVooData = JSON.parse(voosDropdown.value);
+        const voosDiv = document.getElementById('voo');
+
+
+        //0 = Só ida
+        //1 = ida e volta
+        if(selectedVooData[8] == 0 ){
+            selectedVooData.splice(2, 1);
+            selectedVooData.splice(3, 1);
+            selectedVooData.splice(5, 1);
+            console.log(selectedVooData)
+            displayVoosIda(voosDiv, selectedVooData);
+        }
+
+
+        if(selectedVooData[8] == 1 ){
+            displayVoosIdaVolta(voosDiv, selectedVooData);
+        }
+
+
+    }
+
+    function displayVoosIda(container, voo) {
+    container.innerHTML = '';
+    const nomes = ["Codigo :", "Dia do Voo : ", "Hora do Voo : ", "Aeronave : ", "Trecho : ", "Ida e Volta : "];
+    if (voo) {
+        const table = document.createElement('table');
+        const tableBody = document.createElement('tbody');
+        for (const key in voo) {
+            const row = tableBody.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            cell1.textContent = nomes[key];
+            cell2.textContent = voo[key];
+        }
+        
+        table.appendChild(tableBody);
+        container.appendChild(table);
+    }
+    }
+
+    function displayVoosIdaVolta(container, voo) {
+    container.innerHTML = '';
+    const nomesidavolta = ["Codigo :", "Dia de ida Voo : ", "Dia de volta Voo : ", "Hora de ida Voo : ","Hora de Volta Voo : ", "Aeronave : ", "Trecho de Ida: ", "Trecho de Volta: ", "Ida e Volta :"];
+    if (voo) {
+        const table = document.createElement('table');
+        const tableBody = document.createElement('tbody');
+        for (const key in voo) {
+            const row = tableBody.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            cell1.textContent = nomesidavolta[key];
+            cell2.textContent = voo[key];
+        }
+        
+        table.appendChild(tableBody);
+        container.appendChild(table);
+    }
+    }
+
+    function displayVooInit(){
+        const voosDiv = document.getElementById('voo');
+        const voosDropdown = document.getElementById('vooDropdown');
+        const defaultOption = document.createElement('option');
+        defaultOption.textContent = 'Escolha um voo';
+        defaultOption.value = "Escolha um voo";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        voosDropdown.appendChild(defaultOption);
+        const firstAeronave = [0,'N/A','N/A',0,'N/A',0];
+        displayVoosIdaVolta(voosDiv, firstAeronave);
+    }
+
+    function atualizaVooFiltrado(){
+        vooDropdown.innerHTML = '';
+        const voosDiv = document.getElementById('voo');
+        const voosDropdown = document.getElementById('vooDropdown');
+        
+        displayVooInit()
+
+        voosfiltrados = todosvoos;
+        console.log(voosfiltrados)
+        var filtroidavolta = -1;
+        var destino = "N/A";
+
+         //remover do voosfiltrado todos que nao correspondem com "voo ida e volta"
+        const checkbox = document.getElementById("ida_volta");
+        if(!checkbox.checked){
+            voosfiltrados = voosfiltrados.filter(voo => voo[8] == 0 && trechospesquisado.includes(voo[6]));  
+        }
+        if(checkbox.checked){
+            voosfiltrados = voosfiltrados.filter(voo => voo[8] == 1); 
+        }
+       
+
+
+        //pesquisar trechos e remover do voosfiltrado todos que nao correspondem com "destino"
+
+        
+        voosfiltrados.forEach(voo => {
+            
+            const option = document.createElement('option');
+            option.value = JSON.stringify(voo); 
+
+
+            const CODIGO = voo[0];
+            const DIA= voo[1];
+            const HORARIO = voo[2];
+            const AERONAVE = voo[3];
+            const TRECHO = voo[4];
+            const IDAVOLTA = voo[5];
+            option.textContent = [CODIGO];
+            voosDropdown.appendChild(option);
+
+        });
+
+        voosDropdown.addEventListener('change', handleDropdownChange);
+
+
+    }
+
+    function buscaTodosInit(){
+        voosfiltrados = todosvoos;
+        vooDropdown.innerHTML = '';
+        displayVooInit()
+        const voosDiv = document.getElementById('voo');
+        const voosDropdown = document.getElementById('vooDropdown');
+
+        voosfiltrados.forEach(voo => {
+            
+            const option = document.createElement('option');
+            option.value = JSON.stringify(voo); 
+
+
+            const CODIGO = voo[0];
+            const DIA= voo[1];
+            const HORARIO = voo[2];
+            const AERONAVE = voo[3];
+            const TRECHO = voo[4];
+            const IDAVOLTA = voo[5];
+            option.textContent = [CODIGO];
+            voosDropdown.appendChild(option);
+
+        });
+
+        voosDropdown.addEventListener('change', handleDropdownChange);
+    }
+
+        window.onload = async () => {
+        await listarVoos();
+        await atualizaVooFiltrado();
+        await buscaTodosInit();
+
+    };
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Comprar Passagem</h1>
+        <form id="cadastro-form">
+            <p>Selecione os detalhes do seu voo :</p>
+
+            <div class="form-group">
+
+                <div class="radio-group">
+                    <label for="ida_volta">Voo ida e volta :</label>
+                    <input type="checkbox" id="ida_volta" onchange="atualizaVooFiltrado()"/>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="destino">Qual sua cidade de destino:</label>
+                <input type="text" id="destino" name="destino">
+                <button type="button" class="btn btn-clear" onclick="buscaTrecho()">Atualizar</button>
+            </div>
+
+
+
+
+
+
+
+
+
+
+            <div class="form-group">
+              <label for="vooDropdown">Escolha um voo:</label>
+              <select id="vooDropdown"></select>              
+              <div id="voo">
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="">Continuar</button>
+                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+            </div>
+            
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>

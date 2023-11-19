@@ -1,27 +1,27 @@
 //TABLES//
 
-create table AEROPORTOS2(
+create table AEROPORTOS(
     codigo_aeroporto int NOT NULL,
     nome_aeroporto varchar2(30)PRIMARY KEY,
     cidade_aeroporto varchar2(30) NOT NULL,
-    constraint FK_cidade_aeroporto2 FOREIGN KEY (cidade_aeroporto) references CIDADES2 (nome_cidade) ON DELETE CASCADE
+    constraint FK_cidade_aeroporto FOREIGN KEY (cidade_aeroporto) references CIDADES (nome_cidade) ON DELETE CASCADE
 );
 
-create table CIDADES2(
+create table CIDADES(
     codigo_cidade int NOT NULL,
     pais_cidade varchar2(30),
     nome_cidade varchar2(30) PRIMARY KEY,
-    constraint FK_pais_cidade2 FOREIGN KEY (pais_cidade) references PAISES2 (nome_pais) ON DELETE CASCADE
+    constraint FK_pais_cidade FOREIGN KEY (pais_cidade) references PAISES (nome_pais) ON DELETE CASCADE
 );
 
 
-create table PAISES2(
+create table PAISES(
     codigo_pais int NOT NULL,
     nome_pais varchar2(30) PRIMARY KEY,
     sigla_pais varchar2(5)
 );
 
-create table TRECHOS2(
+create table TRECHOS(
     codigo_trecho int NOT NULL,
     pais_partida varchar2(30) NOT NULL,
     pais_chegada varchar2(30) NOT NULL,
@@ -30,16 +30,16 @@ create table TRECHOS2(
     aeroporto_partida varchar2(30) NOT NULL,
     aeroporto_chegada varchar2(30) NOT NULL,
     trecho varchar2(200) PRIMARY KEY,
-    constraint FK_pais_partida2 FOREIGN KEY (pais_partida) references PAISES2 (nome_pais) ON DELETE CASCADE,
-    constraint FK_pais_chegada2 FOREIGN KEY (pais_chegada) references PAISES2 (nome_pais) ON DELETE CASCADE,
-    constraint FK_cidade_partida2 FOREIGN KEY (cidade_partida) references CIDADES2 (nome_cidade) ON DELETE CASCADE,
-    constraint FK_cidade_chegada2 FOREIGN KEY (cidade_chegada) references CIDADES2 (nome_cidade) ON DELETE CASCADE,
-    constraint FK_aeroporto_partida2 FOREIGN KEY (aeroporto_partida) references AEROPORTOS2 (nome_aeroporto) ON DELETE CASCADE,
-    constraint FK_aeroporto_chegada2 FOREIGN KEY (aeroporto_chegada) references AEROPORTOS2 (nome_aeroporto) ON DELETE CASCADE
+    constraint FK_pais_partida FOREIGN KEY (pais_partida) references PAISES (nome_pais) ON DELETE CASCADE,
+    constraint FK_pais_chegada FOREIGN KEY (pais_chegada) references PAISES (nome_pais) ON DELETE CASCADE,
+    constraint FK_cidade_partida FOREIGN KEY (cidade_partida) references CIDADES (nome_cidade) ON DELETE CASCADE,
+    constraint FK_cidade_chegada FOREIGN KEY (cidade_chegada) references CIDADES (nome_cidade) ON DELETE CASCADE,
+    constraint FK_aeroporto_partida FOREIGN KEY (aeroporto_partida) references AEROPORTOS (nome_aeroporto) ON DELETE CASCADE,
+    constraint FK_aeroporto_chegada FOREIGN KEY (aeroporto_chegada) references AEROPORTOS (nome_aeroporto) ON DELETE CASCADE
 );
 
 
-create table AERONAVES2(
+create table AERONAVES(
     codigo_aeronave int PRIMARY KEY,
     fabricante varchar2(30) NOT NULL,
     modelo varchar2(10) NOT NULL,
@@ -56,17 +56,17 @@ create table AERONAVES2(
 
 
 
-create table MAPA_ASSENTOS2(
+create table MAPA_ASSENTOS(
     aeronave int NOT NULL,
     banco int PRIMARY KEY NOT NULL,
     disponivel int NOT NULL,
     custo int DEFAULT 150 NOT NULL,
-    constraint FK_assento_aeronave2 FOREIGN KEY (aeronave) references AERONAVES2 (codigo_aeronave) ON DELETE CASCADE
+    constraint FK_assento_aeronave FOREIGN KEY (aeronave) references AERONAVES (codigo_aeronave) ON DELETE CASCADE
 );
 
 
 
-create table VOOS2(
+create table VOOS(
     codigo_voo int PRIMARY KEY,
     dia_ida varchar2(10) NOT NULL,
     dia_volta varchar2(10) NOT NULL,
@@ -80,13 +80,13 @@ create table VOOS2(
     unique (dia_ida,horario_ida),
     unique (aeronave, dia_volta),
     unique (dia_volta,horario_volta),
-    constraint FK_aeronave2 FOREIGN KEY (aeronave) references AERONAVES2 (codigo_aeronave) ON DELETE CASCADE,
-    constraint FK_trecho_ida2 FOREIGN KEY (trecho_ida) references TRECHOS2 (trecho) ON DELETE CASCADE,
-    constraint FK_trecho_volta2 FOREIGN KEY (trecho_volta) references TRECHOS2 (trecho) ON DELETE CASCADE
+    constraint FK_aeronave FOREIGN KEY (aeronave) references AERONAVES (codigo_aeronave) ON DELETE CASCADE,
+    constraint FK_trecho_ida FOREIGN KEY (trecho_ida) references TRECHOS (trecho) ON DELETE CASCADE,
+    
 );
 
 
-create table PASSAGEIROS2(
+create table PASSAGEIROS(
     nome varchar2(30),
     cpf varchar2(14) PRIMARY KEY,
     email varchar2(50),
@@ -94,14 +94,18 @@ create table PASSAGEIROS2(
     
 );
 
+alter table voos drop constraint FK_trecho_volta;
 
+drop table paises;
+drop table cidades;
+drop table aeroportos;
+drop table trechos;
+drop table aeronaves;
+drop table mapa_assentos;
+drop table passageiros;
+drop table voos;
 
-select * from paises2;
-select * from CIDADES2;
-select * from aeroportos2;
-select * from trechos2;
-
-
+select * from trechos;
 
 //TABLES BUGADAS
 

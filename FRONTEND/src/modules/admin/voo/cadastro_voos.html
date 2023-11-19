@@ -96,6 +96,9 @@
         var valorSelecionado = listaTrechos.value;
 
         var trechoIda = document.getElementById("trechoIdaDropdown").value;
+        if(!checkbox.checked){
+              return true;
+            }
         if(checkbox.checked){
           if (valorSelecionado !== "Escolha um trecho" && valorSelecionado !== trechoIda){
           resultado = "true";
@@ -113,24 +116,25 @@
             var checkbox = document.getElementById("ida_volta");
             let resultado = false; 
             var dia_volta = document.getElementById("dia_volta").value;
-            if(checkbox.checked){
-              if (dia_volta.length > 0){
-              resultado = true;
-              }
-              return resultado;
+            if(!checkbox.checked){
+              return true;
             }
-
+            if(checkbox.checked && dia_volta.length > 0){
+              resultado = true;
+              
+            }
+            return resultado;
         }
 
         function preencheuHoraVolta(){
             var checkbox = document.getElementById("ida_volta");
             let resultado = false; 
             var hora_volta = document.getElementById("hora_volta").value;
-          
-            if(checkbox.checked){
-              if (hora_volta.length > 0){
-            resultado = true;
+            if(!checkbox.checked){
+              return true;
             }
+            if(checkbox.checked && hora_volta.length > 0){
+            resultado = true;            
             return resultado;
             }
 
@@ -207,13 +211,13 @@
         
         trechos.forEach(trecho => {
             const option1 = document.createElement('option');
-            option1.value = trecho[5]; 
-            option1.textContent = trecho[5];
+            option1.value = trecho[7]; 
+            option1.textContent = trecho[7];
             trechosIdaDropdown.appendChild(option1);
 
             const option2 = document.createElement('option');
-            option2.value = trecho[5]; 
-            option2.textContent = trecho[5];
+            option2.value = trecho[7]; 
+            option2.textContent = trecho[7];
             trechosVoltaDropdown.appendChild(option2);
         
 
@@ -332,7 +336,7 @@
           return;
         }
 
-
+        
         const aeronaveInfo = document.getElementById("aeronaveDropdown").value;
         const aeronaveObj = JSON.parse(aeronaveInfo);
         const codigo = aeronaveObj[0];
@@ -345,18 +349,16 @@
         var horario_volta = document.getElementById("hora_volta").value;
         const aeronave = codigo;
         const trechoida = document.getElementById("trechoIdaDropdown").value;
-        const trechovolta = document.getElementById("trechoVoltaDropdown").value;
+        var trechovolta = document.getElementById("trechoVoltaDropdown").value;
         const idavolta  = document.getElementById("ida_volta").checked ?  '1'  :  '0' ;
 
 
-        console.log(dia_ida);
-        console.log(dia_volta);
-        console.log(horario_ida);
-        console.log(horario_volta);
+
 
         if (idavolta == 0){
           dia_volta = 0;
           horario_volta = 0;
+          trechovolta = 0;
 
         }
 
@@ -385,6 +387,7 @@
             .catch(()=>{
               showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
               console.log("Falha grave ao cadastrar.")
+              console.log(dia_volta,horario_volta,trechovolta)
             });
 
 
