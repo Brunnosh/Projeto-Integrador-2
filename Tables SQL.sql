@@ -76,13 +76,14 @@ create table VOOS(
     trecho_ida varchar2(200) NOT NULL,
     trecho_volta varchar2(200) NOT NULL,
     idavolta int NOT NULL,
-    unique (aeronave,dia_ida),
-    unique (dia_ida,horario_ida),
+    unique (aeronave,dia_ida) ,
     unique (aeronave, dia_volta),
+    unique (dia_ida,horario_ida),
     unique (dia_volta,horario_volta),
+    unique(dia_ida,dia_volta) ,
     constraint FK_aeronave FOREIGN KEY (aeronave) references AERONAVES (codigo_aeronave) ON DELETE CASCADE,
-    constraint FK_trecho_ida FOREIGN KEY (trecho_ida) references TRECHOS (trecho) ON DELETE CASCADE,
-    
+    constraint FK_trecho_ida FOREIGN KEY (trecho_ida) references TRECHOS (trecho) ON DELETE CASCADE
+
 );
 
 
@@ -105,7 +106,7 @@ drop table mapa_assentos;
 drop table passageiros;
 drop table voos;
 
-select * from trechos;
+select * from voos;
 
 //TABLES BUGADAS
 
@@ -127,6 +128,12 @@ create sequence SEQ_TRECHOS;
 create sequence SEQ_CIDADES;
 
 create sequence SEQ_AEROPORTOS;
+
+create sequence SEQ_DIAVOLTAVAZIO ;
+
+create sequence SEQ_HORAVOLTAVAZIO;
+
+create sequence SEQ_TRECHOVOLTAVAZIO;
 //----------------------------//
 drop sequence SEQ_PAISES;
 
