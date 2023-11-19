@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservar assentos</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/reservar_assento.css">
+
+    <style>
+        .statusError{
+           color:red;
+        }
+        .statusSuccess{
+          color:blue;
+        }
+      </style>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Aguarda o carregamento completo da página para garantir que o sessionStorage esteja pronto
+        const vooEscolhido = sessionStorage.getItem("vooEscolhido");
+
+        // Verifica se o valor foi recuperado com sucesso
+        if (vooEscolhido) {
+            console.log("Valor recuperado:", vooEscolhido);
+        } else {
+            console.log("Nenhum valor encontrado no sessionStorage.");
+        }
+    });
+
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Reservar assentos</h1>
+        <form id="cadastro-form">
+
+            
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>
