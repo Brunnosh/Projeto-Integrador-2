@@ -60,6 +60,46 @@ app.get("/listarAeronaves", async(req,res)=>{
 
 });
 
+app.post("/listarAeronavesWhere", async(req,res)=>{
+
+  let cr: CustomResponse = {status: "ERROR", message: "", payload: undefined,};
+
+  try {
+    const connAttibs = {
+      user: process.env.ORACLE_DB_USER,
+      password: process.env.ORACLE_DB_PASSWORD,
+      connectionString: process.env.ORACLE_CONN_STR,
+    };
+
+    const connection = await oracledb.getConnection(connAttibs);
+
+    // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
+    const codigo_aeronave = req.body.codigo_aeronave;
+
+    // Usando a cláusula WHERE para filtrar por CPF
+    const result = await connection.execute(
+      "SELECT numero_assentos,assentos_linha,assentos_corredor FROM AERONAVES WHERE codigo_aeronave = :codigo_aeronave",
+      { codigo_aeronave: { val: codigo_aeronave } } // Configuração correta do bind para o parâmetro :cpf
+    );
+
+    await connection.close();
+
+    cr.status = "SUCCESS";
+    cr.message = "Dados obtidos";
+    cr.payload = result.rows;
+
+  } catch (e) {
+    if (e instanceof Error) {
+      cr.message = e.message;
+      console.log(e.message);
+    } else {
+      cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+    }
+  } finally {
+    res.send(cr);
+  }
+});
+
 app.put("/inserirAeronave", async(req,res)=>{
   
   // para inserir a aeronave temos que receber os dados na requisição. 
@@ -1283,6 +1323,48 @@ app.get("/listarAssentos", async(req,res)=>{
     res.send(cr);  
   }
 
+});
+
+app.post("/listarAssentosWhere", async(req,res)=>{
+
+  let cr: CustomResponse = {status: "ERROR", message: "", payload: undefined,};
+
+  try {
+    const connAttibs = {
+      user: process.env.ORACLE_DB_USER,
+      password: process.env.ORACLE_DB_PASSWORD,
+      connectionString: process.env.ORACLE_CONN_STR,
+    };
+
+    const connection = await oracledb.getConnection(connAttibs);
+
+    // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
+    const codigo_aeronave = req.body.codigo_aeronave
+
+    
+
+    // Usando a cláusula WHERE para filtrar por CPF
+    const result = await connection.execute(
+      "SELECT * FROM MAPA_ASSENTOS WHERE aeronave = :codigo_aeronave",
+      { codigo_aeronave: { val: codigo_aeronave } } // Configuração correta do bind para o parâmetro :cpf
+    );
+
+    await connection.close();
+
+    cr.status = "SUCCESS";
+    cr.message = "Dados obtidos";
+    cr.payload = result.rows;
+
+  } catch (e) {
+    if (e instanceof Error) {
+      cr.message = e.message;
+      console.log(e.message);
+    } else {
+      cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+    }
+  } finally {
+    res.send(cr);
+  }
 });
 
 app.delete("/excluirAssentoUnico", async(req,res)=>{
