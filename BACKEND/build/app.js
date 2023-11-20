@@ -56,6 +56,38 @@ app.get("/listarAeronaves", (req, res) => __awaiter(void 0, void 0, void 0, func
         res.send(cr);
     }
 }));
+app.post("/listarAeronavesWhere", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let cr = { status: "ERROR", message: "", payload: undefined, };
+    try {
+        const connAttibs = {
+            user: process.env.ORACLE_DB_USER,
+            password: process.env.ORACLE_DB_PASSWORD,
+            connectionString: process.env.ORACLE_CONN_STR,
+        };
+        const connection = yield oracledb_1.default.getConnection(connAttibs);
+        // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
+        const codigo_aeronave = req.body.codigo_aeronave;
+        // Usando a cláusula WHERE para filtrar por CPF
+        const result = yield connection.execute("SELECT numero_assentos,assentos_linha,assentos_corredor FROM AERONAVES WHERE codigo_aeronave = :codigo_aeronave", { codigo_aeronave: { val: codigo_aeronave } } // Configuração correta do bind para o parâmetro :cpf
+        );
+        yield connection.close();
+        cr.status = "SUCCESS";
+        cr.message = "Dados obtidos";
+        cr.payload = result.rows;
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            cr.message = e.message;
+            console.log(e.message);
+        }
+        else {
+            cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+        }
+    }
+    finally {
+        res.send(cr);
+    }
+}));
 app.put("/inserirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // para inserir a aeronave temos que receber os dados na requisição. 
     const marca = req.body.marca;
@@ -1115,6 +1147,38 @@ app.get("/listarAssentos", (req, res) => __awaiter(void 0, void 0, void 0, funct
         }
         else {
             cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+        }
+    }
+    finally {
+        res.send(cr);
+    }
+}));
+app.post("/listarAssentosWhere", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let cr = { status: "ERROR", message: "", payload: undefined, };
+    try {
+        const connAttibs = {
+            user: process.env.ORACLE_DB_USER,
+            password: process.env.ORACLE_DB_PASSWORD,
+            connectionString: process.env.ORACLE_CONN_STR,
+        };
+        const connection = yield oracledb_1.default.getConnection(connAttibs);
+        // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
+        const codigo_aeronave = req.body.codigo_aeronave;
+        // Usando a cláusula WHERE para filtrar por CPF
+        const result = yield connection.execute("SELECT * FROM MAPA_ASSENTOS WHERE aeronave = :codigo_aeronave", { codigo_aeronave: { val: codigo_aeronave } } // Configuração correta do bind para o parâmetro :cpf
+        );
+        yield connection.close();
+        cr.status = "SUCCESS";
+        cr.message = "Dados obtidos";
+        cr.payload = result.rows;
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            cr.message = e.message;
+            console.log(e.message);
+        }
+        else {
+            cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
         }
     }
     finally {

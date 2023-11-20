@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservar assentos</title>
-    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/reservar_assento.css">
-
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/reservarassento.css">
     <style>
         .statusError{
            color:red;
@@ -13,25 +12,138 @@
         .statusSuccess{
           color:blue;
         }
-      </style>
-
+    </style>
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
+
+
+
+    document.addEventListener("DOMContentLoaded", async function () {
         // Aguarda o carregamento completo da página para garantir que o sessionStorage esteja pronto
         const vooEscolhido = sessionStorage.getItem("vooEscolhido");
-
+        const aeronaveEscolhida = sessionStorage.getItem("aeronaveEscolhida");
         // Verifica se o valor foi recuperado com sucesso
         if (vooEscolhido) {
-            console.log("Valor recuperado:", vooEscolhido);
+            console.log("Valor recuperado 1:", vooEscolhido);
+            console.log("Valor recuperado 2:", aeronaveEscolhida);
+            const arrayinfo = await listarAssentosAeronave(aeronaveEscolhida);
+            
+            const totalSeatsFromDatabase = arrayinfo[0];
+            const seatsPerRowFromDatabase = arrayinfo[1];
+            const seatsBeforeCorridorFromDatabase = arrayinfo[2];
+
+            const assentosOcupados = await listarAssentosOcupados(aeronaveEscolhida);
+
+            initSeatMap(totalSeatsFromDatabase,seatsPerRowFromDatabase,seatsBeforeCorridorFromDatabase, assentosOcupados);    
         } else {
             console.log("Nenhum valor encontrado no sessionStorage.");
         }
     });
+    
+    function showStatusMessage(msg, error) {
+    var pStatus = document.getElementById("status");
+    if (error === true) {
+        pStatus.className = "statusError";
+    } else {
+        pStatus.className = "statusSuccess";
+    }
+    pStatus.textContent = msg;
+}
+
+    function fetchBuscarAero(body) {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/listarAeronavesWhere', requestOptions)
+        .then(data => {
+        return data;
+        });
+    }
+
+    async function listarAssentosAeronave(codigo_aeronave) {
+
+
+    const response = await fetchBuscarAero({
+        codigo_aeronave: codigo_aeronave
+    });
+    const data = await response.json();
+
+    if (data.status === "SUCCESS") {
+    const infoassentos = data.payload;
+
+    let totalSeatsFromDatabase, seatsPerRowFromDatabase, seatsBeforeCorridorFromDatabase;
+
+    infoassentos.forEach(info => {
+        totalSeatsFromDatabase = info[0];
+        seatsPerRowFromDatabase = info[1];
+        seatsBeforeCorridorFromDatabase = info[2];
+    });
+
+    const arrayreturn = [totalSeatsFromDatabase, seatsPerRowFromDatabase,seatsBeforeCorridorFromDatabase];
+
+    return arrayreturn;
+    } 
+    else {
+    showStatusMessage("Erro ao buscar dados " + data.message, true);
+    
+    }
+    }
+
+    
+    function fetchBuscarAssento(body) {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/listarAssentosWhere', requestOptions)
+        .then(data => {
+        return data;
+        });
+    }
+
+    async function listarAssentosOcupados(codigo_aeronave) {
+
+        console.log(codigo_aeronave)
+
+        const response = await fetchBuscarAssento({
+            codigo_aeronave: codigo_aeronave
+        });
+        const data = await response.json();
+
+        if (data.status === "SUCCESS") {
+        const arrayOcupados = [];
+        const assentosocupado = data.payload;
+        console.log(assentosocupado)
+
+        assentosocupado.forEach(info => {
+        arrayOcupados.push(info[1]);
+        });
+
+        return arrayOcupados;
+
+        } 
+        else {
+        showStatusMessage("Erro ao buscar dados " + data.message, true);
+
+        }
+    }
 
     </script>
+    
 
 </head>
 <body>
+    <div id="seat-map"></div>
+
+    <script src="/FRONTEND/src/assets/css/construirmapa.js"></script>
+    <script>
+
+    </script>
+
     <div class="container">
         <h1>Reservar assentos</h1>
         <form id="cadastro-form">

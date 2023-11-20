@@ -292,6 +292,7 @@
         const vooValue = document.getElementById("vooDropdown").value
         const vooOBJ = JSON.parse(vooValue);
         sessionStorage.setItem("vooEscolhido", vooOBJ[0]);
+        sessionStorage.setItem("aeronaveEscolhida", vooOBJ[5]);
         console.log(vooOBJ)
         window.location.href = "/FRONTEND/src/modules/cliente/passagem/comprapassagem2.html";
     }
