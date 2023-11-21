@@ -21,9 +21,11 @@
     const ndeAssentos = sessionStorage.getItem("ndeAssentos");
     const cpfPassageiro = sessionStorage.getItem("cpfPassageiro");
     const vooEscolhido = sessionStorage.getItem("vooEscolhido");
-
     const custo = ndeAssentos * 150;
     const custodisplay = custo + "R$"
+
+    console.log(JSON.parse(assentosEscolhidos)[0]);
+    
 
 
     document.addEventListener("DOMContentLoaded", async function () {
@@ -34,9 +36,30 @@
             const divcheckbox = document.getElementById("divcheckbox");
             divcheckbox.style.display = "block";
         }
+        if(ndeAssentos > 1)
+        {   
+            const checkbox = document.getElementById("assentosunico")
+            if(checkbox.checked){
+                addElement(ndeAssentos);
+            }
+            
+        }
     });
+ 
+    function addElement(n){
+        for (let i = 0; i < n; i++) {
+            const newDiv = document.createElement("div");
+            const newContent = document.createTextNode("Hi there and greetings!");
+            newDiv.appendChild(newContent);
+            const currentDiv = document.getElementById("divcheckbox");
+            
+
+            }
+        
+    }
 
     function atualizarStatusDisponibilidade() {
+        addElement(ndeAssentos);
         var checkbox = document.getElementById("assentosunico");
         var statusSpan = document.getElementById("statusDisponibilidade");
 
@@ -137,8 +160,62 @@
     }
 
     if(ndeAssentos > 1){
+        const checkbox = document.getElementById("assentosunico")
+        if(checkbox.checked){
+            await fetchInserirPagamento({
+                cpf: cpfPassageiro, 
+                custo: custo,
+                qtd_paga: custo, 
+                modo_pagamento: modo_pagamento
+                })
+                .then(resultado => {
+                
+                if(resultado.status === "SUCCESS"){
+                    for (let i = 0; i < ndeAssentos; i++) {
+                        fetchReservarAssento({
+                            isADM: isADM, 
+                            aeronave: aeronaveEscolhida,
+                            assento: JSON.parse(assentosEscolhidos)[i], 
+                            cpfpassageiro: cpfPassageiro,
+                            numvoo : vooEscolhido
+                            })
+                            .then(resultado => {
+                        
+                            if(resultado.status === "SUCCESS"){
+                            
+                                }else{
+                            showStatusMessage("Erro ao criar conta " + message, true);
+                            console.log(resultado.message);
+                            }
+                            })
+                            .catch(()=>{
+                            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+                            console.log("Falha grave ao cadastrar.")
+                            });
+                    }
+                    
+                }else{
+                    showStatusMessage("Erro ao criar conta " + message, true);
+                    console.log(resultado.message);
+                }
+                })
+                .catch(()=>{
+                showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+                console.log("Falha grave ao cadastrar.")
+                });
+        
+            alert("Compra efetuada e assentos reservados!");
+            window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
+        }
+        if(!checkbox.checked){
+            for (let i = 0; i < ndeAssentos; i++) {
+            
+            }
+        }
+
 
     }
+
 
     }
 
@@ -152,6 +229,7 @@
     console.log(aeronaveEscolhida, assentosEscolhidos, ndeAssentos, cpfPassageiro, vooEscolhido)
 
     window.onload = function () {
+        addElement(ndeAssentos);
         atualizarStatusDisponibilidade();
     }
     </script>

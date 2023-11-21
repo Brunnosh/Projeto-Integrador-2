@@ -154,7 +154,7 @@
         const ndeAssentos = selectedSeats.length;
 
         sessionStorage.setItem("aeronaveEscolhida", aeronaveEscolhida);
-        sessionStorage.setItem("assentosEscolhidos", selectedSeats);
+        sessionStorage.setItem("assentosEscolhidos",JSON.stringify(selectedSeats));
         sessionStorage.setItem("ndeAssentos", ndeAssentos);
         sessionStorage.setItem("cpfPassageiro", cpfPassageiro);
         sessionStorage.setItem("vooEscolhido", vooEscolhido);
