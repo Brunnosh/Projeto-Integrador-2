@@ -1,6 +1,6 @@
 
 const seatMap = document.getElementById('seat-map');
-const selectedSeats = [];
+
 
 function createSeat(id, ocupado) {
     const seatElement = document.createElement('div');

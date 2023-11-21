@@ -1233,16 +1233,16 @@ app.delete("/excluirVoo", async(req,res)=>{
 app.put("/inserirAssento", async(req,res)=>{
   
   // para inserir a aeronave temos que receber os dados na requisição.
-  const aeronave = req.body.codigo as number;
+  const isADM = req.body.isADM as number;
+  const aeronave = req.body.aeronave as number;
   const assento = req.body.assento as number;
+  const cpfpassageiro = req.body.cpfpassageiro as string;
+  const numvoo = req.body.numvoo as number;
   const disponivel = 0;
 
-  // correção: verificar se tudo chegou para prosseguir com o cadastro.
-  // verificar se chegaram os parametros
-  // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-  // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-
-  // definindo um objeto de resposta.
+  //Se a inserção estiver vindo da tela de ADM
+  if(isADM == 1){
+    
   let cr: CustomResponse = {
     status: "ERROR",
     message: "",
@@ -1292,6 +1292,61 @@ app.put("/inserirAssento", async(req,res)=>{
     }
     res.send(cr);  
   }
+  }
+
+  //Se a inserção estiver vindo da tela de um cliente
+  if(isADM == 0){
+    
+    let cr: CustomResponse = {
+      status: "ERROR",
+      message: "",
+      payload: undefined,
+    };
+  
+    let conn;
+  
+    // conectando 
+    try{
+      conn = await oracledb.getConnection({
+         user: process.env.ORACLE_DB_USER,
+         password: process.env.ORACLE_DB_PASSWORD,
+         connectionString: process.env.ORACLE_CONN_STR,
+      });
+  
+      const cmdInsertVoo = `INSERT INTO MAPA_ASSENTOS
+      (aeronave, banco, disponivel, cpf_passageiro, numero_voo)
+      VALUES
+      (:1, :2, :3, :4, :5)`
+  
+      const dados = [aeronave, assento, disponivel, cpfpassageiro, numvoo];
+      let resInsert = await conn.execute(cmdInsertVoo, dados);
+      
+      // importante: efetuar o commit para gravar no Oracle.
+      await conn.commit();
+    
+      // obter a informação de quantas linhas foram inseridas. 
+      // neste caso precisa ser exatamente 1
+      const rowsInserted = resInsert.rowsAffected
+      if(rowsInserted !== undefined &&  rowsInserted === 1) {
+        cr.status = "SUCCESS"; 
+        cr.message = "assento Cadastrado";
+      }
+  
+    }catch(e){
+      if(e instanceof Error){
+        cr.message = e.message;
+        console.log(e.message);
+      }else{
+        cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+      }
+    } finally {
+      //fechar a conexao.
+      if(conn!== undefined){
+        await conn.close();
+      }
+      res.send(cr);  
+    }
+    }
 });
 
 app.get("/listarAssentos", async(req,res)=>{
@@ -1340,13 +1395,14 @@ app.post("/listarAssentosWhere", async(req,res)=>{
 
     // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
     const codigo_aeronave = req.body.codigo_aeronave
+    const numero_voo = req.body.numero_voo
 
     
 
     // Usando a cláusula WHERE para filtrar por CPF
     const result = await connection.execute(
-      "SELECT * FROM MAPA_ASSENTOS WHERE aeronave = :codigo_aeronave",
-      { codigo_aeronave: { val: codigo_aeronave } } // Configuração correta do bind para o parâmetro :cpf
+      "SELECT * FROM MAPA_ASSENTOS WHERE AERONAVE = :codigo_aeronave AND NUMERO_VOO = :numero_voo",
+      { codigo_aeronave: { val: codigo_aeronave }, numero_voo: { val: numero_voo } } // Configuração correta do bind para o parâmetro :cpf
     );
 
     await connection.close();
@@ -1578,6 +1634,74 @@ app.post("/loginCliente", async (req, res) => {
     }
   } finally {
     res.send(cr);
+  }
+});
+
+//SERVICOS PAGAMENTO
+
+app.put("/InserirPagamento", async(req,res)=>{
+  
+  // para inserir a aeronave temos que receber os dados na requisição.
+  const cpf = req.body.cpf as string;
+  const custo = req.body.custo as number;
+  const qtd_paga = req.body.qtd_paga as number;
+  const modo_pagamento = req.body.modo_pagamento as string;
+
+
+  // correção: verificar se tudo chegou para prosseguir com o cadastro.
+  // verificar se chegaram os parametros
+  // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
+  // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
+
+  // definindo um objeto de resposta.
+  let cr: CustomResponse = {
+    status: "ERROR",
+    message: "",
+    payload: undefined,
+  };
+
+  let conn;
+
+  // conectando 
+  try{
+    conn = await oracledb.getConnection({
+       user: process.env.ORACLE_DB_USER,
+       password: process.env.ORACLE_DB_PASSWORD,
+       connectionString: process.env.ORACLE_CONN_STR,
+    });
+
+    const cmdInsertVoo = `INSERT INTO PAGAMENTOS 
+    (cpf_cliente, custo, qtd_paga, modo_pagamento)
+    VALUES
+    (:1, :2, :3, :4)`
+
+    const dados = [cpf, custo, qtd_paga, modo_pagamento];
+    let resInsert = await conn.execute(cmdInsertVoo, dados);
+    
+    // importante: efetuar o commit para gravar no Oracle.
+    await conn.commit();
+  
+    // obter a informação de quantas linhas foram inseridas. 
+    // neste caso precisa ser exatamente 1
+    const rowsInserted = resInsert.rowsAffected
+    if(rowsInserted !== undefined &&  rowsInserted === 1) {
+      cr.status = "SUCCESS"; 
+      cr.message = "Cliente Cadastrado";
+    }
+
+  }catch(e){
+    if(e instanceof Error){
+      cr.message = e.message;
+      console.log(e.message);
+    }else{
+      cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+    }
+  } finally {
+    //fechar a conexao.
+    if(conn!== undefined){
+      await conn.close();
+    }
+    res.send(cr);  
   }
 });
 

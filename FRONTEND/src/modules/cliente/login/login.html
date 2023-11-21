@@ -78,10 +78,11 @@
 
             const senhadigitada = document.getElementById("senha").value;
 
-            console.log(senhadigitada);
+            console.log(cliente[1]);
 
             if (senhaDoUsuario == senhadigitada){
                 alert("Login Efetuado com sucesso");
+                sessionStorage.setItem("cpfPassageiro", cliente[1]);
                 window.location.href = "/FRONTEND/src/modules/cliente/login/hublogin.html";
 
             }else{showStatusMessage("Senha incorreta ", true);}
