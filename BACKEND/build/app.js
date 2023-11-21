@@ -1071,58 +1071,107 @@ app.delete("/excluirVoo", (req, res) => __awaiter(void 0, void 0, void 0, functi
 //SERVICOS BACKEND ASSENTOS
 app.put("/inserirAssento", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // para inserir a aeronave temos que receber os dados na requisição.
-    const aeronave = req.body.codigo;
+    const isADM = req.body.isADM;
+    const aeronave = req.body.aeronave;
     const assento = req.body.assento;
+    const cpfpassageiro = req.body.cpfpassageiro;
+    const numvoo = req.body.numvoo;
     const disponivel = 0;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
-    let cr = {
-        status: "ERROR",
-        message: "",
-        payload: undefined,
-    };
-    let conn;
-    // conectando 
-    try {
-        conn = yield oracledb_1.default.getConnection({
-            user: process.env.ORACLE_DB_USER,
-            password: process.env.ORACLE_DB_PASSWORD,
-            connectionString: process.env.ORACLE_CONN_STR,
-        });
-        const cmdInsertVoo = `INSERT INTO MAPA_ASSENTOS
+    //Se a inserção estiver vindo da tela de ADM
+    if (isADM == 1) {
+        let cr = {
+            status: "ERROR",
+            message: "",
+            payload: undefined,
+        };
+        let conn;
+        // conectando 
+        try {
+            conn = yield oracledb_1.default.getConnection({
+                user: process.env.ORACLE_DB_USER,
+                password: process.env.ORACLE_DB_PASSWORD,
+                connectionString: process.env.ORACLE_CONN_STR,
+            });
+            const cmdInsertVoo = `INSERT INTO MAPA_ASSENTOS
     (aeronave, banco, disponivel)
     VALUES
     (:1, :2, :3)`;
-        const dados = [aeronave, assento, disponivel];
-        let resInsert = yield conn.execute(cmdInsertVoo, dados);
-        // importante: efetuar o commit para gravar no Oracle.
-        yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
-        const rowsInserted = resInsert.rowsAffected;
-        if (rowsInserted !== undefined && rowsInserted === 1) {
-            cr.status = "SUCCESS";
-            cr.message = "assento Cadastrado";
+            const dados = [aeronave, assento, disponivel];
+            let resInsert = yield conn.execute(cmdInsertVoo, dados);
+            // importante: efetuar o commit para gravar no Oracle.
+            yield conn.commit();
+            // obter a informação de quantas linhas foram inseridas. 
+            // neste caso precisa ser exatamente 1
+            const rowsInserted = resInsert.rowsAffected;
+            if (rowsInserted !== undefined && rowsInserted === 1) {
+                cr.status = "SUCCESS";
+                cr.message = "assento Cadastrado";
+            }
+        }
+        catch (e) {
+            if (e instanceof Error) {
+                cr.message = e.message;
+                console.log(e.message);
+            }
+            else {
+                cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+            }
+        }
+        finally {
+            //fechar a conexao.
+            if (conn !== undefined) {
+                yield conn.close();
+            }
+            res.send(cr);
         }
     }
-    catch (e) {
-        if (e instanceof Error) {
-            cr.message = e.message;
-            console.log(e.message);
+    //Se a inserção estiver vindo da tela de um cliente
+    if (isADM == 0) {
+        let cr = {
+            status: "ERROR",
+            message: "",
+            payload: undefined,
+        };
+        let conn;
+        // conectando 
+        try {
+            conn = yield oracledb_1.default.getConnection({
+                user: process.env.ORACLE_DB_USER,
+                password: process.env.ORACLE_DB_PASSWORD,
+                connectionString: process.env.ORACLE_CONN_STR,
+            });
+            const cmdInsertVoo = `INSERT INTO MAPA_ASSENTOS
+      (aeronave, banco, disponivel, cpf_passageiro, numero_voo)
+      VALUES
+      (:1, :2, :3, :4, :5)`;
+            const dados = [aeronave, assento, disponivel, cpfpassageiro, numvoo];
+            let resInsert = yield conn.execute(cmdInsertVoo, dados);
+            // importante: efetuar o commit para gravar no Oracle.
+            yield conn.commit();
+            // obter a informação de quantas linhas foram inseridas. 
+            // neste caso precisa ser exatamente 1
+            const rowsInserted = resInsert.rowsAffected;
+            if (rowsInserted !== undefined && rowsInserted === 1) {
+                cr.status = "SUCCESS";
+                cr.message = "assento Cadastrado";
+            }
         }
-        else {
-            cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+        catch (e) {
+            if (e instanceof Error) {
+                cr.message = e.message;
+                console.log(e.message);
+            }
+            else {
+                cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+            }
         }
-    }
-    finally {
-        //fechar a conexao.
-        if (conn !== undefined) {
-            yield conn.close();
+        finally {
+            //fechar a conexao.
+            if (conn !== undefined) {
+                yield conn.close();
+            }
+            res.send(cr);
         }
-        res.send(cr);
     }
 }));
 app.get("/listarAssentos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -1164,8 +1213,9 @@ app.post("/listarAssentosWhere", (req, res) => __awaiter(void 0, void 0, void 0,
         const connection = yield oracledb_1.default.getConnection(connAttibs);
         // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
         const codigo_aeronave = req.body.codigo_aeronave;
+        const numero_voo = req.body.numero_voo;
         // Usando a cláusula WHERE para filtrar por CPF
-        const result = yield connection.execute("SELECT * FROM MAPA_ASSENTOS WHERE aeronave = :codigo_aeronave", { codigo_aeronave: { val: codigo_aeronave } } // Configuração correta do bind para o parâmetro :cpf
+        const result = yield connection.execute("SELECT * FROM MAPA_ASSENTOS WHERE AERONAVE = :codigo_aeronave AND NUMERO_VOO = :numero_voo", { codigo_aeronave: { val: codigo_aeronave }, numero_voo: { val: numero_voo } } // Configuração correta do bind para o parâmetro :cpf
         );
         yield connection.close();
         cr.status = "SUCCESS";
@@ -1369,6 +1419,64 @@ app.post("/loginCliente", (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
     }
     finally {
+        res.send(cr);
+    }
+}));
+//SERVICOS PAGAMENTO
+app.put("/InserirPagamento", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // para inserir a aeronave temos que receber os dados na requisição.
+    const cpf = req.body.cpf;
+    const custo = req.body.custo;
+    const qtd_paga = req.body.qtd_paga;
+    const modo_pagamento = req.body.modo_pagamento;
+    // correção: verificar se tudo chegou para prosseguir com o cadastro.
+    // verificar se chegaram os parametros
+    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
+    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
+    // definindo um objeto de resposta.
+    let cr = {
+        status: "ERROR",
+        message: "",
+        payload: undefined,
+    };
+    let conn;
+    // conectando 
+    try {
+        conn = yield oracledb_1.default.getConnection({
+            user: process.env.ORACLE_DB_USER,
+            password: process.env.ORACLE_DB_PASSWORD,
+            connectionString: process.env.ORACLE_CONN_STR,
+        });
+        const cmdInsertVoo = `INSERT INTO PAGAMENTOS 
+    (cpf_cliente, custo, qtd_paga, modo_pagamento)
+    VALUES
+    (:1, :2, :3, :4)`;
+        const dados = [cpf, custo, qtd_paga, modo_pagamento];
+        let resInsert = yield conn.execute(cmdInsertVoo, dados);
+        // importante: efetuar o commit para gravar no Oracle.
+        yield conn.commit();
+        // obter a informação de quantas linhas foram inseridas. 
+        // neste caso precisa ser exatamente 1
+        const rowsInserted = resInsert.rowsAffected;
+        if (rowsInserted !== undefined && rowsInserted === 1) {
+            cr.status = "SUCCESS";
+            cr.message = "Cliente Cadastrado";
+        }
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            cr.message = e.message;
+            console.log(e.message);
+        }
+        else {
+            cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+        }
+    }
+    finally {
+        //fechar a conexao.
+        if (conn !== undefined) {
+            yield conn.close();
+        }
         res.send(cr);
     }
 }));

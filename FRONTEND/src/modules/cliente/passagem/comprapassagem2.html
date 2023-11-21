@@ -15,12 +15,24 @@
     </style>
     <script>
 
+    const cpfPassageiro = sessionStorage.getItem("cpfPassageiro");
+    const vooEscolhido = sessionStorage.getItem("vooEscolhido");
+    const aeronaveEscolhida = sessionStorage.getItem("aeronaveEscolhida");
+    var selectedSeats = [];
 
+    function selecionouAssento(){
+
+        let resultado = false; 
+
+        if (selectedSeats.length > 0){
+        resultado = true;
+        }
+        return resultado;
+    }
 
     document.addEventListener("DOMContentLoaded", async function () {
         // Aguarda o carregamento completo da página para garantir que o sessionStorage esteja pronto
-        const vooEscolhido = sessionStorage.getItem("vooEscolhido");
-        const aeronaveEscolhida = sessionStorage.getItem("aeronaveEscolhida");
+
         // Verifica se o valor foi recuperado com sucesso
         if (vooEscolhido) {
             console.log("Valor recuperado 1:", vooEscolhido);
@@ -31,7 +43,7 @@
             const seatsPerRowFromDatabase = arrayinfo[1];
             const seatsBeforeCorridorFromDatabase = arrayinfo[2];
 
-            const assentosOcupados = await listarAssentosOcupados(aeronaveEscolhida);
+            const assentosOcupados = await listarAssentosOcupados(aeronaveEscolhida, vooEscolhido);
 
             initSeatMap(totalSeatsFromDatabase,seatsPerRowFromDatabase,seatsBeforeCorridorFromDatabase, assentosOcupados);    
         } else {
@@ -105,12 +117,13 @@
         });
     }
 
-    async function listarAssentosOcupados(codigo_aeronave) {
+    async function listarAssentosOcupados(codigo_aeronave, numero_voo) {
 
         console.log(codigo_aeronave)
 
         const response = await fetchBuscarAssento({
-            codigo_aeronave: codigo_aeronave
+            codigo_aeronave: codigo_aeronave,
+            numero_voo: numero_voo
         });
         const data = await response.json();
 
@@ -132,6 +145,24 @@
         }
     }
 
+    function continuar(){
+
+        if(!selecionouAssento()){
+        showStatusMessage("Selecione ao menos um assento...", true);  
+        return;
+        }
+        const ndeAssentos = selectedSeats.length;
+
+        sessionStorage.setItem("aeronaveEscolhida", aeronaveEscolhida);
+        sessionStorage.setItem("assentosEscolhidos", selectedSeats);
+        sessionStorage.setItem("ndeAssentos", ndeAssentos);
+        sessionStorage.setItem("cpfPassageiro", cpfPassageiro);
+        sessionStorage.setItem("vooEscolhido", vooEscolhido);
+        
+        window.location.href = "/FRONTEND/src/modules/cliente/passagem/pagamento.html";
+
+    }
+
     </script>
     
 
@@ -148,6 +179,11 @@
         <h1>Reservar assentos</h1>
         <form id="cadastro-form">
 
+            <div class="btn-group">
+                <button type="button" class="btn" onclick="continuar()">Continuar para o Pagamento</button>
+                
+                
+            </div>
             
             <p id="status" class="statusError"></p>
         </form>

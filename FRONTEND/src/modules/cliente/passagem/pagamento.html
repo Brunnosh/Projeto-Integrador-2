@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/pagamento.css">
+    <style>
+        .statusError{
+           color:red;
+        }
+        .statusSuccess{
+          color:blue;
+        }
+    </style>
+    <script>
+
+
+    const aeronaveEscolhida = sessionStorage.getItem("aeronaveEscolhida");
+    const assentosEscolhidos = sessionStorage.getItem("assentosEscolhidos");
+    const ndeAssentos = sessionStorage.getItem("ndeAssentos");
+    const cpfPassageiro = sessionStorage.getItem("cpfPassageiro");
+    const vooEscolhido = sessionStorage.getItem("vooEscolhido");
+
+    const custo = ndeAssentos * 150;
+    const custodisplay = custo + "R$"
+
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        var divCusto =  document.getElementById("custo");
+        divCusto.textContent = custodisplay;
+
+        if(ndeAssentos > 1){
+            const divcheckbox = document.getElementById("divcheckbox");
+            divcheckbox.style.display = "block";
+        }
+    });
+
+    function atualizarStatusDisponibilidade() {
+        var checkbox = document.getElementById("assentosunico");
+        var statusSpan = document.getElementById("statusDisponibilidade");
+
+        if (checkbox.checked) {
+            statusSpan.textContent = "Sim";
+        } else {
+            statusSpan.textContent = "Não";
+        }
+        }
+
+    function showStatusMessage(msg, error) {
+        var pStatus = document.getElementById("status");
+        if (error === true) {
+            pStatus.className = "statusError";
+        } else {
+            pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+    }
+
+    function fetchInserirPagamento(body) {
+        const requestOptions = {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/inserirPagamento', requestOptions)
+        .then(T => T.json())
+      }
+
+    function fetchReservarAssento(body) {
+        const requestOptions = {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/inserirAssento', requestOptions)
+        .then(T => T.json())
+    }
+
+
+    async function pagar(){
+
+    const isADM = 0;
+    var radial = document.querySelector('input[name="modoPagamento"]:checked');
+    var modo_pagamento = radial.id;
+
+    if(ndeAssentos == 1){
+
+        await fetchInserirPagamento({
+        cpf: cpfPassageiro, 
+        custo: custo,
+        qtd_paga: custo, 
+        modo_pagamento: modo_pagamento
+        })
+        .then(resultado => {
+        
+        if(resultado.status === "SUCCESS"){
+            fetchReservarAssento({
+            isADM: isADM, 
+            aeronave: aeronaveEscolhida,
+            assento: assentosEscolhidos, 
+            cpfpassageiro: cpfPassageiro,
+            numvoo : vooEscolhido
+            })
+            .then(resultado => {
+        
+            if(resultado.status === "SUCCESS"){
+            alert("Compra efetuada e assentos reservados!");
+            window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
+            
+                }else{
+            showStatusMessage("Erro ao criar conta " + message, true);
+            console.log(resultado.message);
+            }
+            })
+            .catch(()=>{
+            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+            console.log("Falha grave ao cadastrar.")
+            });
+            
+        }else{
+            showStatusMessage("Erro ao criar conta " + message, true);
+            console.log(resultado.message);
+        }
+        })
+        .catch(()=>{
+        showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+        console.log("Falha grave ao cadastrar.")
+        });
+
+
+
+
+
+    }
+
+    if(ndeAssentos > 1){
+
+    }
+
+    }
+
+
+
+    function teste(){
+        var modo_pagamento = document.querySelector('input[name="modoPagamento"]:checked');
+        console.log(modo_pagamento.id)
+    }
+
+    console.log(aeronaveEscolhida, assentosEscolhidos, ndeAssentos, cpfPassageiro, vooEscolhido)
+
+    window.onload = function () {
+        atualizarStatusDisponibilidade();
+    }
+    </script>
+    
+
+</head>
+<body>
+    <div id="seat-map"></div>
+
+
+    <div class="container">
+        <h1>Pagamento</h1>
+        <form id="cadastro-form">
+
+            <div class="form-group">
+                <p>Modo de Pagamento:</p>
+                <div class="radio-group">
+                    <label for="pix">Pix :</label>
+                    <input type="radio" name="modoPagamento" id="pix"/>
+                </div>
+                <div class="radio-group">
+                    <label for="credito">Crédito:</label>
+                    <input type="radio" name="modoPagamento" id="credito"/>
+                </div>
+                <div class="radio-group">
+                    <label for="debito">Débito:</label>
+                    <input type="radio" name="modoPagamento" id="debito"/>
+                </div>
+                <div>
+                    <p>Quantia a pagar:</p>
+                    <div id="custo"></div>
+                </div>
+                <div class="radio-group" style="display: none" id="divcheckbox">
+                    <label for="assentosunico">Todos os assentos são seus? :</label>
+                    <input type="checkbox" id="assentosunico" onchange="atualizarStatusDisponibilidade()"/>
+                    <span id="statusDisponibilidade"></span>    
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn" onclick="pagar()">Pagar e reservar assento(s)</button>
+                </div>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>
