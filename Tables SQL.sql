@@ -127,7 +127,9 @@ select * from pagamentos;
 
 //TABLES BUGADAS
 
-drop table MAPA_ASSENTOS;
+
+ 
+ 
 
 drop table paises;
 
