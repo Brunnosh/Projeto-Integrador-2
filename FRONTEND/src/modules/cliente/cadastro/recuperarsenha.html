@@ -15,10 +15,27 @@
             window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
         }
 
+        function atualizarNome(nome) {
+        // Obtém o elemento span pelo id
+        var nomeSpan = document.getElementById("nomeSpan");
+
+        // Atualiza o texto no span
+        nomeSpan.textContent = nome;
+    }
+
         document.addEventListener('DOMContentLoaded', function() {
-            const input = document.querySelector('#cpf');
+
+          var queryString = window.location.search;
+          var params = new URLSearchParams(queryString);
+          var nome = params.get("nome");
+          console.log(nome);
+          atualizarNome(nome);
+
+
+
+          const input = document.querySelector('#cpf');
             
-            input.addEventListener('keypress', () => {
+          input.addEventListener('keypress', () => {
                 const inputValue = event.key;
 
                 if (!/\d/.test(inputValue)) {
@@ -34,44 +51,10 @@
                     input.value = input.value + '-';
                 }
             
-            });
+          });
         });
 
               // verifica se o ano é valido
-        function fetchListarCliente(body) {
-          const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-          };
-
-          return fetch('http://localhost:3000/loginCliente', requestOptions)
-          .then(data => {
-          return data;
-          });
-        }
-
-        async function lisarCliente()
-        {
-          const nome = document.getElementById("nome").value;
-          const cpf = document.getElementById("cpf").value;
-          const response = await fetchListarCliente({
-                cpf: cpf
-                });
-                const data = await response.json();
-
-                if (data.status === "SUCCESS") {
-                    
-                    var novaUrl = "/FRONTEND/src/modules/cliente/cadastro/recuperarsenha.html" + "?nome=" + encodeURIComponent(nome);
-                    alert("Usuário ja encontrado, recuperando senha")
-                    window.location.href = novaUrl;
-                    
-                    } 
-                    else {
-                    showStatusMessage("Erro ao buscar info " + data.message, true);
-                    
-                    }
-        }
 
 
       // funcao para exibir mensagem de status... seja qual for. 
@@ -92,26 +75,23 @@
           body: JSON.stringify(body)
         };
 
-        return fetch('http://localhost:3000/inserirCliente', requestOptions)
+        return fetch('http://localhost:3000/atualizarCliente', requestOptions)
         .then(T => T.json())
       }
 
       
-      async function inserirCliente(){
-
-        await lisarCliente();
+      function inserirCliente(){
 
         console.log(document.getElementById("cpf").value);
 
-        const nome = document.getElementById("nome").value;
+        
         const cpf = document.getElementById("cpf").value;
         const email = document.getElementById("email").value;
         const senha = document.getElementById("senha").value;
 
 
        
-        fetchInserir({
-            nome: nome, 
+        fetchInserir({ 
             cpf: cpf,
             email: email, 
             senha: senha
@@ -119,7 +99,7 @@
             .then(resultado => {
               
               if(resultado.status === "SUCCESS"){
-                alert("Usuário Cadastrado!");
+                alert("Usuário Atualizado!");
                 window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
               }else{
                 showStatusMessage("Erro ao criar conta " + message, true);
@@ -153,8 +133,8 @@
         <form id="cadastro-form">
 
             <div class="form-group">
-                <label for="nome">Como devemos te chamar?:</label>
-                <input type="text" id="nome" name="nome" required>
+                <label for="nome">Nome:</label>
+                <span id="nomeSpan"></span>
             </div>
             <div class="form-group">
                 <label for="cpf">Digite seu CPF:</label>

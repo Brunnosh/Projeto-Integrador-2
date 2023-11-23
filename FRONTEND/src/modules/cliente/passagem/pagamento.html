@@ -24,7 +24,7 @@
     const custo = ndeAssentos * 150;
     const custodisplay = custo + "R$"
 
-    console.log(JSON.parse(assentosEscolhidos)[0]);
+    
     
 
 
@@ -44,14 +44,63 @@
             }
             
         }
+
+        
+
+
+
     });
  
+    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('input', function(event) {
+        const target = event.target;
+
+        if (target.classList.contains('cpf-input')) {
+            const inputValue = event.data;
+
+            if (!/\d/.test(inputValue)) {
+                // Remove caracteres não numéricos
+                target.value = target.value.replace(/\D/g, '');
+            }
+
+            let inputLength = target.value.length;
+
+            // Formatação do CPF
+            if (inputLength === 3 || inputLength === 7) {
+                target.value = target.value + '.';
+            } else if (inputLength === 11) {
+                target.value = target.value + '-';
+            }
+        }
+    });
+});
+
     function addElement(n){
+        const divAssentos = document.getElementById("divAssentos");
+        divAssentos.innerHTML = "";
         for (let i = 0; i < n; i++) {
             const newDiv = document.createElement("div");
-            const newContent = document.createTextNode("Hi there and greetings!");
-            newDiv.appendChild(newContent);
-            const currentDiv = document.getElementById("divcheckbox");
+            const nameLabel = document.createElement("label");
+            const nameInput = document.createElement("input");
+            const cpfLabel = document.createElement("label");
+            const cpfInput = document.createElement("input");
+
+            nameLabel.textContent = "Nome:" + (i + 1);
+            nameInput.type = "text";
+            nameInput.name = `nomeAssento${i + 1}`; // Correção aqui
+            cpfLabel.textContent = "CPF:" + (i + 1);
+            cpfInput.type = "text";
+            cpfInput.placeholder = "123.456.789-01";
+            cpfInput.name = `cpfAssento${i + 1}`; // Correção aqui
+            cpfInput.maxLength = 14;
+            cpfInput.classList.add('cpf-input');
+
+            newDiv.appendChild(nameLabel);
+            newDiv.appendChild(nameInput);
+            newDiv.appendChild(document.createElement("br")); // Adiciona uma quebra de linha
+            newDiv.appendChild(cpfLabel);
+            newDiv.appendChild(cpfInput);
+            divAssentos.appendChild(newDiv);
             
 
             }
@@ -59,12 +108,20 @@
     }
 
     function atualizarStatusDisponibilidade() {
-        addElement(ndeAssentos);
+        
+        const divAssentos = document.getElementById("divAssentos");
+        const divs = divAssentos.querySelectorAll("div");
         var checkbox = document.getElementById("assentosunico");
         var statusSpan = document.getElementById("statusDisponibilidade");
 
+        divs.forEach(div => {
+        div.style.display = checkbox.checked ? "none" : "block";
+    });
+
+
         if (checkbox.checked) {
             statusSpan.textContent = "Sim";
+            
         } else {
             statusSpan.textContent = "Não";
         }
@@ -102,6 +159,29 @@
         .then(T => T.json())
     }
 
+    function fetchCadastro(body) {
+        const requestOptions = {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/inserirCliente', requestOptions)
+        .then(T => T.json())
+    }
+
+    function fetchListarCliente(body) {
+        const requestOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/loginCliente', requestOptions)
+        .then(data => {
+        return data;
+        });
+      }
 
     async function pagar(){
 
@@ -110,6 +190,23 @@
     var modo_pagamento = radial.id;
 
     if(ndeAssentos == 1){
+        await pagarassentos1();
+    }
+
+    if(ndeAssentos > 1){
+        await pagarassentosmaisq1();
+
+    }
+
+
+    }
+
+
+    async function pagarassentos1()
+    {
+        const isADM = 0;
+        var radial = document.querySelector('input[name="modoPagamento"]:checked');
+        var modo_pagamento = radial.id;
 
         await fetchInserirPagamento({
         cpf: cpfPassageiro, 
@@ -156,11 +253,15 @@
 
 
 
-
     }
-
-    if(ndeAssentos > 1){
+    
+    async function pagarassentosmaisq1()
+    {
+        const isADM = 0;
+        var radial = document.querySelector('input[name="modoPagamento"]:checked');
+        var modo_pagamento = radial.id;
         const checkbox = document.getElementById("assentosunico")
+
         if(checkbox.checked){
             await fetchInserirPagamento({
                 cpf: cpfPassageiro, 
@@ -203,23 +304,135 @@
                 showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
                 console.log("Falha grave ao cadastrar.")
                 });
-        
+
             alert("Compra efetuada e assentos reservados!");
             window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
         }
+        
         if(!checkbox.checked){
-            for (let i = 0; i < ndeAssentos; i++) {
-            
+            var cpfassentos = []
+            var nomeassentos = []
+            for(let i = 0; i<ndeAssentos;i++)
+            {
+                cpfassentos.push(document.querySelector(`input[name="cpfAssento${i + 1}"]`).value)
+                nomeassentos.push(document.querySelector(`input[name="nomeAssento${i + 1}"]`).value)
             }
+
+            nomeassentos = nomeassentos.map(function(string) {
+                return string.toUpperCase();
+            });
+
+            var nomeinserirlogin  = nomeassentos;
+            var cpfinserirlogin = cpfassentos;
+            
+            console.log(cpfinserirlogin,nomeinserirlogin)
+
+            for(let i = 0; i<ndeAssentos;i++)
+            {
+                const response = await fetchListarCliente({
+                cpf: cpfassentos[i]
+                });
+                const data = await response.json();
+
+                if (data.status === "SUCCESS") {
+                    if(data.payload.length == 0){
+                        continue;
+                    }
+                    // se encontrou conta com CPF
+                    // remover cpf e o nome das listas para inserir
+                    const cliente = data.payload[0];
+                    const nomecliente = cliente[0].toUpperCase();
+
+            
+                    nomeinserirlogin = nomeinserirlogin.filter(nome => nome !== nomecliente);
+                    cpfinserirlogin = cpfinserirlogin.filter(cpf => cpf !== cpfassentos[i]);
+
+                    } 
+                    else {
+                    showStatusMessage("Erro ao buscar info " + data.message, true);
+                    
+                    }
+
+                    console.log(cpfinserirlogin,nomeinserirlogin)
+            }
+            
+            for(let i =0; i< cpfinserirlogin.length ; i++)
+            {
+                console.log(cpfinserirlogin,nomeinserirlogin)
+                
+                fetchCadastro({
+            nome: nomeinserirlogin[i], 
+            cpf: cpfinserirlogin[i]
+        })
+            .then(resultado => {
+            
+            if(resultado.status === "SUCCESS"){
+
+            }else{
+                showStatusMessage("Erro ao criar conta " + message, true);
+                console.log(resultado.message);
+            }
+            })
+            .catch(()=>{
+            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+            console.log("Falha grave ao cadastrar.")
+            });
+            }
+
+            await fetchInserirPagamento({
+                cpf: cpfPassageiro, 
+                custo: custo,
+                qtd_paga: custo, 
+                modo_pagamento: modo_pagamento
+                })
+                .then(resultado => {
+                
+                if(resultado.status === "SUCCESS"){
+                    console.log(cpfassentos)
+
+
+
+                    
+                    for (let i = 0; i < ndeAssentos; i++) {
+                        fetchReservarAssento({
+                            isADM: isADM, 
+                            aeronave: aeronaveEscolhida,
+                            assento: JSON.parse(assentosEscolhidos)[i], 
+                            cpfpassageiro: cpfassentos[i],
+                            numvoo : vooEscolhido
+                            })
+                            .then(resultado => {
+                        
+                            if(resultado.status === "SUCCESS"){
+                            
+                                }else{
+                            showStatusMessage("Erro ao criar conta " + message, true);
+                            console.log(resultado.message);
+                            }
+                            })
+                            .catch(()=>{
+                            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+                            console.log("Falha grave ao cadastrar.")
+                            });
+                    
+                    }
+                    
+                }else{
+                    showStatusMessage("Erro ao criar conta " + message, true);
+                    console.log(resultado.message);
+                }
+                })
+                .catch(()=>{
+                showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+                console.log("Falha grave ao cadastrar.")
+                });
+
+            alert("Compra efetuada e assentos reservados!");
+            window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
+
         }
 
-
     }
-
-
-    }
-
-
 
     function teste(){
         var modo_pagamento = document.querySelector('input[name="modoPagamento"]:checked');
@@ -267,6 +480,7 @@
                     <input type="checkbox" id="assentosunico" onchange="atualizarStatusDisponibilidade()"/>
                     <span id="statusDisponibilidade"></span>    
                 </div>
+                <div id="divAssentos"></div>
                 <div class="btn-group">
                     <button type="button" class="btn" onclick="pagar()">Pagar e reservar assento(s)</button>
                 </div>

@@ -1422,6 +1422,59 @@ app.post("/loginCliente", (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.send(cr);
     }
 }));
+app.put("/atualizarCliente", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // para inserir a aeronave temos que receber os dados na requisição.
+    const cpf = req.body.cpf;
+    const email = req.body.email;
+    const senha = req.body.senha;
+    // correção: verificar se tudo chegou para prosseguir com o cadastro.
+    // verificar se chegaram os parametros
+    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
+    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
+    // definindo um objeto de resposta.
+    let cr = {
+        status: "ERROR",
+        message: "",
+        payload: undefined,
+    };
+    let conn;
+    // conectando 
+    try {
+        conn = yield oracledb_1.default.getConnection({
+            user: process.env.ORACLE_DB_USER,
+            password: process.env.ORACLE_DB_PASSWORD,
+            connectionString: process.env.ORACLE_CONN_STR,
+        });
+        const cmdInsertVoo = `UPDATE PASSAGEIROS set email = :1, senha = :2 where cpf = :3 `;
+        const dados = [email, senha, cpf];
+        let resInsert = yield conn.execute(cmdInsertVoo, dados);
+        // importante: efetuar o commit para gravar no Oracle.
+        yield conn.commit();
+        // obter a informação de quantas linhas foram inseridas. 
+        // neste caso precisa ser exatamente 1
+        const rowsInserted = resInsert.rowsAffected;
+        if (rowsInserted !== undefined && rowsInserted === 1) {
+            cr.status = "SUCCESS";
+            cr.message = "Cliente Cadastrado";
+        }
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            cr.message = e.message;
+            console.log(e.message);
+        }
+        else {
+            cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+        }
+    }
+    finally {
+        //fechar a conexao.
+        if (conn !== undefined) {
+            yield conn.close();
+        }
+        res.send(cr);
+    }
+}));
 //SERVICOS PAGAMENTO
 app.put("/InserirPagamento", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // para inserir a aeronave temos que receber os dados na requisição.

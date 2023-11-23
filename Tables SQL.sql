@@ -118,18 +118,22 @@ drop table trechos;
 drop table aeronaves;
 drop table mapa_assentos;
 drop table passageiros;
+drop table pagamentos;
 drop table voos;
 
 select * from mapa_assentos;
 select * from pagamentos;
+select * from passageiros;
 
-
+delete from passageiros;
 
 //TABLES BUGADAS
 
-drop table MAPA_ASSENTOS;
 
-drop table paises;
+ 
+ 
+
+drop table passageiros;
 
 
 //----------------------------//
