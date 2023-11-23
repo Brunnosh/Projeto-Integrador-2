@@ -1637,6 +1637,68 @@ app.post("/loginCliente", async (req, res) => {
   }
 });
 
+app.put("/atualizarCliente", async(req,res)=>{
+  
+  // para inserir a aeronave temos que receber os dados na requisição.
+  const cpf = req.body.cpf as string;
+  const email = req.body.email as string;
+  const senha = req.body.senha as string;
+
+
+  // correção: verificar se tudo chegou para prosseguir com o cadastro.
+  // verificar se chegaram os parametros
+  // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
+  // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
+
+  // definindo um objeto de resposta.
+  let cr: CustomResponse = {
+    status: "ERROR",
+    message: "",
+    payload: undefined,
+  };
+
+  let conn;
+
+  // conectando 
+  try{
+    conn = await oracledb.getConnection({
+       user: process.env.ORACLE_DB_USER,
+       password: process.env.ORACLE_DB_PASSWORD,
+       connectionString: process.env.ORACLE_CONN_STR,
+    });
+
+    const cmdInsertVoo = `UPDATE PASSAGEIROS set email = :1, senha = :2 where cpf = :3 `
+
+    const dados = [email, senha, cpf];
+    let resInsert = await conn.execute(cmdInsertVoo, dados);
+    
+    // importante: efetuar o commit para gravar no Oracle.
+    await conn.commit();
+  
+    // obter a informação de quantas linhas foram inseridas. 
+    // neste caso precisa ser exatamente 1
+    const rowsInserted = resInsert.rowsAffected
+    if(rowsInserted !== undefined &&  rowsInserted === 1) {
+      cr.status = "SUCCESS"; 
+      cr.message = "Cliente Cadastrado";
+    }
+
+  }catch(e){
+    if(e instanceof Error){
+      cr.message = e.message;
+      console.log(e.message);
+    }else{
+      cr.message = "Erro ao conectar ao oracle. Sem detalhes";
+    }
+  } finally {
+    //fechar a conexao.
+    if(conn!== undefined){
+      await conn.close();
+    }
+    res.send(cr);  
+  }
+});
+
 //SERVICOS PAGAMENTO
 
 app.put("/InserirPagamento", async(req,res)=>{

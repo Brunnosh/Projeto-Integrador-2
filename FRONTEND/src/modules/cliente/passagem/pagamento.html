@@ -318,16 +318,14 @@
                 nomeassentos.push(document.querySelector(`input[name="nomeAssento${i + 1}"]`).value)
             }
 
-            var nomeassentosmaiusculo = nomeassentos.map(function(string) {
+            nomeassentos = nomeassentos.map(function(string) {
                 return string.toUpperCase();
             });
 
-            var cpfinserirlogin = []
-            cpfinserirlogin = cpfassentos;
-            var nomeinserirlogin = [];
-            nomeinserirlogin = nomeassentosmaiusculo;
-
-            console.log(cpfinserirlogin)
+            var nomeinserirlogin  = nomeassentos;
+            var cpfinserirlogin = cpfassentos;
+            
+            console.log(cpfinserirlogin,nomeinserirlogin)
 
             for(let i = 0; i<ndeAssentos;i++)
             {
@@ -343,28 +341,25 @@
                     // se encontrou conta com CPF
                     // remover cpf e o nome das listas para inserir
                     const cliente = data.payload[0];
-                    const nomecliente = cliente[0]
+                    const nomecliente = cliente[0].toUpperCase();
 
-                    console.log(nomecliente)
-                    console.log(nomeinserirlogin)
+            
+                    nomeinserirlogin = nomeinserirlogin.filter(nome => nome !== nomecliente);
+                    cpfinserirlogin = cpfinserirlogin.filter(cpf => cpf !== cpfassentos[i]);
 
-                    let indicecpf = cpfinserirlogin.indexOf(cpfassentos[i]);
-                    let indicenome = nomeinserirlogin.indexOf(nomecliente);
-
-                    if (indicecpf !== -1 && indicenome !== -1) {
-                        cpfinserirlogin.splice(indicecpf, 1);
-                        nomeinserirlogin.splice(indicenome, 1);
-                    }
-                    
                     } 
                     else {
                     showStatusMessage("Erro ao buscar info " + data.message, true);
                     
                     }
+
+                    console.log(cpfinserirlogin,nomeinserirlogin)
             }
             
             for(let i =0; i< cpfinserirlogin.length ; i++)
             {
+                console.log(cpfinserirlogin,nomeinserirlogin)
+                
                 fetchCadastro({
             nome: nomeinserirlogin[i], 
             cpf: cpfinserirlogin[i]
