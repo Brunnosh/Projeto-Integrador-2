@@ -26,8 +26,9 @@
 
     
     
-
-
+    //Funções não especificas
+    
+    //deixa os inputs de nome e cpf invisiveis caso checkado a opção
     document.addEventListener("DOMContentLoaded", async function () {
         var divCusto =  document.getElementById("custo");
         divCusto.textContent = custodisplay;
@@ -50,7 +51,8 @@
 
 
     });
- 
+    
+    //funcão para formatar o cpf
     document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('input', function(event) {
         const target = event.target;
@@ -75,6 +77,7 @@
     });
 });
 
+    //função para adicionar os campos de nome e cpf
     function addElement(n){
         const divAssentos = document.getElementById("divAssentos");
         divAssentos.innerHTML = "";
@@ -88,13 +91,15 @@
             nameLabel.textContent = "Nome:" + (i + 1);
             nameInput.type = "text";
             nameInput.name = `nomeAssento${i + 1}`; // Correção aqui
+            
+
             cpfLabel.textContent = "CPF:" + (i + 1);
             cpfInput.type = "text";
             cpfInput.placeholder = "123.456.789-01";
             cpfInput.name = `cpfAssento${i + 1}`; // Correção aqui
             cpfInput.maxLength = 14;
             cpfInput.classList.add('cpf-input');
-
+           
             newDiv.appendChild(nameLabel);
             newDiv.appendChild(nameInput);
             newDiv.appendChild(document.createElement("br")); // Adiciona uma quebra de linha
@@ -106,7 +111,7 @@
             }
         
     }
-
+    
     function atualizarStatusDisponibilidade() {
         
         const divAssentos = document.getElementById("divAssentos");
@@ -136,6 +141,42 @@
         }
         pStatus.textContent = msg;
     }
+
+    //
+    //Funções de validação
+    function selecionouPagamento(){
+            let resultado = false; 
+            var radial = document.querySelector('input[name="modoPagamento"]:checked');
+          
+            if (radial){
+            console.log('Radio button selecionado:', radial.value);
+            resultado = true;
+            }
+            return resultado;
+        }
+
+    function preencheuTudo(){
+            let resultado = true; 
+            for(let i=0;i<ndeAssentos;i++){
+                const cpfInput = document.querySelector(`input[name="cpfAssento${i + 1}"]`);
+                const nomeInput = document.querySelector(`input[name="nomeAssento${i + 1}"]`);
+
+                console.log(`CPF ${i + 1}: "${cpfInput.value}"`);
+                console.log(`Nome ${i + 1}: "${nomeInput.value}"`);
+
+                if (cpfInput.value.trim() == "" || nomeInput.value.trim() == "") {
+                    console.log("bunda")
+                    resultado = false;
+                break;
+                }
+            }
+            console.log(resultado)
+            return resultado;
+    }
+
+    //
+
+    //Fetch que acessam o backend
 
     function fetchInserirPagamento(body) {
         const requestOptions = {
@@ -183,25 +224,92 @@
         });
       }
 
-    async function pagar(){
+    //
 
-    const isADM = 0;
-    var radial = document.querySelector('input[name="modoPagamento"]:checked');
-    var modo_pagamento = radial.id;
+    //Funções criadas para limpar outras funções
+    async function inserirCadastro(cpfinserirlogin,nomeinserirlogin){
+        console.log(cpfinserirlogin,nomeinserirlogin)
+                
+            fetchCadastro({
+            nome: nomeinserirlogin, 
+            cpf: cpfinserirlogin
+            })
+            .then(resultado => {
+            
+            if(resultado.status === "SUCCESS"){
 
-    if(ndeAssentos == 1){
-        await pagarassentos1();
+            }else{
+                showStatusMessage("Erro ao criar conta " + message, true);
+                console.log(resultado.message);
+            }
+            })
+            .catch(()=>{
+            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+            console.log("Falha grave ao cadastrar.")
+            });
     }
 
-    if(ndeAssentos > 1){
-        await pagarassentosmaisq1();
-
+    async function reservarAssento(isADM,assentoEscolhido, cpfassento){
+        fetchReservarAssento({
+                isADM: isADM, 
+                aeronave: aeronaveEscolhida,
+                assento: assentoEscolhido, 
+                cpfpassageiro: cpfassento,
+                numvoo : vooEscolhido
+                })
+                .then(resultado => {
+                        
+                if(resultado.status === "SUCCESS"){
+                            
+                                }else{
+                showStatusMessage("Erro ao criar conta " + message, true);
+                console.log(resultado.message);
+                }
+                })
+                .catch(()=>{
+                showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+                console.log("Falha grave ao cadastrar.")
+            });
     }
 
+    async function listarCliente(nomeassentos,cpfassentos){
+        var nomeinserirlogin  = nomeassentos;
+        var cpfinserirlogin = cpfassentos;
 
+        for(let i = 0; i<ndeAssentos;i++)
+            {
+                const response = await fetchListarCliente({
+                cpf: cpfassentos[i]
+                });
+                const data = await response.json();
+
+                if (data.status === "SUCCESS") {
+                    if(data.payload.length == 0){
+                        continue;
+                    }
+                    // se encontrou conta com CPF
+                    // remover cpf e o nome das listas para inserir
+                    const cliente = data.payload[0];
+                    const nomecliente = cliente[0].toUpperCase();
+
+            
+                    nomeinserirlogin = nomeinserirlogin.filter(nome => nome !== nomecliente);
+                    cpfinserirlogin = cpfinserirlogin.filter(cpf => cpf !== cpfassentos[i]);
+
+                    } 
+                    else {
+                    showStatusMessage("Erro ao buscar info " + data.message, true);
+                    
+                    }
+
+                    console.log(cpfinserirlogin,nomeinserirlogin)
+            }
+            return { nomeinserirlogin, cpfinserirlogin };
     }
 
+    //
 
+    //Função que realiza tudo
     async function pagarassentos1()
     {
         const isADM = 0;
@@ -322,61 +430,12 @@
                 return string.toUpperCase();
             });
 
-            var nomeinserirlogin  = nomeassentos;
-            var cpfinserirlogin = cpfassentos;
             
-            console.log(cpfinserirlogin,nomeinserirlogin)
+            const { nomeinserirlogin, cpfinserirlogin } = await listarCliente(nomeassentos, cpfassentos);
 
-            for(let i = 0; i<ndeAssentos;i++)
-            {
-                const response = await fetchListarCliente({
-                cpf: cpfassentos[i]
-                });
-                const data = await response.json();
-
-                if (data.status === "SUCCESS") {
-                    if(data.payload.length == 0){
-                        continue;
-                    }
-                    // se encontrou conta com CPF
-                    // remover cpf e o nome das listas para inserir
-                    const cliente = data.payload[0];
-                    const nomecliente = cliente[0].toUpperCase();
-
-            
-                    nomeinserirlogin = nomeinserirlogin.filter(nome => nome !== nomecliente);
-                    cpfinserirlogin = cpfinserirlogin.filter(cpf => cpf !== cpfassentos[i]);
-
-                    } 
-                    else {
-                    showStatusMessage("Erro ao buscar info " + data.message, true);
-                    
-                    }
-
-                    console.log(cpfinserirlogin,nomeinserirlogin)
-            }
-            
             for(let i =0; i< cpfinserirlogin.length ; i++)
             {
-                console.log(cpfinserirlogin,nomeinserirlogin)
-                
-                fetchCadastro({
-            nome: nomeinserirlogin[i], 
-            cpf: cpfinserirlogin[i]
-        })
-            .then(resultado => {
-            
-            if(resultado.status === "SUCCESS"){
-
-            }else{
-                showStatusMessage("Erro ao criar conta " + message, true);
-                console.log(resultado.message);
-            }
-            })
-            .catch(()=>{
-            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-            console.log("Falha grave ao cadastrar.")
-            });
+                inserirCadastro(cpfinserirlogin[i],nomeinserirlogin[i]);
             }
 
             await fetchInserirPagamento({
@@ -388,33 +447,9 @@
                 .then(resultado => {
                 
                 if(resultado.status === "SUCCESS"){
-                    console.log(cpfassentos)
-
-
-
-                    
                     for (let i = 0; i < ndeAssentos; i++) {
-                        fetchReservarAssento({
-                            isADM: isADM, 
-                            aeronave: aeronaveEscolhida,
-                            assento: JSON.parse(assentosEscolhidos)[i], 
-                            cpfpassageiro: cpfassentos[i],
-                            numvoo : vooEscolhido
-                            })
-                            .then(resultado => {
-                        
-                            if(resultado.status === "SUCCESS"){
-                            
-                                }else{
-                            showStatusMessage("Erro ao criar conta " + message, true);
-                            console.log(resultado.message);
-                            }
-                            })
-                            .catch(()=>{
-                            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-                            console.log("Falha grave ao cadastrar.")
-                            });
-                    
+                        reservarAssento(isADM,JSON.parse(assentosEscolhidos)[i],cpfassentos[i]);
+
                     }
                     
                 }else{
@@ -427,6 +462,7 @@
                 console.log("Falha grave ao cadastrar.")
                 });
 
+
             alert("Compra efetuada e assentos reservados!");
             window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
 
@@ -434,12 +470,46 @@
 
     }
 
-    function teste(){
-        var modo_pagamento = document.querySelector('input[name="modoPagamento"]:checked');
-        console.log(modo_pagamento.id)
+    //
+
+    //Funcão final que governa o que acontecerá com base no numero de assentos reservados
+    async function pagar(){
+
+        if(!selecionouPagamento()){
+          showStatusMessage("Selecione metodo de pagamento...", true);  
+          return;
+        }
+
+        
+        
+
+        if(ndeAssentos == 1){
+            await pagarassentos1();
+        }
+
+        if(ndeAssentos > 1){
+            const checkbox = document.getElementById("assentosunico")
+            if(checkbox.checked){
+                await pagarassentosmaisq1();
+            }
+            if(!checkbox.checked){
+                if(!preencheuTudo()){
+                showStatusMessage("Preencha todos os campos...", true);  
+                return;
+                await pagarassentosmaisq1();
+            }
+
+
+        }
+
+            
+
+        }
+
+
     }
 
-    console.log(aeronaveEscolhida, assentosEscolhidos, ndeAssentos, cpfPassageiro, vooEscolhido)
+    //
 
     window.onload = function () {
         addElement(ndeAssentos);
@@ -461,15 +531,15 @@
                 <p>Modo de Pagamento:</p>
                 <div class="radio-group">
                     <label for="pix">Pix :</label>
-                    <input type="radio" name="modoPagamento" id="pix"/>
+                    <input type="radio" name="modoPagamento" id="pix" value="pix"/>
                 </div>
                 <div class="radio-group">
                     <label for="credito">Crédito:</label>
-                    <input type="radio" name="modoPagamento" id="credito"/>
+                    <input type="radio" name="modoPagamento" id="credito" value="credito"/>
                 </div>
                 <div class="radio-group">
                     <label for="debito">Débito:</label>
-                    <input type="radio" name="modoPagamento" id="debito"/>
+                    <input type="radio" name="modoPagamento" id="debito" value="debito"/>
                 </div>
                 <div>
                     <p>Quantia a pagar:</p>
