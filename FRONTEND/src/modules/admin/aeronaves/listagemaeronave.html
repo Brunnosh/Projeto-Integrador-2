@@ -1,82 +1,86 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Lista de Aeronaves</title>
-</head>
-<body>
-    <h1>Lista de Aeronaves</h1>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cadastro de Aeronave</title>
+        <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_aeronave.css">
     
+        <script>
+            
+async function listarAeronaves() {
+    const response = await fetch('http://localhost:3000/listarAeronaves');
+    const data = await response.json();
+
+    if (data.status === 'SUCCESS') {
+        const aeronavesDiv = document.getElementById('aeronaves');
+        const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+        const aeronaves = data.payload;
+
+        const defaultOption = document.createElement('option');
+        defaultOption.textContent = 'Escolha uma aeronave';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        aeronavesDropdown.appendChild(defaultOption);
+
+        aeronaves.forEach(aeronave => {
+        
+            const option = document.createElement('option');
+            option.value = JSON.stringify(aeronave); 
+            const CODIGO = aeronave[0];
+            const FABRICANTE = aeronave[1];
+            const MODELO = aeronave[2];
+            option.textContent = [CODIGO,FABRICANTE,MODELO];
+            aeronavesDropdown.appendChild(option);
+
+        });
+
+        aeronavesDropdown.addEventListener('change', handleDropdownChange);
+        
+    } else {
+        console.error('Erro ao buscar dados de aeronaves:', data.message);
+    }
+}
+
+function handleDropdownChange() {
+    const aeronavesDropdown = document.getElementById('aeronaveDropdown');
+    const selectedAeronaveData = JSON.parse(aeronavesDropdown.value);
+    const aeronavesDiv = document.getElementById('aeronaves');
+
+    displayAeronaves(aeronavesDiv, selectedAeronaveData);
+}
+
+const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :", "Assentos por linha:", "Assentos antes de corredor:"];
+
+function displayAeronaves(container, aeronave) {
+    container.innerHTML = '';
+    if (aeronave) {
+        const table = document.createElement('table');
+        const tableBody = document.createElement('tbody');
+        for (const key in aeronave) {
+            const row = tableBody.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            cell1.textContent = nomes[key];
+            cell2.textContent = aeronave[key];
+        }
+        
+        table.appendChild(tableBody);
+        container.appendChild(table);
+    }
+}
+
+window.onload = listarAeronaves;
+        </script>
     
-    <label for="aeronaveDropdown">Escolha uma aeronave:</label>
-    <select id="aeronaveDropdown"></select>
-    
-    <div id="aeronaves"></div>
-
-    <script>
-
-        async function listarAeronaves() {
-            const response = await fetch('http://localhost:3000/listarAeronaves');
-            const data = await response.json();
-
-            if (data.status === 'SUCCESS') {
-                const aeronavesDiv = document.getElementById('aeronaves');
-                const aeronavesDropdown = document.getElementById('aeronaveDropdown');
-                const aeronaves = data.payload;
-
-                const defaultOption = document.createElement('option');
-                defaultOption.textContent = 'Escolha uma aeronave';
-                defaultOption.disabled = true;
-                defaultOption.selected = true;
-                aeronavesDropdown.appendChild(defaultOption);
-
-                aeronaves.forEach(aeronave => {
-                
-                    const option = document.createElement('option');
-                    option.value = JSON.stringify(aeronave); 
-                    const CODIGO = aeronave[0];
-                    const FABRICANTE = aeronave[1];
-                    const MODELO = aeronave[2];
-                    option.textContent = [CODIGO,FABRICANTE,MODELO];
-                    aeronavesDropdown.appendChild(option);
-
-                });
-
-                aeronavesDropdown.addEventListener('change', handleDropdownChange);
-                
-            } else {
-                console.error('Erro ao buscar dados de aeronaves:', data.message);
-            }
-        }
-
-        function handleDropdownChange() {
-            const aeronavesDropdown = document.getElementById('aeronaveDropdown');
-            const selectedAeronaveData = JSON.parse(aeronavesDropdown.value);
-            const aeronavesDiv = document.getElementById('aeronaves');
-
-            displayAeronaves(aeronavesDiv, selectedAeronaveData);
-        }
-
-        const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :", "Assentos por linha:", "Assentos antes de corredor:"];
-
-        function displayAeronaves(container, aeronave) {
-            container.innerHTML = '';
-            if (aeronave) {
-                const table = document.createElement('table');
-                const tableBody = document.createElement('tbody');
-                for (const key in aeronave) {
-                    const row = tableBody.insertRow();
-                    const cell1 = row.insertCell(0);
-                    const cell2 = row.insertCell(1);
-                    cell1.textContent = nomes[key];
-                    cell2.textContent = aeronave[key];
-                }
-                
-                table.appendChild(tableBody);
-                container.appendChild(table);
-            }
-        }
-
-        window.onload = listarAeronaves;
-    </script>
+    </head>
+<body class="center-content">
+    <div class="container">
+        <h1>Lista de Aeronaves</h1>
+        <label for="aeronaveDropdown">Escolha uma aeronave:</label>
+        <select id="aeronaveDropdown"></select>
+        
+        <div id="aeronaves"></div>
+    </div>
 </body>
 </html>
