@@ -19,163 +19,154 @@
       
               
 
-              function selecionouVooDeletar(){
+      function selecionouVooDeletar(){
+        let resultado = false; 
+        var vooSelecionada = document.getElementById("vooDropdown").value;
+
+        console.log(vooSelecionada)
+        if (vooSelecionada !== "Escolha um voo"){
+        resultado = true;
+        }
+        return resultado;
+      }
+
+      async function listarVoos() {
+        const response = await fetch('http://localhost:3000/listarVoos');
+        const data = await response.json();
+
+        if (data.status === 'SUCCESS') {
+            const voosDiv = document.getElementById('voo');
+            const voosDropdown = document.getElementById('vooDropdown');
+            const voos = data.payload;
 
             
+            const defaultOption = document.createElement('option');
+            defaultOption.textContent = 'Escolha um voo';
+            defaultOption.value = "Escolha um voo";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            voosDropdown.appendChild(defaultOption);
 
-let resultado = false; 
-var vooSelecionada = document.getElementById("vooDropdown").value;
-
-console.log(vooSelecionada)
-if (vooSelecionada !== "Escolha um voo"){
-resultado = true;
-}
-return resultado;
-}
-
-
-
-async function listarVoos() {
-const response = await fetch('http://localhost:3000/listarVoos');
-const data = await response.json();
-
-if (data.status === 'SUCCESS') {
-    const voosDiv = document.getElementById('voo');
-    const voosDropdown = document.getElementById('vooDropdown');
-    const voos = data.payload;
-
-    
-    const defaultOption = document.createElement('option');
-    defaultOption.textContent = 'Escolha um voo';
-    defaultOption.value = "Escolha um voo";
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    voosDropdown.appendChild(defaultOption);
-
-    
-    voos.forEach(voo => {
-    
-        const option = document.createElement('option');
-        option.value = JSON.stringify(voo); 
+            
+            voos.forEach(voo => {
+            
+                const option = document.createElement('option');
+                option.value = JSON.stringify(voo); 
 
 
-                            
+                                    
 
-        
-        const CODIGO = voo[0];
-        const DIA= voo[1];
-        const HORARIO = voo[2];
-        const AERONAVE = voo[3];
-        const TRECHO = voo[4];
-        const IDAVOLTA = voo[5];
-        option.textContent = [CODIGO];
-        voosDropdown.appendChild(option);
+                
+                const CODIGO = voo[0];
+                const DIA= voo[1];
+                const HORARIO = voo[2];
+                const AERONAVE = voo[3];
+                const TRECHO = voo[4];
+                const IDAVOLTA = voo[5];
+                option.textContent = [CODIGO];
+                voosDropdown.appendChild(option);
 
-    });
-
-
-    
-    voosDropdown.addEventListener('change', handleDropdownChange);
-
-    const firstAeronave = [0,'N/A','N/A',0,'N/A',0];
-    displayVoos(voosDiv, firstAeronave);
-    
-} else {
-    console.error('Erro ao buscar dados de voo:', data.message);
-}
-}
-
-function showStatusMessage(msg, error){
-var pStatus = document.getElementById("status");
-if (error === true){
-pStatus.className = "statusError";
-}else{
-pStatus.className = "statusSuccess";
-}
-pStatus.textContent = msg;
-}
-
-function fetchInserir(body) {
-const requestOptions = {
-method: 'DELETE',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify(body)
-};
-
-return fetch('http://localhost:3000/excluirVoo', requestOptions)
-.then(T => T.json())
-}
+            });
 
 
-function deletarVoo(){
+            
+            voosDropdown.addEventListener('change', handleDropdownChange);
 
-if(!selecionouVooDeletar()){
-    showStatusMessage("Selecione um voo para deletar...", true);  
-    return;
-    }
+            const firstAeronave = [0,'N/A','N/A',0,'N/A',0];
+            displayVoos(voosDiv, firstAeronave);
+            
+        } else {
+            console.error('Erro ao buscar dados de voo:', data.message);
+        }
+      }
+
+      function showStatusMessage(msg, error){
+        var pStatus = document.getElementById("status");
+        if (error === true){
+        pStatus.className = "statusError";
+        }else{
+        pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+      }
+
+      function fetchInserir(body) {
+        const requestOptions = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/excluirVoo', requestOptions)
+        .then(T => T.json())
+      }
+
+      function deletarVoo(){
+
+      if(!selecionouVooDeletar()){
+          showStatusMessage("Selecione um voo para deletar...", true);  
+          return;
+          }
 
 
 
 
-const voo = document.getElementById("vooDropdown").value;
-const vooObj = JSON.parse(voo);
-const codigo = vooObj[0];
+      const voo = document.getElementById("vooDropdown").value;
+      const vooObj = JSON.parse(voo);
+      const codigo = vooObj[0];
 
 
-console.log(codigo)
+      console.log(codigo)
 
 
-fetchInserir({
-codigo: codigo
-})
-.then(resultado => {
- 
-  if(resultado.status === "SUCCESS"){
-    showStatusMessage("voo deletado... ", false);
-  }else{
-    showStatusMessage("Erro ao deletar voo...: " + message, true);
-    console.log(resultado.message);
-  }
-})
-.catch(()=>{
-  showStatusMessage("Erro técnico ao deletar... Contate o suporte.", true);
-  console.log("Falha grave ao cadastrar.")
-});
+      fetchInserir({
+      codigo: codigo
+      })
+      .then(resultado => {
+      
+        if(resultado.status === "SUCCESS"){
+          showStatusMessage("voo deletado... ", false);
+        }else{
+          showStatusMessage("Erro ao deletar voo...: " + message, true);
+          console.log(resultado.message);
+        }
+      })
+      .catch(()=>{
+        showStatusMessage("Erro técnico ao deletar... Contate o suporte.", true);
+        console.log("Falha grave ao cadastrar.")
+      });
 
-}
+      }
 
+      function handleDropdownChange() {
+        const voosDropdown = document.getElementById('vooDropdown');
+        const selectedVooData = JSON.parse(voosDropdown.value);
+        const voosDiv = document.getElementById('voo');
 
+        displayVoos(voosDiv, selectedVooData);
+      }
 
-function handleDropdownChange() {
-const voosDropdown = document.getElementById('vooDropdown');
-const selectedVooData = JSON.parse(voosDropdown.value);
-const voosDiv = document.getElementById('voo');
+      const nomes = ["Codigo :", "Dia do Voo : ", "Hora do Voo : ", "Aeronave : ", "Trecho : ", "Ida e Volta : "];
+      
+      function displayVoos(container, voo) {
+        container.innerHTML = '';
+        if (voo) {
+            const table = document.createElement('table');
+            const tableBody = document.createElement('tbody');
+            for (const key in voo) {
+                const row = tableBody.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                cell1.textContent = nomes[key];
+                cell2.textContent = voo[key];
+            }
+            
+            table.appendChild(tableBody);
+            container.appendChild(table);
+        }
+      }
 
-displayVoos(voosDiv, selectedVooData);
-}
-
-
-const nomes = ["Codigo :", "Dia do Voo : ", "Hora do Voo : ", "Aeronave : ", "Trecho : ", "Ida e Volta : "];
-function displayVoos(container, voo) {
-container.innerHTML = '';
-if (voo) {
-    const table = document.createElement('table');
-    const tableBody = document.createElement('tbody');
-    for (const key in voo) {
-        const row = tableBody.insertRow();
-        const cell1 = row.insertCell(0);
-        const cell2 = row.insertCell(1);
-        cell1.textContent = nomes[key];
-        cell2.textContent = voo[key];
-    }
-    
-    table.appendChild(tableBody);
-    container.appendChild(table);
-}
-}
-
-
-window.onload = listarVoos;
+      window.onload = listarVoos;
 
     </script>
 

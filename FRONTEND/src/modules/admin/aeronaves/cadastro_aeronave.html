@@ -7,15 +7,16 @@
     <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_aeronave.css">
 
     <script>
-        function limparForm() {
+
+      function limparForm() {
             document.getElementById("cadastro-form").reset();
         }
 
-        function cancelarCadastro() {
+      function cancelarCadastro() {
             alert("Cadastro cancelado");
         }
 
-        function atualizarStatusDisponibilidade() {
+      function atualizarStatusDisponibilidade() {
         var checkbox = document.getElementById("disponivel");
         var statusSpan = document.getElementById("statusDisponibilidade");
 
@@ -25,9 +26,10 @@
             statusSpan.textContent = "Não";
         }
         }
+      
         window.onload = function () {
         atualizarStatusDisponibilidade();
-        }
+      }
 
               // verifica se o ano é valido
       function anoValido(){
@@ -115,10 +117,6 @@
         return resultado; 
       }
 
-
-
-
-      // funcao para exibir mensagem de status... seja qual for. 
       function showStatusMessage(msg, error){
         var pStatus = document.getElementById("status");
         if (error === true){
@@ -177,8 +175,6 @@
           return;
         }
 
-
-
         const fabricante = document.getElementById("fabricante").value;
         const modelo = document.getElementById("modelo").value;
         const anoFab = document.getElementById("ano_fabricacao").value;
@@ -187,7 +183,6 @@
         const disponivel  = document.getElementById("disponivel").checked ?  '1'  :  '0' ;
         const assentoslinha = document.getElementById("assentos_linha").value;
         const assentoscorredor = document.getElementById("assentos_corredor").value;
-
        
         fetchInserir({
             marca: fabricante, 

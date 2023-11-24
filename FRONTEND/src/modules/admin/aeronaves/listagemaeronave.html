@@ -13,7 +13,7 @@
     <div id="aeronaves"></div>
 
     <script>
-        // Função para buscar dados da API e exibir na página
+
         async function listarAeronaves() {
             const response = await fetch('http://localhost:3000/listarAeronaves');
             const data = await response.json();
@@ -23,18 +23,16 @@
                 const aeronavesDropdown = document.getElementById('aeronaveDropdown');
                 const aeronaves = data.payload;
 
-                // Add a default option with a placeholder text
                 const defaultOption = document.createElement('option');
                 defaultOption.textContent = 'Escolha uma aeronave';
                 defaultOption.disabled = true;
                 defaultOption.selected = true;
                 aeronavesDropdown.appendChild(defaultOption);
 
-                // Populate the dropdown (select) element with aircraft information
                 aeronaves.forEach(aeronave => {
                 
                     const option = document.createElement('option');
-                    option.value = JSON.stringify(aeronave); // Store the entire aircraft data as JSON string
+                    option.value = JSON.stringify(aeronave); 
                     const CODIGO = aeronave[0];
                     const FABRICANTE = aeronave[1];
                     const MODELO = aeronave[2];
@@ -43,8 +41,6 @@
 
                 });
 
-
-                // Add an event listener to the dropdown to handle selection changes
                 aeronavesDropdown.addEventListener('change', handleDropdownChange);
                 
             } else {
@@ -52,7 +48,6 @@
             }
         }
 
-        // Function to handle dropdown selection change
         function handleDropdownChange() {
             const aeronavesDropdown = document.getElementById('aeronaveDropdown');
             const selectedAeronaveData = JSON.parse(aeronavesDropdown.value);
@@ -61,8 +56,8 @@
             displayAeronaves(aeronavesDiv, selectedAeronaveData);
         }
 
-        // Function to display aircraft information
         const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :", "Assentos por linha:", "Assentos antes de corredor:"];
+
         function displayAeronaves(container, aeronave) {
             container.innerHTML = '';
             if (aeronave) {
@@ -81,7 +76,6 @@
             }
         }
 
-        // Chamar a função para listar aeronaves quando a página carregar
         window.onload = listarAeronaves;
     </script>
 </body>
