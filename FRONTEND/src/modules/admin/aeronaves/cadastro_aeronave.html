@@ -7,209 +7,209 @@
     <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_aeronave.css">
 
     <script>
-
-      function limparForm() {
-            document.getElementById("cadastro-form").reset();
-        }
-
-      function cancelarCadastro() {
-            alert("Cadastro cancelado");
-        }
-
-      function atualizarStatusDisponibilidade() {
-        var checkbox = document.getElementById("disponivel");
-        var statusSpan = document.getElementById("statusDisponibilidade");
-
-        if (checkbox.checked) {
-            statusSpan.textContent = "Sim";
-        } else {
-            statusSpan.textContent = "Não";
-        }
-        }
-      
-        window.onload = function () {
-        atualizarStatusDisponibilidade();
-      }
-
-              // verifica se o ano é valido
-      function anoValido(){
-        let resultado = false;
-        // obter o texto preenchido no campo anoFab
-        var strAno = document.getElementById("ano_fabricacao").value;
-        const ano = parseInt(strAno);
-        console.log("Ano aeronave: " + ano.toString());
-        if (ano >= 1990 && ano <= 2026){
-          resultado = true;
-        }
-        return resultado; 
-      }
-
-      // verifica se o campo total de assentos é numerico e válido
-      function totalAssentosValido(){
-        let resultado = false;
-        const strAssentos = document.getElementById("assentos").value;
-        const assentos = parseInt(strAssentos);
-        if (assentos > 0){
-          resultado = true;
-        }
-        return resultado; 
-      }
-
-      // funcao que verifica se selecionou ou não o fabricante.
-      function selecionouFabricante(){
-        let resultado = false; 
-        var listaFabricantes = document.getElementById("fabricante");
-        var valorSelecionado = listaFabricantes.value;
-        // se quiséssemos obter o TEXTO selecionado. 
-        // var text = listaFabricantes.options[listaFabricantes.selectedIndex].text;
-        if (valorSelecionado !== "0"){
-          resultado = true;
-        }
-        return resultado;
-      }
-
-      // funcao que verifica se preencheu o modelo.
-      function preencheuModelo(){
-        let resultado = false;
-        const modeloInformado = document.getElementById("modelo").value;
-        if(modeloInformado.length > 0){
-          resultado = true;
-        }
-        return resultado;
-      }
-
-      // funcao para verificar se preencheu o registro de referencia. 
-      function preencheuRegistro(){
-        let resultado = false;
-        const registroReferencia = document.getElementById("referencia").value;
-        if(registroReferencia.length > 0){
-          resultado = true;
-        }
-        return resultado;
-      }
-
-      function assentoslinhaValido(){
-        let resultado = false;
-        const strAssentos = document.getElementById("assentos").value;
-        const assentos = parseInt(strAssentos);
-        const strAssentoslinha = document.getElementById("assentos_linha").value;
-        const assentoslinha = parseInt(strAssentoslinha);
-        if (assentoslinha > 0){
-          if(assentoslinha < assentos){
-            resultado = true;
-          }
-          
-        }
-        return resultado; 
-      }
-
-      function assentoscorredorValido(){
-        let resultado = false;
-        const strAssentos = document.getElementById("assentos").value;
-        const assentos = parseInt(strAssentos);
-        const strAssentoscorredor = document.getElementById("assentos_corredor").value;
-        const assentoscorredor = parseInt(strAssentoscorredor);
-        if (assentoscorredor > 0){
-          if(assentoscorredor < assentos){
-            resultado = true;
-          }
-        }
-        return resultado; 
-      }
-
-      function showStatusMessage(msg, error){
-        var pStatus = document.getElementById("status");
-        if (error === true){
-          pStatus.className = "statusError";
-        }else{
-          pStatus.className = "statusSuccess";
-        }
-        pStatus.textContent = msg;
-      }
-
-      function fetchInserir(body) {
-        const requestOptions = {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        };
-
-        return fetch('http://localhost:3000/inserirAeronave', requestOptions)
-        .then(T => T.json())
-      }
-
-      
-      function inserirAeronave(){
-
-        if(!selecionouFabricante()){
-          showStatusMessage("Selecione o fabricante...", true);  
-          return;
-        }
-
-        if(!preencheuModelo()){
-          showStatusMessage("Preencha o modelo...", true);
-          return;
-        }
-
-        if(!preencheuRegistro()){
-          showStatusMessage("Preencha o registro da aeronave...", true);
-          return;
-        }
-
-        if(!anoValido()){
-          showStatusMessage("Ano deve de 1990 até 2026...", true);
-          return;
-        }
-
-        if(!totalAssentosValido()){
-          showStatusMessage("Preencha corretamente o total de assentos.", true);
-          return;
-        }
-        if(!assentoslinhaValido()){
-          showStatusMessage("Assentos por linha não pode ser maior que o total de assentos", true);
-          return;
-        }
-
-        if(!assentoscorredorValido()){
-          showStatusMessage("Assentos antes do corredor não pode ser maior que o total de assentos", true);
-          return;
-        }
-
-        const fabricante = document.getElementById("fabricante").value;
-        const modelo = document.getElementById("modelo").value;
-        const anoFab = document.getElementById("ano_fabricacao").value;
-        const registro = document.getElementById("referencia").value;
-        const totalAssentos = document.getElementById("assentos").value;
-        const disponivel  = document.getElementById("disponivel").checked ?  '1'  :  '0' ;
-        const assentoslinha = document.getElementById("assentos_linha").value;
-        const assentoscorredor = document.getElementById("assentos_corredor").value;
-       
-        fetchInserir({
-            marca: fabricante, 
-            modelo: modelo,
-            anoFab: anoFab, 
-            qtdeAssentos: totalAssentos,
-            registro: registro,
-            disponivel: disponivel,
-            assentoslinha: assentoslinha,
-            assentoscorredor: assentoscorredor
-           })
-            .then(resultado => {
-              
-              if(resultado.status === "SUCCESS"){
-                showStatusMessage("Aeronave cadastrada... ", false);
-              }else{
-                showStatusMessage("Erro ao cadastrar aeronave...: " + message, true);
-                console.log(resultado.message);
-              }
-            })
-            .catch(()=>{
-              showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-              console.log("Falha grave ao cadastrar.")
-            });
         
+function limparForm() {
+    document.getElementById("cadastro-form").reset();
+}
+
+function cancelarCadastro() {
+    alert("Cadastro cancelado");
+}
+
+function atualizarStatusDisponibilidade() {
+var checkbox = document.getElementById("disponivel");
+var statusSpan = document.getElementById("statusDisponibilidade");
+
+if (checkbox.checked) {
+    statusSpan.textContent = "Sim";
+} else {
+    statusSpan.textContent = "Não";
+}
+}
+
+window.onload = function () {
+atualizarStatusDisponibilidade();
+}
+
+      // verifica se o ano é valido
+function anoValido(){
+let resultado = false;
+// obter o texto preenchido no campo anoFab
+var strAno = document.getElementById("ano_fabricacao").value;
+const ano = parseInt(strAno);
+console.log("Ano aeronave: " + ano.toString());
+if (ano >= 1990 && ano <= 2026){
+  resultado = true;
+}
+return resultado; 
+}
+
+// verifica se o campo total de assentos é numerico e válido
+function totalAssentosValido(){
+let resultado = false;
+const strAssentos = document.getElementById("assentos").value;
+const assentos = parseInt(strAssentos);
+if (assentos > 0){
+  resultado = true;
+}
+return resultado; 
+}
+
+// funcao que verifica se selecionou ou não o fabricante.
+function selecionouFabricante(){
+let resultado = false; 
+var listaFabricantes = document.getElementById("fabricante");
+var valorSelecionado = listaFabricantes.value;
+// se quiséssemos obter o TEXTO selecionado. 
+// var text = listaFabricantes.options[listaFabricantes.selectedIndex].text;
+if (valorSelecionado !== "0"){
+  resultado = true;
+}
+return resultado;
+}
+
+// funcao que verifica se preencheu o modelo.
+function preencheuModelo(){
+let resultado = false;
+const modeloInformado = document.getElementById("modelo").value;
+if(modeloInformado.length > 0){
+  resultado = true;
+}
+return resultado;
+}
+
+// funcao para verificar se preencheu o registro de referencia. 
+function preencheuRegistro(){
+let resultado = false;
+const registroReferencia = document.getElementById("referencia").value;
+if(registroReferencia.length > 0){
+  resultado = true;
+}
+return resultado;
+}
+
+function assentoslinhaValido(){
+let resultado = false;
+const strAssentos = document.getElementById("assentos").value;
+const assentos = parseInt(strAssentos);
+const strAssentoslinha = document.getElementById("assentos_linha").value;
+const assentoslinha = parseInt(strAssentoslinha);
+if (assentoslinha > 0){
+  if(assentoslinha < assentos){
+    resultado = true;
+  }
+  
+}
+return resultado; 
+}
+
+function assentoscorredorValido(){
+let resultado = false;
+const strAssentos = document.getElementById("assentos").value;
+const assentos = parseInt(strAssentos);
+const strAssentoscorredor = document.getElementById("assentos_corredor").value;
+const assentoscorredor = parseInt(strAssentoscorredor);
+if (assentoscorredor > 0){
+  if(assentoscorredor < assentos){
+    resultado = true;
+  }
+}
+return resultado; 
+}
+
+function showStatusMessage(msg, error){
+var pStatus = document.getElementById("status");
+if (error === true){
+  pStatus.className = "statusError";
+}else{
+  pStatus.className = "statusSuccess";
+}
+pStatus.textContent = msg;
+}
+
+function fetchInserir(body) {
+const requestOptions = {
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body)
+};
+
+return fetch('http://localhost:3000/inserirAeronave', requestOptions)
+.then(T => T.json())
+}
+
+
+function inserirAeronave(){
+
+if(!selecionouFabricante()){
+  showStatusMessage("Selecione o fabricante...", true);  
+  return;
+}
+
+if(!preencheuModelo()){
+  showStatusMessage("Preencha o modelo...", true);
+  return;
+}
+
+if(!preencheuRegistro()){
+  showStatusMessage("Preencha o registro da aeronave...", true);
+  return;
+}
+
+if(!anoValido()){
+  showStatusMessage("Ano deve de 1990 até 2026...", true);
+  return;
+}
+
+if(!totalAssentosValido()){
+  showStatusMessage("Preencha corretamente o total de assentos.", true);
+  return;
+}
+if(!assentoslinhaValido()){
+  showStatusMessage("Assentos por linha não pode ser maior que o total de assentos", true);
+  return;
+}
+
+if(!assentoscorredorValido()){
+  showStatusMessage("Assentos antes do corredor não pode ser maior que o total de assentos", true);
+  return;
+}
+
+const fabricante = document.getElementById("fabricante").value;
+const modelo = document.getElementById("modelo").value;
+const anoFab = document.getElementById("ano_fabricacao").value;
+const registro = document.getElementById("referencia").value;
+const totalAssentos = document.getElementById("assentos").value;
+const disponivel  = document.getElementById("disponivel").checked ?  '1'  :  '0' ;
+const assentoslinha = document.getElementById("assentos_linha").value;
+const assentoscorredor = document.getElementById("assentos_corredor").value;
+
+fetchInserir({
+    marca: fabricante, 
+    modelo: modelo,
+    anoFab: anoFab, 
+    qtdeAssentos: totalAssentos,
+    registro: registro,
+    disponivel: disponivel,
+    assentoslinha: assentoslinha,
+    assentoscorredor: assentoscorredor
+   })
+    .then(resultado => {
+      
+      if(resultado.status === "SUCCESS"){
+        showStatusMessage("Aeronave cadastrada... ", false);
+      }else{
+        showStatusMessage("Erro ao cadastrar aeronave...: " + message, true);
+        console.log(resultado.message);
       }
-    
+    })
+    .catch(()=>{
+      showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+      console.log("Falha grave ao cadastrar.")
+    });
+
+}
+
     </script>
 
 </head>

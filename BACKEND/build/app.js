@@ -65,11 +65,8 @@ app.post("/listarAeronavesWhere", (req, res) => __awaiter(void 0, void 0, void 0
             connectionString: process.env.ORACLE_CONN_STR,
         };
         const connection = yield oracledb_1.default.getConnection(connAttibs);
-        // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
         const codigo_aeronave = req.body.codigo_aeronave;
-        // Usando a cláusula WHERE para filtrar por CPF
-        const result = yield connection.execute("SELECT numero_assentos,assentos_linha,assentos_corredor FROM AERONAVES WHERE codigo_aeronave = :codigo_aeronave", { codigo_aeronave: { val: codigo_aeronave } } // Configuração correta do bind para o parâmetro :cpf
-        );
+        const result = yield connection.execute("SELECT numero_assentos,assentos_linha,assentos_corredor FROM AERONAVES WHERE codigo_aeronave = :codigo_aeronave", { codigo_aeronave: { val: codigo_aeronave } });
         yield connection.close();
         cr.status = "SUCCESS";
         cr.message = "Dados obtidos";
@@ -89,7 +86,6 @@ app.post("/listarAeronavesWhere", (req, res) => __awaiter(void 0, void 0, void 0
     }
 }));
 app.put("/inserirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição. 
     const marca = req.body.marca;
     const modelo = req.body.modelo;
     const anoFab = req.body.anoFab;
@@ -98,18 +94,12 @@ app.put("/inserirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
     const disponivel = req.body.disponivel;
     const assentoslinha = req.body.assentoslinha;
     const assentoscorredor = req.body.assentoscorredor;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
-    // conectando 
     try {
         conn = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -122,10 +112,7 @@ app.put("/inserirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
     (SEQ_AERONAVES.NEXTVAL, :1, :2, :3, :4, :5, :6, :7, :8)`;
         const dados = [marca, modelo, registro, anoFab, qtdeAssentos, disponivel, assentoslinha, assentoscorredor];
         let resInsert = yield conn.execute(cmdInsertAero, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsInserted = resInsert.rowsAffected;
         if (rowsInserted !== undefined && rowsInserted === 1) {
             cr.status = "SUCCESS";
@@ -142,7 +129,6 @@ app.put("/inserirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
         }
     }
     finally {
-        //fechar a conexao.
         if (conn !== undefined) {
             yield conn.close();
         }
@@ -150,15 +136,12 @@ app.put("/inserirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 }));
 app.delete("/excluirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // excluindo a aeronave pelo código dela:
     const codigo = req.body.codigo;
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
-    // conectando 
     try {
         const connection = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -168,12 +151,8 @@ app.delete("/excluirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, f
         const cmdDeleteAero = `DELETE AERONAVES WHERE codigo_aeronave = :1`;
         const dados = [codigo];
         let resDelete = yield connection.execute(cmdDeleteAero, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield connection.commit();
-        // encerrar a conexao. 
         yield connection.close();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsDeleted = resDelete.rowsAffected;
         if (rowsDeleted !== undefined && rowsDeleted === 1) {
             cr.status = "SUCCESS";
@@ -193,12 +172,10 @@ app.delete("/excluirAeronave", (req, res) => __awaiter(void 0, void 0, void 0, f
         }
     }
     finally {
-        // devolvendo a resposta da requisição.
         res.send(cr);
     }
 }));
 app.put("/alterarAeronave", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição. 
     const codigo = req.body.marca;
     const marca = req.body.marca;
     const modelo = req.body.modelo;
@@ -206,18 +183,12 @@ app.put("/alterarAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
     const qtdeAssentos = req.body.qtdeAssentos;
     const registro = req.body.registro;
     const disponivel = req.body.disponivel;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
-    // conectando 
     try {
         conn = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -229,10 +200,7 @@ app.put("/alterarAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
     WHERE CODIGO_AERONAVE = :1`;
         const dados = [codigo, marca, modelo, registro, anoFab, qtdeAssentos, disponivel];
         let resInsert = yield conn.execute(cmdInsertAero, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsInserted = resInsert.rowsAffected;
         if (rowsInserted !== undefined && rowsInserted === 1) {
             cr.status = "SUCCESS";
@@ -249,7 +217,6 @@ app.put("/alterarAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
         }
     }
     finally {
-        //fechar a conexao.
         if (conn !== undefined) {
             yield conn.close();
         }
@@ -258,21 +225,14 @@ app.put("/alterarAeronave", (req, res) => __awaiter(void 0, void 0, void 0, func
 }));
 // servicos de backend (AEROPORTOS)
 app.put("/inserirAeroporto", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição. 
     const nomeaeroporto = req.body.nomeaeroporto;
     const cidadeaeroporto = req.body.cidadeaeroporto;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
-    // conectando 
     try {
         conn = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -285,10 +245,7 @@ app.put("/inserirAeroporto", (req, res) => __awaiter(void 0, void 0, void 0, fun
     (SEQ_AEROPORTOS.NEXTVAL, :1, :2)`;
         const dados = [nomeaeroporto, cidadeaeroporto];
         let resInsert = yield conn.execute(cmdInsertAeroporto, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsInserted = resInsert.rowsAffected;
         if (rowsInserted !== undefined && rowsInserted === 1) {
             cr.status = "SUCCESS";
@@ -349,11 +306,8 @@ app.post("/listarAeroportosWhere", (req, res) => __awaiter(void 0, void 0, void 
             connectionString: process.env.ORACLE_CONN_STR,
         };
         const connection = yield oracledb_1.default.getConnection(connAttibs);
-        // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
         const cidade_aeroporto = req.body.cidade_aeroporto;
-        // Usando a cláusula WHERE para filtrar por CPF
-        const result = yield connection.execute("SELECT * FROM AEROPORTOS WHERE CIDADE_AEROPORTO = :cidade_aeroporto", { cidade_aeroporto: { val: cidade_aeroporto } } // Configuração correta do bind para o parâmetro :cpf
-        );
+        const result = yield connection.execute("SELECT * FROM AEROPORTOS WHERE CIDADE_AEROPORTO = :cidade_aeroporto", { cidade_aeroporto: { val: cidade_aeroporto } });
         yield connection.close();
         cr.status = "SUCCESS";
         cr.message = "Dados obtidos";
@@ -373,9 +327,7 @@ app.post("/listarAeroportosWhere", (req, res) => __awaiter(void 0, void 0, void 
     }
 }));
 app.delete("/excluirAeroporto", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // excluindo a aeronave pelo código dela:
     const codigo = req.body.codigo;
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
@@ -391,12 +343,8 @@ app.delete("/excluirAeroporto", (req, res) => __awaiter(void 0, void 0, void 0, 
         const cmdDeleteAero = `DELETE AEROPORTOS WHERE codigo_aeroporto = :1`;
         const dados = [codigo];
         let resDelete = yield connection.execute(cmdDeleteAero, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield connection.commit();
-        // encerrar a conexao. 
         yield connection.close();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsDeleted = resDelete.rowsAffected;
         if (rowsDeleted !== undefined && rowsDeleted === 1) {
             cr.status = "SUCCESS";
@@ -416,28 +364,19 @@ app.delete("/excluirAeroporto", (req, res) => __awaiter(void 0, void 0, void 0, 
         }
     }
     finally {
-        // devolvendo a resposta da requisição.
         res.send(cr);
     }
 }));
 // servicos de backend (CIDADES)
 app.put("/inserirCidade", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição. 
     const nomedacidade = req.body.nomecidade;
     const paisdacidade = req.body.paiscidade;
-    console.log(paisdacidade);
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
-    // conectando 
     try {
         conn = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -450,14 +389,11 @@ app.put("/inserirCidade", (req, res) => __awaiter(void 0, void 0, void 0, functi
     (SEQ_CIDADES.NEXTVAL, :1, :2)`;
         const dados = [paisdacidade, nomedacidade];
         let resInsert = yield conn.execute(cmdInsertCidade, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsInserted = resInsert.rowsAffected;
         if (rowsInserted !== undefined && rowsInserted === 1) {
             cr.status = "SUCCESS";
-            cr.message = "Aeroporto inserido.";
+            cr.message = "Cidade inserida.";
         }
     }
     catch (e) {
@@ -470,7 +406,6 @@ app.put("/inserirCidade", (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
     }
     finally {
-        //fechar a conexao.
         if (conn !== undefined) {
             yield conn.close();
         }
@@ -514,11 +449,8 @@ app.post("/listarCidadesWhere", (req, res) => __awaiter(void 0, void 0, void 0, 
             connectionString: process.env.ORACLE_CONN_STR,
         };
         const connection = yield oracledb_1.default.getConnection(connAttibs);
-        // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
         const pais_cidade = req.body.pais_cidade;
-        // Usando a cláusula WHERE para filtrar por CPF
-        const result = yield connection.execute("SELECT * FROM CIDADES WHERE PAIS_CIDADE = :pais_cidade", { pais_cidade: { val: pais_cidade } } // Configuração correta do bind para o parâmetro :cpf
-        );
+        const result = yield connection.execute("SELECT * FROM CIDADES WHERE PAIS_CIDADE = :pais_cidade", { pais_cidade: { val: pais_cidade } });
         yield connection.close();
         cr.status = "SUCCESS";
         cr.message = "Dados obtidos";
@@ -538,7 +470,6 @@ app.post("/listarCidadesWhere", (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 }));
 app.delete("/excluirCidade", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // excluindo a aeronave pelo código dela:
     const codigo = req.body.codigo;
     // definindo um objeto de resposta.
     let cr = {
@@ -546,7 +477,6 @@ app.delete("/excluirCidade", (req, res) => __awaiter(void 0, void 0, void 0, fun
         message: "",
         payload: undefined,
     };
-    // conectando 
     try {
         const connection = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -556,19 +486,15 @@ app.delete("/excluirCidade", (req, res) => __awaiter(void 0, void 0, void 0, fun
         const cmdDeleteAero = `DELETE CIDADES WHERE codigo_cidade = :1`;
         const dados = [codigo];
         let resDelete = yield connection.execute(cmdDeleteAero, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield connection.commit();
-        // encerrar a conexao. 
         yield connection.close();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsDeleted = resDelete.rowsAffected;
         if (rowsDeleted !== undefined && rowsDeleted === 1) {
             cr.status = "SUCCESS";
             cr.message = "Cidade excluída.";
         }
         else {
-            cr.message = "Cidade não excluída. Verifique se o código informado está correto.";
+            cr.message = "Cidade não excluída, Erro.";
         }
     }
     catch (e) {
@@ -581,27 +507,19 @@ app.delete("/excluirCidade", (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
     }
     finally {
-        // devolvendo a resposta da requisição.
         res.send(cr);
     }
 }));
 // servicos de backend (PAISES)
 app.put("/inserirPais", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição. 
     const nomepais = req.body.nomepais;
     const sigla = req.body.sigla;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
-    // conectando 
     try {
         conn = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -614,10 +532,7 @@ app.put("/inserirPais", (req, res) => __awaiter(void 0, void 0, void 0, function
     (SEQ_PAISES.NEXTVAL, :1, :2)`;
         const dados = [nomepais, sigla];
         let resInsert = yield conn.execute(cmdInserPais, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsInserted = resInsert.rowsAffected;
         if (rowsInserted !== undefined && rowsInserted === 1) {
             cr.status = "SUCCESS";
@@ -634,7 +549,6 @@ app.put("/inserirPais", (req, res) => __awaiter(void 0, void 0, void 0, function
         }
     }
     finally {
-        //fechar a conexao.
         if (conn !== undefined) {
             yield conn.close();
         }
@@ -670,15 +584,12 @@ app.get("/listarPais", (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 }));
 app.delete("/excluirPais", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // excluindo a aeronave pelo código dela:
     const codigo = req.body.codigo;
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
-    // conectando 
     try {
         const connection = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -688,19 +599,15 @@ app.delete("/excluirPais", (req, res) => __awaiter(void 0, void 0, void 0, funct
         const cmdDeleteAero = `DELETE PAISES WHERE codigo_pais = :1`;
         const dados = [codigo];
         let resDelete = yield connection.execute(cmdDeleteAero, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield connection.commit();
-        // encerrar a conexao. 
         yield connection.close();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsDeleted = resDelete.rowsAffected;
         if (rowsDeleted !== undefined && rowsDeleted === 1) {
             cr.status = "SUCCESS";
             cr.message = "Pais excluída.";
         }
         else {
-            cr.message = "Pais não excluída. Verifique se o código informado está correto.";
+            cr.message = "Pais não excluído, Erro.";
         }
     }
     catch (e) {
@@ -713,13 +620,11 @@ app.delete("/excluirPais", (req, res) => __awaiter(void 0, void 0, void 0, funct
         }
     }
     finally {
-        // devolvendo a resposta da requisição.
         res.send(cr);
     }
 }));
 // servicos de backend (TRECHOS)
 app.put("/inserirTrecho", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição. 
     const paispartida = req.body.paispartida;
     const paischegada = req.body.paischegada;
     const cidadepartida = req.body.cidadepartida;
@@ -727,18 +632,12 @@ app.put("/inserirTrecho", (req, res) => __awaiter(void 0, void 0, void 0, functi
     const aeroportopartida = req.body.aeroportopartida;
     const aeroportochegada = req.body.aeroportochegada;
     const trecho = req.body.trecho;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
-    // conectando 
     try {
         conn = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -751,10 +650,7 @@ app.put("/inserirTrecho", (req, res) => __awaiter(void 0, void 0, void 0, functi
     (SEQ_TRECHOS.NEXTVAL, :1, :2, :3, :4, :5, :6, :7)`;
         const dados = [paispartida, paischegada, cidadepartida, cidadechegada, aeroportopartida, aeroportochegada, trecho];
         let resInsert = yield conn.execute(cmdInsertTrecho, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsInserted = resInsert.rowsAffected;
         if (rowsInserted !== undefined && rowsInserted === 1) {
             cr.status = "SUCCESS";
@@ -771,7 +667,6 @@ app.put("/inserirTrecho", (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
     }
     finally {
-        //fechar a conexao.
         if (conn !== undefined) {
             yield conn.close();
         }
@@ -815,12 +710,9 @@ app.post("/listarTrechosWhere", (req, res) => __awaiter(void 0, void 0, void 0, 
             connectionString: process.env.ORACLE_CONN_STR,
         };
         const connection = yield oracledb_1.default.getConnection(connAttibs);
-        // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
         const cidade_ida = req.body.cidade_ida;
         const cidade_chegada = req.body.cidade_chegada;
-        // Usando a cláusula WHERE para filtrar por CPF
-        const result = yield connection.execute("SELECT * FROM TRECHOS WHERE CIDADE_PARTIDA = :cidade_partida AND CIDADE_CHEGADA = :cidade_chegada", { cidade_chegada: { val: cidade_chegada }, cidade_partida: { val: cidade_ida } } // Configuração correta do bind para o parâmetro :cpf
-        );
+        const result = yield connection.execute("SELECT * FROM TRECHOS WHERE CIDADE_PARTIDA = :cidade_partida AND CIDADE_CHEGADA = :cidade_chegada", { cidade_chegada: { val: cidade_chegada }, cidade_partida: { val: cidade_ida } });
         yield connection.close();
         cr.status = "SUCCESS";
         cr.message = "Dados obtidos";
@@ -840,15 +732,12 @@ app.post("/listarTrechosWhere", (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 }));
 app.delete("/excluirTrecho", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // excluindo a aeronave pelo código dela:
     const codigo = req.body.codigo;
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
-    // conectando 
     try {
         const connection = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -858,19 +747,15 @@ app.delete("/excluirTrecho", (req, res) => __awaiter(void 0, void 0, void 0, fun
         const cmdDeleteAero = `DELETE TRECHOS WHERE CODIGO_TRECHO = :1`;
         const dados = [codigo];
         let resDelete = yield connection.execute(cmdDeleteAero, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield connection.commit();
-        // encerrar a conexao. 
         yield connection.close();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsDeleted = resDelete.rowsAffected;
         if (rowsDeleted !== undefined && rowsDeleted === 1) {
             cr.status = "SUCCESS";
             cr.message = "trecho excluída.";
         }
         else {
-            cr.message = "trecho não excluída. Verifique se o código informado está correto.";
+            cr.message = "trecho não excluído, Erro.";
         }
     }
     catch (e) {
@@ -883,13 +768,11 @@ app.delete("/excluirTrecho", (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
     }
     finally {
-        // devolvendo a resposta da requisição.
         res.send(cr);
     }
 }));
 // servicos de backend(VOO)
 app.put("/inserirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição.
     const dia_ida = req.body.dia_ida;
     const dia_volta = req.body.dia_volta;
     const horario_ida = req.body.horario_ida;
@@ -898,19 +781,14 @@ app.put("/inserirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function*
     const trecho_ida = req.body.trechoida;
     const trecho_volta = req.body.trechovolta;
     const idavolta = req.body.idavolta;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
+    //Se o voo for de ida e volta
     if (idavolta == 1) {
-        // conectando 
         try {
             conn = yield oracledb_1.default.getConnection({
                 user: process.env.ORACLE_DB_USER,
@@ -923,10 +801,7 @@ app.put("/inserirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function*
     (SEQ_VOOS.NEXTVAL, :1, :2, :3, :4, :5, :6, :7, :8)`;
             const dados = [dia_ida, dia_volta, horario_ida, horario_volta, aeronave, trecho_ida, trecho_volta, idavolta];
             let resInsert = yield conn.execute(cmdInsertVoo, dados);
-            // importante: efetuar o commit para gravar no Oracle.
             yield conn.commit();
-            // obter a informação de quantas linhas foram inseridas. 
-            // neste caso precisa ser exatamente 1
             const rowsInserted = resInsert.rowsAffected;
             if (rowsInserted !== undefined && rowsInserted === 1) {
                 cr.status = "SUCCESS";
@@ -943,31 +818,28 @@ app.put("/inserirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function*
             }
         }
         finally {
-            //fechar a conexao.
             if (conn !== undefined) {
                 yield conn.close();
             }
             res.send(cr);
         }
     }
+    //Se o voo for só de ida
     if (idavolta == 0) {
-        // conectando 
         try {
             conn = yield oracledb_1.default.getConnection({
                 user: process.env.ORACLE_DB_USER,
                 password: process.env.ORACLE_DB_PASSWORD,
                 connectionString: process.env.ORACLE_CONN_STR,
             });
+            //sequences auxiliares para não conflitar com as clausulas "unique" no SQL, pq se colocar "0" da integrity constraint, poderia colocar como NULL mas ai daria mais trabalho kk.
             const cmdInsertVoo = `INSERT INTO VOOS
     (CODIGO_VOO, DIA_IDA, DIA_VOLTA, HORARIO_IDA, HORARIO_VOLTA, AERONAVE, TRECHO_IDA, TRECHO_VOLTA, IDAVOLTA)
     VALUES
     (SEQ_VOOS.NEXTVAL, :1, SEQ_DIAVOLTAVAZIO.NEXTVAL, :2, SEQ_HORAVOLTAVAZIO.NEXTVAL, :3, :4, SEQ_TRECHOVOLTAVAZIO.NEXTVAL, :5)`;
             const dados = [dia_ida, horario_ida, aeronave, trecho_ida, idavolta];
             let resInsert = yield conn.execute(cmdInsertVoo, dados);
-            // importante: efetuar o commit para gravar no Oracle.
             yield conn.commit();
-            // obter a informação de quantas linhas foram inseridas. 
-            // neste caso precisa ser exatamente 1
             const rowsInserted = resInsert.rowsAffected;
             if (rowsInserted !== undefined && rowsInserted === 1) {
                 cr.status = "SUCCESS";
@@ -984,7 +856,6 @@ app.put("/inserirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function*
             }
         }
         finally {
-            //fechar a conexao.
             if (conn !== undefined) {
                 yield conn.close();
             }
@@ -1021,15 +892,12 @@ app.get("/listarVoos", (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 }));
 app.delete("/excluirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // excluindo a aeronave pelo código dela:
     const codigo = req.body.codigo;
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
-    // conectando 
     try {
         const connection = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -1039,12 +907,8 @@ app.delete("/excluirVoo", (req, res) => __awaiter(void 0, void 0, void 0, functi
         const cmdDeleteAero = `DELETE VOOS WHERE CODIGO_VOO = :1`;
         const dados = [codigo];
         let resDelete = yield connection.execute(cmdDeleteAero, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield connection.commit();
-        // encerrar a conexao. 
         yield connection.close();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsDeleted = resDelete.rowsAffected;
         if (rowsDeleted !== undefined && rowsDeleted === 1) {
             cr.status = "SUCCESS";
@@ -1064,20 +928,18 @@ app.delete("/excluirVoo", (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
     }
     finally {
-        // devolvendo a resposta da requisição.
         res.send(cr);
     }
 }));
 //SERVICOS BACKEND ASSENTOS
 app.put("/inserirAssento", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição.
     const isADM = req.body.isADM;
     const aeronave = req.body.aeronave;
     const assento = req.body.assento;
     const cpfpassageiro = req.body.cpfpassageiro;
     const numvoo = req.body.numvoo;
     const disponivel = 0;
-    //Se a inserção estiver vindo da tela de ADM
+    //Se a inserção estiver vindo de uma tela de ADM
     if (isADM == 1) {
         let cr = {
             status: "ERROR",
@@ -1085,7 +947,6 @@ app.put("/inserirAssento", (req, res) => __awaiter(void 0, void 0, void 0, funct
             payload: undefined,
         };
         let conn;
-        // conectando 
         try {
             conn = yield oracledb_1.default.getConnection({
                 user: process.env.ORACLE_DB_USER,
@@ -1098,10 +959,7 @@ app.put("/inserirAssento", (req, res) => __awaiter(void 0, void 0, void 0, funct
     (:1, :2, :3)`;
             const dados = [aeronave, assento, disponivel];
             let resInsert = yield conn.execute(cmdInsertVoo, dados);
-            // importante: efetuar o commit para gravar no Oracle.
             yield conn.commit();
-            // obter a informação de quantas linhas foram inseridas. 
-            // neste caso precisa ser exatamente 1
             const rowsInserted = resInsert.rowsAffected;
             if (rowsInserted !== undefined && rowsInserted === 1) {
                 cr.status = "SUCCESS";
@@ -1118,7 +976,6 @@ app.put("/inserirAssento", (req, res) => __awaiter(void 0, void 0, void 0, funct
             }
         }
         finally {
-            //fechar a conexao.
             if (conn !== undefined) {
                 yield conn.close();
             }
@@ -1133,7 +990,6 @@ app.put("/inserirAssento", (req, res) => __awaiter(void 0, void 0, void 0, funct
             payload: undefined,
         };
         let conn;
-        // conectando 
         try {
             conn = yield oracledb_1.default.getConnection({
                 user: process.env.ORACLE_DB_USER,
@@ -1146,10 +1002,7 @@ app.put("/inserirAssento", (req, res) => __awaiter(void 0, void 0, void 0, funct
       (:1, :2, :3, :4, :5)`;
             const dados = [aeronave, assento, disponivel, cpfpassageiro, numvoo];
             let resInsert = yield conn.execute(cmdInsertVoo, dados);
-            // importante: efetuar o commit para gravar no Oracle.
             yield conn.commit();
-            // obter a informação de quantas linhas foram inseridas. 
-            // neste caso precisa ser exatamente 1
             const rowsInserted = resInsert.rowsAffected;
             if (rowsInserted !== undefined && rowsInserted === 1) {
                 cr.status = "SUCCESS";
@@ -1211,12 +1064,9 @@ app.post("/listarAssentosWhere", (req, res) => __awaiter(void 0, void 0, void 0,
             connectionString: process.env.ORACLE_CONN_STR,
         };
         const connection = yield oracledb_1.default.getConnection(connAttibs);
-        // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
         const codigo_aeronave = req.body.codigo_aeronave;
         const numero_voo = req.body.numero_voo;
-        // Usando a cláusula WHERE para filtrar por CPF
-        const result = yield connection.execute("SELECT * FROM MAPA_ASSENTOS WHERE AERONAVE = :codigo_aeronave AND NUMERO_VOO = :numero_voo", { codigo_aeronave: { val: codigo_aeronave }, numero_voo: { val: numero_voo } } // Configuração correta do bind para o parâmetro :cpf
-        );
+        const result = yield connection.execute("SELECT * FROM MAPA_ASSENTOS WHERE AERONAVE = :codigo_aeronave AND NUMERO_VOO = :numero_voo", { codigo_aeronave: { val: codigo_aeronave }, numero_voo: { val: numero_voo } });
         yield connection.close();
         cr.status = "SUCCESS";
         cr.message = "Dados obtidos";
@@ -1236,16 +1086,13 @@ app.post("/listarAssentosWhere", (req, res) => __awaiter(void 0, void 0, void 0,
     }
 }));
 app.delete("/excluirAssentoUnico", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // excluindo a aeronave pelo código dela:
     const aeronave = req.body.aeronave;
     const assento = req.body.assento;
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
-    // conectando 
     try {
         const connection = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -1255,12 +1102,8 @@ app.delete("/excluirAssentoUnico", (req, res) => __awaiter(void 0, void 0, void 
         const cmdDeleteAssento = `DELETE FROM MAPA_ASSENTOS WHERE aeronave = :1 AND banco = :2`;
         const dados = [aeronave, assento];
         let resDelete = yield connection.execute(cmdDeleteAssento, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield connection.commit();
-        // encerrar a conexao. 
         yield connection.close();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsDeleted = resDelete.rowsAffected;
         if (rowsDeleted !== undefined && rowsDeleted === 1) {
             cr.status = "SUCCESS";
@@ -1280,20 +1123,16 @@ app.delete("/excluirAssentoUnico", (req, res) => __awaiter(void 0, void 0, void 
         }
     }
     finally {
-        // devolvendo a resposta da requisição.
         res.send(cr);
     }
 }));
 app.delete("/excluirTodosAssentos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // excluindo a aeronave pelo código dela:
     const aeronave = req.body.aeronave;
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
-    // conectando 
     try {
         const connection = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -1303,12 +1142,8 @@ app.delete("/excluirTodosAssentos", (req, res) => __awaiter(void 0, void 0, void
         const cmdDeleteAssento = `DELETE FROM MAPA_ASSENTOS WHERE aeronave = :1`;
         const dados = [aeronave];
         let resDelete = yield connection.execute(cmdDeleteAssento, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield connection.commit();
-        // encerrar a conexao. 
         yield connection.close();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsDeleted = resDelete.rowsAffected;
         if (rowsDeleted !== undefined && rowsDeleted === 1) {
             cr.status = "SUCCESS";
@@ -1328,29 +1163,21 @@ app.delete("/excluirTodosAssentos", (req, res) => __awaiter(void 0, void 0, void
         }
     }
     finally {
-        // devolvendo a resposta da requisição.
         res.send(cr);
     }
 }));
 //SERVICOS BACKENT CLIENTE
 app.put("/inserirCliente", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição.
     const nome = req.body.nome;
     const cpf = req.body.cpf;
     const email = req.body.email;
     const senha = req.body.senha;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
-    // conectando 
     try {
         conn = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -1363,10 +1190,7 @@ app.put("/inserirCliente", (req, res) => __awaiter(void 0, void 0, void 0, funct
     (:1, :2, :3, :4)`;
         const dados = [nome, cpf, email, senha];
         let resInsert = yield conn.execute(cmdInsertVoo, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsInserted = resInsert.rowsAffected;
         if (rowsInserted !== undefined && rowsInserted === 1) {
             cr.status = "SUCCESS";
@@ -1383,7 +1207,6 @@ app.put("/inserirCliente", (req, res) => __awaiter(void 0, void 0, void 0, funct
         }
     }
     finally {
-        //fechar a conexao.
         if (conn !== undefined) {
             yield conn.close();
         }
@@ -1399,11 +1222,8 @@ app.post("/loginCliente", (req, res) => __awaiter(void 0, void 0, void 0, functi
             connectionString: process.env.ORACLE_CONN_STR,
         };
         const connection = yield oracledb_1.default.getConnection(connAttibs);
-        // Suponha que o CPF esteja no corpo da solicitação como req.body.cpf
         const cpf = req.body.cpf;
-        // Usando a cláusula WHERE para filtrar por CPF
-        const result = yield connection.execute("SELECT * FROM PASSAGEIROS WHERE CPF = :cpf", { cpf: { val: cpf } } // Configuração correta do bind para o parâmetro :cpf
-        );
+        const result = yield connection.execute("SELECT * FROM PASSAGEIROS WHERE CPF = :cpf", { cpf: { val: cpf } });
         yield connection.close();
         cr.status = "SUCCESS";
         cr.message = "Dados obtidos";
@@ -1423,22 +1243,15 @@ app.post("/loginCliente", (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 }));
 app.put("/atualizarCliente", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição.
     const cpf = req.body.cpf;
     const email = req.body.email;
     const senha = req.body.senha;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
-    // conectando 
     try {
         conn = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -1448,10 +1261,7 @@ app.put("/atualizarCliente", (req, res) => __awaiter(void 0, void 0, void 0, fun
         const cmdInsertVoo = `UPDATE PASSAGEIROS set email = :1, senha = :2 where cpf = :3 `;
         const dados = [email, senha, cpf];
         let resInsert = yield conn.execute(cmdInsertVoo, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsInserted = resInsert.rowsAffected;
         if (rowsInserted !== undefined && rowsInserted === 1) {
             cr.status = "SUCCESS";
@@ -1468,7 +1278,6 @@ app.put("/atualizarCliente", (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
     }
     finally {
-        //fechar a conexao.
         if (conn !== undefined) {
             yield conn.close();
         }
@@ -1477,23 +1286,16 @@ app.put("/atualizarCliente", (req, res) => __awaiter(void 0, void 0, void 0, fun
 }));
 //SERVICOS PAGAMENTO
 app.put("/InserirPagamento", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // para inserir a aeronave temos que receber os dados na requisição.
     const cpf = req.body.cpf;
     const custo = req.body.custo;
     const qtd_paga = req.body.qtd_paga;
     const modo_pagamento = req.body.modo_pagamento;
-    // correção: verificar se tudo chegou para prosseguir com o cadastro.
-    // verificar se chegaram os parametros
-    // VALIDAR se estão bons (de acordo com os critérios - exemplo: 
-    // não pode qtdeAssentos ser número e ao mesmo tempo o valor ser -5)
-    // definindo um objeto de resposta.
     let cr = {
         status: "ERROR",
         message: "",
         payload: undefined,
     };
     let conn;
-    // conectando 
     try {
         conn = yield oracledb_1.default.getConnection({
             user: process.env.ORACLE_DB_USER,
@@ -1506,10 +1308,7 @@ app.put("/InserirPagamento", (req, res) => __awaiter(void 0, void 0, void 0, fun
     (:1, :2, :3, :4)`;
         const dados = [cpf, custo, qtd_paga, modo_pagamento];
         let resInsert = yield conn.execute(cmdInsertVoo, dados);
-        // importante: efetuar o commit para gravar no Oracle.
         yield conn.commit();
-        // obter a informação de quantas linhas foram inseridas. 
-        // neste caso precisa ser exatamente 1
         const rowsInserted = resInsert.rowsAffected;
         if (rowsInserted !== undefined && rowsInserted === 1) {
             cr.status = "SUCCESS";
@@ -1526,7 +1325,6 @@ app.put("/InserirPagamento", (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
     }
     finally {
-        //fechar a conexao.
         if (conn !== undefined) {
             yield conn.close();
         }
