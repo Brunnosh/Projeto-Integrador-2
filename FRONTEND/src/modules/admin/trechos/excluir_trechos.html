@@ -27,157 +27,150 @@
         //FUNCOES VALIDACAO
 
         function selecionouTrechoDeletar(){
+              let resultado = false; 
+            var trechoSelecionada = document.getElementById("trechoDropdown").value;
+
+            console.log(trechoSelecionada)
+            if (trechoSelecionada !== "Escolha um trecho"){
+            resultado = true;
+            }
+            return resultado;
+        }
+
+
+        // Função para buscar dados da API e exibir na página
+        async function listarTrechos() {
+            const response = await fetch('http://localhost:3000/listarTrechos');
+            const data = await response.json();
+
+            if (data.status === 'SUCCESS') {
+                const trechosDiv = document.getElementById('trecho');
+                const trechosDropdown = document.getElementById('trechoDropdown');
+                const trechos = data.payload;
 
             
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = 'Escolha um trecho';
+                defaultOption.value = "Escolha um trecho";
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                trechosDropdown.appendChild(defaultOption);
 
-let resultado = false; 
-var trechoSelecionada = document.getElementById("trechoDropdown").value;
+            
+                trechos.forEach(trecho => {
+                
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(trecho);
+                    const CODIGO = trecho[0];
+                    const CIDADE_PARTIDA= trecho[1];
+                    const CIDADE_CHEGADA = trecho[2];
+                    const AEROPORTO_PARTIDA = trecho[3];
+                    const AEROPORTO_CHEGADA = trecho[4];
+                    const TRECHO = trecho[7];
+                    option.textContent = [TRECHO];
+                    trechosDropdown.appendChild(option);
 
-console.log(trechoSelecionada)
-if (trechoSelecionada !== "Escolha um trecho"){
-resultado = true;
-}
-return resultado;
-}
-
-
-// Função para buscar dados da API e exibir na página
-async function listarTrechos() {
-const response = await fetch('http://localhost:3000/listarTrechos');
-const data = await response.json();
-
-if (data.status === 'SUCCESS') {
-    const trechosDiv = document.getElementById('trecho');
-    const trechosDropdown = document.getElementById('trechoDropdown');
-    const trechos = data.payload;
-
-   
-    const defaultOption = document.createElement('option');
-    defaultOption.textContent = 'Escolha um trecho';
-    defaultOption.value = "Escolha um trecho";
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    trechosDropdown.appendChild(defaultOption);
-
-   
-    trechos.forEach(trecho => {
-    
-        const option = document.createElement('option');
-        option.value = JSON.stringify(trecho);
-        const CODIGO = trecho[0];
-        const CIDADE_PARTIDA= trecho[1];
-        const CIDADE_CHEGADA = trecho[2];
-        const AEROPORTO_PARTIDA = trecho[3];
-        const AEROPORTO_CHEGADA = trecho[4];
-        const TRECHO = trecho[7];
-        option.textContent = [TRECHO];
-        trechosDropdown.appendChild(option);
-
-    });
+                });
 
 
- 
-    trechosDropdown.addEventListener('change', handleDropdownChange);
+            
+                trechosDropdown.addEventListener('change', handleDropdownChange);
 
-    const firstAeronave = [0,'N/A','N/A','N/A','N/A','N/A'];
-    displayTrechos(trechosDiv, firstAeronave);
-    
-} else {
-    console.error('Erro ao buscar dados de aeronaves:', data.message);
-}
-}
+                const firstAeronave = [0,'N/A','N/A','N/A','N/A','N/A'];
+                displayTrechos(trechosDiv, firstAeronave);
+                
+            } else {
+                console.error('Erro ao buscar dados de aeronaves:', data.message);
+            }
+        }
 
-function showStatusMessage(msg, error){
-var pStatus = document.getElementById("status");
-if (error === true){
-pStatus.className = "statusError";
-}else{
-pStatus.className = "statusSuccess";
-}
-pStatus.textContent = msg;
-}
+        function showStatusMessage(msg, error){
+            var pStatus = document.getElementById("status");
+            if (error === true){
+            pStatus.className = "statusError";
+            }else{
+            pStatus.className = "statusSuccess";
+            }
+            pStatus.textContent = msg;
+        }
 
-function fetchInserir(body) {
-const requestOptions = {
-method: 'DELETE',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify(body)
-};
+        function fetchInserir(body) {
+            const requestOptions = {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+            };
 
-return fetch('http://localhost:3000/excluirTrecho', requestOptions)
-.then(T => T.json())
-}
+            return fetch('http://localhost:3000/excluirTrecho', requestOptions)
+            .then(T => T.json())
+        }
 
+        function deletarTrecho(){
 
-function deletarTrecho(){
-
-if(!selecionouTrechoDeletar()){
-    showStatusMessage("Selecione um trecho para deletar...", true);  
-    return;
-    }
+        if(!selecionouTrechoDeletar()){
+            showStatusMessage("Selecione um trecho para deletar...", true);  
+            return;
+            }
 
 
 
 
-const trecho = document.getElementById("trechoDropdown").value;
-const trechoObj = JSON.parse(trecho);
-const codigo = trechoObj[0];
+        const trecho = document.getElementById("trechoDropdown").value;
+        const trechoObj = JSON.parse(trecho);
+        const codigo = trechoObj[0];
 
 
-console.log(codigo)
+        console.log(codigo)
 
 
-fetchInserir({
-codigo: codigo
-})
-.then(resultado => {
- 
-  if(resultado.status === "SUCCESS"){
-    showStatusMessage("Trecho deletado... ", false);
-  }else{
-    showStatusMessage("Erro ao deletar Trecho...: " + message, true);
-    console.log(resultado.message);
-  }
-})
-.catch(()=>{
-  showStatusMessage("Erro técnico ao deletar... Contate o suporte.", true);
-  console.log("Falha grave ao cadastrar.")
-});
+        fetchInserir({
+        codigo: codigo
+        })
+        .then(resultado => {
+        
+        if(resultado.status === "SUCCESS"){
+            showStatusMessage("Trecho deletado... ", false);
+        }else{
+            showStatusMessage("Erro ao deletar Trecho...: " + message, true);
+            console.log(resultado.message);
+        }
+        })
+        .catch(()=>{
+        showStatusMessage("Erro técnico ao deletar... Contate o suporte.", true);
+        console.log("Falha grave ao cadastrar.")
+        });
 
-}
+        }
 
+        function handleDropdownChange() {
+            const trechosDropdown = document.getElementById('trechoDropdown');
+            const selectedTrechoData = JSON.parse(trechosDropdown.value);
+            const trechosDiv = document.getElementById('trecho');
 
+            displayTrechos(trechosDiv, selectedTrechoData);
+        }
 
-function handleDropdownChange() {
-const trechosDropdown = document.getElementById('trechoDropdown');
-const selectedTrechoData = JSON.parse(trechosDropdown.value);
-const trechosDiv = document.getElementById('trecho');
+        const nomes = ["Codigo :", "Cidade de Partida : ", "Cidade de Chegada : ", "Aeroporto de Partida : ", "Aeroporto de Chegada : ", "Trecho : "];
+        
+        function displayTrechos(container, trecho) {
+            container.innerHTML = '';
+            if (trecho) {
+                const table = document.createElement('table');
+                const tableBody = document.createElement('tbody');
+                for (const key in trecho) {
+                    const row = tableBody.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+                    cell1.textContent = nomes[key];
+                    cell2.textContent = trecho[key];
+                }
+                
+                table.appendChild(tableBody);
+                container.appendChild(table);
+            }
+        }
 
-displayTrechos(trechosDiv, selectedTrechoData);
-}
-
-
-const nomes = ["Codigo :", "Cidade de Partida : ", "Cidade de Chegada : ", "Aeroporto de Partida : ", "Aeroporto de Chegada : ", "Trecho : "];
-function displayTrechos(container, trecho) {
-container.innerHTML = '';
-if (trecho) {
-    const table = document.createElement('table');
-    const tableBody = document.createElement('tbody');
-    for (const key in trecho) {
-        const row = tableBody.insertRow();
-        const cell1 = row.insertCell(0);
-        const cell2 = row.insertCell(1);
-        cell1.textContent = nomes[key];
-        cell2.textContent = trecho[key];
-    }
-    
-    table.appendChild(tableBody);
-    container.appendChild(table);
-}
-}
-
-
-window.onload = listarTrechos;
+        window.onload = listarTrechos;
     </script>
 
 </head>

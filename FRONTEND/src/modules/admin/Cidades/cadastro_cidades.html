@@ -18,16 +18,16 @@
         
         //FUNCOES VALIDACAO
         function selecionouPais(){
-        let resultado = false; 
-        var listacidades = document.getElementById("paisDropdown");
-        var valorSelecionado = listacidades.value;
-        // se quiséssemos obter o TEXTO selecionado. 
-        // var text = listaFabricantes.options[listaFabricantes.selectedIndex].text;
-        if (valorSelecionado !== "Escolha um pais"){
-          resultado = true;
+            let resultado = false; 
+            var listacidades = document.getElementById("paisDropdown");
+            var valorSelecionado = listacidades.value;
+            // se quiséssemos obter o TEXTO selecionado. 
+            // var text = listaFabricantes.options[listaFabricantes.selectedIndex].text;
+            if (valorSelecionado !== "Escolha um pais"){
+            resultado = true;
+            }
+            return resultado;
         }
-        return resultado;
-      }
 
         function preencheuNome(){
             let resultado = false;
@@ -38,9 +38,6 @@
             return resultado;
         }
 
-
-
-        // Função para buscar dados da API e exibir na página
         async function listarPaises() {
             const response = await fetch('http://localhost:3000/listarPais');
             const data = await response.json();
@@ -97,28 +94,25 @@
                 pStatus.className = "statusSuccess";
             }
             pStatus.textContent = msg;
-        }
+    }
 
-        function fetchInserir(body) {
-            const requestOptions = {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            };
+    function fetchInserir(body) {
+        const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+        };
 
-            return fetch('http://localhost:3000/inserirCidade', requestOptions)
-                .then(response => response.json())
-                .catch(error => {
-                    showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-                    console.log("Falha grave ao cadastrar:", error);
-                });
-        }
+        return fetch('http://localhost:3000/inserirCidade', requestOptions)
+        .then(response => response.json())
+        .catch(error => {
+            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+            console.log("Falha grave ao cadastrar:", error);
+        });
+    }
 
-
-
-        function inserirAeroporto() {
-
-            
+    function inserirAeroporto() {
+ 
         if(!selecionouPais()){
           showStatusMessage("Selecione um Pais...", true);  
           return;
@@ -129,31 +123,24 @@
         }
 
 
-            const paiscidade = document.getElementById("paisDropdown").value;
-            const nomecidade = document.getElementById("nome").value;
-
-            console.log(paiscidade,nomecidade)
+        const paiscidade = document.getElementById("paisDropdown").value;
+        const nomecidade = document.getElementById("nome").value;
            
-            fetchInserir({
-              nomecidade: nomecidade,
-              paiscidade: paiscidade
+        fetchInserir({
+            nomecidade: nomecidade,
+            paiscidade: paiscidade
 
-            }).then(resultado => {
+        }).then(resultado => {
                 
-                if (resultado.status === "SUCCESS") {
-                    showStatusMessage("Cidade cadastrado...", false);
-                } else {
-                    showStatusMessage("Erro ao cadastrar Cidade: " + resultado.message, true);
-                    console.log(resultado.message);
-                }
-            });
-        }
+            if (resultado.status === "SUCCESS") {
+                showStatusMessage("Cidade cadastrado...", false);
+            } else {
+                showStatusMessage("Erro ao cadastrar Cidade: " + resultado.message, true);
+                console.log(resultado.message);
+            }
+        });
+    }
     
-
-   
-
-
-
     </script>
 
 

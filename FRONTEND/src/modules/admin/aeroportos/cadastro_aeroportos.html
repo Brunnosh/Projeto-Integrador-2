@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_aeroportos.css">
 
     <script>
+
         function limparForm() {
             document.getElementById("cadastro-form").reset();
         }
@@ -15,19 +16,19 @@
             alert("Cadastro cancelado");
         }
 
-        
-        //FUNCOES VALIDACAO
+            
+            //FUNCOES VALIDACAO
+
         function selecionouCidade(){
-        let resultado = false; 
-        var listacidades = document.getElementById("cidadeDropdown");
-        var valorSelecionado = listacidades.value;
-        // se quiséssemos obter o TEXTO selecionado. 
-        // var text = listaFabricantes.options[listaFabricantes.selectedIndex].text;
-        if (valorSelecionado !== "Escolha uma cidade"){
-          resultado = true;
+            let resultado = false; 
+            var listacidades = document.getElementById("cidadeDropdown");
+            var valorSelecionado = listacidades.value;
+
+            if (valorSelecionado !== "Escolha uma cidade"){
+            resultado = true;
+            }
+            return resultado;
         }
-        return resultado;
-      }
 
         function preencheuNome(){
             let resultado = false;
@@ -38,9 +39,6 @@
             return resultado;
         }
 
-
-
-        // Função para buscar dados da API e exibir na página
         async function listarCidades() {
             const response = await fetch('http://localhost:3000/listarCidades');
             const data = await response.json();
@@ -50,7 +48,7 @@
                 const cidadesDropdown = document.getElementById('cidadeDropdown');
                 const cidades = data.payload;
 
-               
+                
                 const defaultOption = document.createElement('option');
                 defaultOption.textContent = 'Escolha uma cidade';
                 defaultOption.disabled = true;
@@ -65,39 +63,33 @@
                     cidadesDropdown.appendChild(option);
                 });
 
-              
+                
                 cidadesDropdown.addEventListener('change', handleDropdownChange);
 
-                
+                    
             } else {
                 console.error('Erro ao buscar dados de cidades:', data.message);
             }
         }
-
-  
+    
         function handleDropdownChange(event) {
             const selectedCidadeData = event.target.value;
-           
+            
         }
 
-        // Chamar a função para listar cidades quando a página carregar
         window.onload = async () => {
-        await listarCidades();
-    };
+            await listarCidades();
+        };
 
-
-
-    // FUNCOES PARA INSERIR O TRECHO
-
-    function showStatusMessage(msg, error) {
-            var pStatus = document.getElementById("status");
-            if (error === true) {
-                pStatus.className = "statusError";
-            } else {
-                pStatus.className = "statusSuccess";
+        function showStatusMessage(msg, error) {
+                var pStatus = document.getElementById("status");
+                if (error === true) {
+                    pStatus.className = "statusError";
+                } else {
+                    pStatus.className = "statusSuccess";
+                }
+                pStatus.textContent = msg;
             }
-            pStatus.textContent = msg;
-        }
 
         function fetchInserir(body) {
             const requestOptions = {
@@ -114,30 +106,28 @@
                 });
         }
 
-
-
         function inserirAeroporto() {
 
-            
-        if(!selecionouCidade()){
-          showStatusMessage("Selecione a Cidade do aeroporto...", true);  
-          return;
-        }
-        if(!preencheuNome()){
-          showStatusMessage("Preencha o nome do aeroporto...", true);  
-          return;
-        }
+                
+            if(!selecionouCidade()){
+            showStatusMessage("Selecione a Cidade do aeroporto...", true);  
+            return;
+            }
+            if(!preencheuNome()){
+            showStatusMessage("Preencha o nome do aeroporto...", true);  
+            return;
+            }
 
 
             const cidadeaeroporto = document.getElementById("cidadeDropdown").value;
             const nomeaeroporto = document.getElementById("nome").value;
-           
+            
             fetchInserir({
-              cidadeaeroporto: cidadeaeroporto,
-              nomeaeroporto: nomeaeroporto
+                cidadeaeroporto: cidadeaeroporto,
+                nomeaeroporto: nomeaeroporto
 
             }).then(resultado => {
-                
+                    
                 if (resultado.status === "SUCCESS") {
                     showStatusMessage("Aeroporto cadastrado...", false);
                 } else {
@@ -146,12 +136,7 @@
                 }
             });
         }
-    
-
-   
-
-
-
+        
     </script>
 
 

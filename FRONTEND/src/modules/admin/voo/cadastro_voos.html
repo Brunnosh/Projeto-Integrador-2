@@ -16,47 +16,47 @@
       </style>
 
     <script>
-        function limparForm() {
+      function limparForm() {
             document.getElementById("cadastro-form").reset();
         }
 
-        function cancelarCadastro() {
+      function cancelarCadastro() {
             alert("Cadastro cancelado");
         }
 
-        function toggleVoltaOptions() {
+      function toggleVoltaOptions() {
         
-        var checkbox = document.getElementById("ida_volta");
-        var dataVoltaGroup = document.getElementById("dataVoltaGroup");
-        var horaVoltaGroup = document.getElementById("horaVoltaGroup");
-        var trechoVoltaGroup = document.getElementById("trechoVoltaGroup");
+          var checkbox = document.getElementById("ida_volta");
+          var dataVoltaGroup = document.getElementById("dataVoltaGroup");
+          var horaVoltaGroup = document.getElementById("horaVoltaGroup");
+          var trechoVoltaGroup = document.getElementById("trechoVoltaGroup");
 
-       
-        if (checkbox.checked) {
-            dataVoltaGroup.style.display = "block";
-            horaVoltaGroup.style.display = "block";
-            trechoVoltaGroup.style.display = "block";
-        } else {
-            dataVoltaGroup.style.display = "none";
-            horaVoltaGroup.style.display = "none";
-            trechoVoltaGroup.style.display = "block";
+        
+          if (checkbox.checked) {
+              dataVoltaGroup.style.display = "block";
+              horaVoltaGroup.style.display = "block";
+              trechoVoltaGroup.style.display = "block";
+          } else {
+              dataVoltaGroup.style.display = "none";
+              horaVoltaGroup.style.display = "none";
+              trechoVoltaGroup.style.display = "block";
+          }
         }
-    }
 
-               //FUNCOES PARA VALIDAÇÃO DE INFORMAÇÃO
+        //FUNCOES PARA VALIDAÇÃO DE INFORMAÇÃO
       
-        function selecionouTrechoIda(){
-        let resultado = false; 
-        var listaTrechos = document.getElementById("trechoIdaDropdown");
-        var valorSelecionado = listaTrechos.value;
-      
-        if (valorSelecionado !== "Escolha um trecho"){
-          resultado = true;
+      function selecionouTrechoIda(){
+          let resultado = false; 
+          var listaTrechos = document.getElementById("trechoIdaDropdown");
+          var valorSelecionado = listaTrechos.value;
+        
+          if (valorSelecionado !== "Escolha um trecho"){
+            resultado = true;
+          }
+          return resultado;
         }
-        return resultado;
-      }
 
-        function selecionouAeronave(){
+      function selecionouAeronave(){
             let resultado = false; 
             var listaAeronaves = document.getElementById("aeronaveDropdown");
             var valorSelecionado = listaAeronaves.value;
@@ -65,10 +65,10 @@
             resultado = true;
             }
             return resultado;
-        }
+          }
         
                 	
-        function preencheuDia(){
+      function preencheuDia(){
             let resultado = false; 
             var dia = document.getElementById("dia_ida").value;
           
@@ -76,9 +76,9 @@
             resultado = true;
             }
             return resultado;
-        }
+          }
 
-        function preencheuHora(){
+      function preencheuHora(){
             let resultado = false; 
             var hora = document.getElementById("hora_ida").value;
           
@@ -87,32 +87,32 @@
             resultado = true;
             }
             return resultado;
-        }
+          }
 
-        function selecionouTrechoVolta(){
-        var checkbox = document.getElementById("ida_volta");
-        var resultado = "false"; 
-        var listaTrechos = document.getElementById("trechoVoltaDropdown");
-        var valorSelecionado = listaTrechos.value;
+      function selecionouTrechoVolta(){
+          var checkbox = document.getElementById("ida_volta");
+          var resultado = "false"; 
+          var listaTrechos = document.getElementById("trechoVoltaDropdown");
+          var valorSelecionado = listaTrechos.value;
 
-        var trechoIda = document.getElementById("trechoIdaDropdown").value;
-        if(!checkbox.checked){
-              return true;
+          var trechoIda = document.getElementById("trechoIdaDropdown").value;
+          if(!checkbox.checked){
+                return true;
+              }
+          if(checkbox.checked){
+            if (valorSelecionado !== "Escolha um trecho" && valorSelecionado !== trechoIda){
+            resultado = "true";
             }
-        if(checkbox.checked){
-          if (valorSelecionado !== "Escolha um trecho" && valorSelecionado !== trechoIda){
-          resultado = "true";
+            if(valorSelecionado !== "Escolha um trecho" && valorSelecionado == trechoIda)
+            {
+            resultado = "igual";
+            }
+            return resultado;
           }
-          if(valorSelecionado !== "Escolha um trecho" && valorSelecionado == trechoIda)
-          {
-          resultado = "igual";
-          }
-          return resultado;
+          
         }
-        
-      }
 
-        function preencheuDiaVolta(){
+      function preencheuDiaVolta(){
             var checkbox = document.getElementById("ida_volta");
             let resultado = false; 
             var dia_volta = document.getElementById("dia_volta").value;
@@ -124,9 +124,9 @@
               
             }
             return resultado;
-        }
+          }
 
-        function preencheuHoraVolta(){
+      function preencheuHoraVolta(){
             var checkbox = document.getElementById("ida_volta");
             let resultado = false; 
             var hora_volta = document.getElementById("hora_volta").value;
@@ -138,13 +138,11 @@
             return resultado;
             }
 
-        }
-
-
-
-
+          }
         
-        async function listarAeronaves() {
+        //
+
+      async function listarAeronaves() {
             const response = await fetch('http://localhost:3000/listarAeronaves');
             const data = await response.json();
 
@@ -187,53 +185,52 @@
             }
         }
 
-        async function listarTrechos() {
-    const response = await fetch('http://localhost:3000/listarTrechos');
-    const data = await response.json();
+      async function listarTrechos() {
+          const response = await fetch('http://localhost:3000/listarTrechos');
+          const data = await response.json();
 
-    if (data.status === 'SUCCESS') {
-        const trechosIdaDiv = document.getElementById('trechosIda');
-        const trechosIdaDropdown = document.getElementById('trechoIdaDropdown');
-        const trechosVoltaDropdown = document.getElementById('trechoVoltaDropdown');
-        const trechos = data.payload;
+          if (data.status === 'SUCCESS') {
+              const trechosIdaDiv = document.getElementById('trechosIda');
+              const trechosIdaDropdown = document.getElementById('trechoIdaDropdown');
+              const trechosVoltaDropdown = document.getElementById('trechoVoltaDropdown');
+              const trechos = data.payload;
 
-        
-        const defaultOption1 = document.createElement('option');
-        const defaultOption2 = document.createElement('option');
-        defaultOption1.textContent = 'Escolha um trecho';
-        defaultOption1.disabled = true;
-        defaultOption1.selected = true;
-        defaultOption2.textContent = 'Escolha um trecho';
-        defaultOption2.disabled = true;
-        defaultOption2.selected = true;
-        trechosIdaDropdown.appendChild(defaultOption1);
-        trechosVoltaDropdown.appendChild(defaultOption2);
-        
-        trechos.forEach(trecho => {
-            const option1 = document.createElement('option');
-            option1.value = trecho[7]; 
-            option1.textContent = trecho[7];
-            trechosIdaDropdown.appendChild(option1);
+              
+              const defaultOption1 = document.createElement('option');
+              const defaultOption2 = document.createElement('option');
+              defaultOption1.textContent = 'Escolha um trecho';
+              defaultOption1.disabled = true;
+              defaultOption1.selected = true;
+              defaultOption2.textContent = 'Escolha um trecho';
+              defaultOption2.disabled = true;
+              defaultOption2.selected = true;
+              trechosIdaDropdown.appendChild(defaultOption1);
+              trechosVoltaDropdown.appendChild(defaultOption2);
+              
+              trechos.forEach(trecho => {
+                  const option1 = document.createElement('option');
+                  option1.value = trecho[7]; 
+                  option1.textContent = trecho[7];
+                  trechosIdaDropdown.appendChild(option1);
 
-            const option2 = document.createElement('option');
-            option2.value = trecho[7]; 
-            option2.textContent = trecho[7];
-            trechosVoltaDropdown.appendChild(option2);
-        
+                  const option2 = document.createElement('option');
+                  option2.value = trecho[7]; 
+                  option2.textContent = trecho[7];
+                  trechosVoltaDropdown.appendChild(option2);
+              
 
-        });
+              });
 
-        trechosIdaDropdown.addEventListener('change', handleDropdownChangeTrecho);
-        trechosVoltaDropdown.addEventListener('change', handleDropdownChangeTrecho);
-        
+              trechosIdaDropdown.addEventListener('change', handleDropdownChangeTrecho);
+              trechosVoltaDropdown.addEventListener('change', handleDropdownChangeTrecho);
+              
 
-    } else {
-        console.error('Erro ao buscar dados de trechos:', data.message);
-    }
-}
-
-        
-        function handleDropdownChangeAeronave() {
+          } else {
+              console.error('Erro ao buscar dados de trechos:', data.message);
+          }
+        }
+     
+      function handleDropdownChangeAeronave() {
             const aeronavesDropdown = document.getElementById('aeronaveDropdown');
             const selectedAeronaveData = JSON.parse(aeronavesDropdown.value);
             const aeronavesDiv = document.getElementById('aeronaves');
@@ -241,15 +238,15 @@
             displayAeronaves(aeronavesDiv, selectedAeronaveData);
         }
 
-        function handleDropdownChangeTrecho(event) {
+      function handleDropdownChangeTrecho(event) {
             const selectedTrechoData = event.target.value;
             
         }
-
         
-        function displayAeronaves(container, aeronave) {
-            const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :", "Assentos por linha:", "Assentos antes do corredor:"];
-            container.innerHTML = '';
+      function displayAeronaves(container, aeronave) {
+            
+          const nomes = ["Codigo :", "Fabricante : ", "Modelo : ", "Registro : ", "Ano : ", "Assentos : ", "Disponível :", "Assentos por linha:", "Assentos antes do corredor:"];
+          container.innerHTML = '';
             if (aeronave) {
                 const table = document.createElement('table');
                 const tableBody = document.createElement('tbody');
@@ -265,9 +262,8 @@
                 container.appendChild(table);
             }
         }
-
         
-        window.onload = async () => {
+      window.onload = async () => {
         await listarAeronaves();
         await listarTrechos();
 
@@ -297,9 +293,8 @@
         return fetch('http://localhost:3000/inserirVoo', requestOptions)
         .then(T => T.json())
       }
-
-      
-      function inserirVoo(){
+     
+    function inserirVoo(){
         if(!selecionouAeronave()){
           showStatusMessage("Selecione a Aeronave...", true);  
           return;

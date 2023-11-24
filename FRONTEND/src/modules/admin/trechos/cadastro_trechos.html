@@ -16,477 +16,470 @@
       </style>
 
     <script>
-
-      
-
-        function limparForm() {
-            document.getElementById("cadastro-form").reset();
-        }
-
-        function cancelarCadastro() {
-            alert("Cadastro cancelado");
-        }
-
-        const todosaeroportos = "";
-
-        function updatePreviewTrecho() {
-          const valoresPaisPartida = document.getElementById("paisDropdown1").value;
-          const valoresPaisChegada = document.getElementById("paisDropdown2").value;
-          const paisPartida = valoresPaisPartida.split(',')[1];
-          const paisChegada = valoresPaisChegada.split(',')[1];         
-          const cidadePartida = document.getElementById("cidadeDropdown1").value;
-          const aeroportoPartida = document.getElementById("aeroportoDropdown1").value.split(',')[0];
-          const cidadeChegada = document.getElementById("cidadeDropdown2").value;
-          const aeroportoChegada = document.getElementById("aeroportoDropdown2").value.split(',')[0];
-
-          const previewDiv = document.getElementById("previewTrecho");
-          previewDiv.textContent = `${paisPartida}:${cidadePartida}:${aeroportoPartida} --> ${paisChegada}:${cidadeChegada}: ${aeroportoChegada}`;
-        }
-
-
-
-//FUNCOES VALIDACAO
-function selecionouCidade1(){
-let resultado = false; 
-var listacidades1 = document.getElementById("cidadeDropdown1");
-var valorSelecionado = listacidades1.value;
-
-if (valorSelecionado !== "Escolha uma cidade"){
-  resultado = true;
-}
-return resultado;
-}
-function selecionouCidade2(){
-  let resultado = false; 
-  var listacidades2 = document.getElementById("cidadeDropdown2");
-  var valorSelecionado = listacidades2.value;
-
-  if (valorSelecionado !== "Escolha uma cidade"){
-    resultado = true;
-  }
-  return resultado;
-}
-function selecionouAeroporto1(){
-  let resultado = false; 
-  var listaAeroportos1 = document.getElementById("aeroportoDropdown1");
-  var valorSelecionado = listaAeroportos1.value;
-
-  if (valorSelecionado !== "Escolha um aeroporto"){
-    resultado = true;
-  }
-  return resultado;
-}
-function selecionouAeroporto2(){
-  let resultado = false; 
-  var listaAeroportos2 = document.getElementById("aeroportoDropdown2");
-  var valorSelecionado = listaAeroportos2.value;
-
-  if (valorSelecionado !== "Escolha um aeroporto"){
-    resultado = true;
-  }
-  return resultado;
-}
-
-
-// Função para buscar dados da API e exibir na página
-async function listarPaises() {
-    const response = await fetch('http://localhost:3000/listarPais');
-    const data = await response.json();
-
-    if (data.status === 'SUCCESS') {
-
-
-
-        const paisDiv1 = document.getElementById('pais1');
-        const paisDropdown1 = document.getElementById('paisDropdown1');
-        const paisDiv2 = document.getElementById('pais2');
-        const paisDropdown2 = document.getElementById('paisDropdown2');
-        const paises = data.payload;
-        
-
-        
-        const defaultOption1 = document.createElement('option');
-        defaultOption1.textContent = 'Escolha um Pais';
-        defaultOption1.disabled = true;
-        defaultOption1.selected = true;
-        paisDropdown1.appendChild(defaultOption1);
-
-        
-        const defaultOption2 = document.createElement('option');
-        defaultOption2.textContent = 'Escolha um Pais';
-        defaultOption2.value = ['Escolha um Pais','Escolha um Pais'];
-        defaultOption2.disabled = true;
-        defaultOption2.selected = true;
-        paisDropdown2.appendChild(defaultOption2);
-
-       
-        paises.forEach(pais => {
-            const option1 = document.createElement('option');
-            option1.value = [pais[1],pais[2]];
-            const nome1 = pais[1];
-            option1.textContent = nome1; 
-            paisDropdown1.appendChild(option1);
-        });
-
-        
-        paises.forEach(pais => {
-            const option2 = document.createElement('option');
-            option2.value = [pais[1],pais[2]]; 
-            const nome2 = pais[1];
-            option2.textContent = nome2; 
-            paisDropdown2.appendChild(option2);
-        });
-
-        
-        paisDropdown1.addEventListener('change', handleDropdownChangeCidadeIda);
-        paisDropdown2.addEventListener('change', handleDropdownChangeCidadeVolta);
-        
-    } else {
-        console.error('Erro ao buscar dados de cidades:', data.message);
-    }
-}
-
-
-
-//Funcoes listar cidades depois de escolher pais
-async function listarCidadeIda(pais) {
-
-function fetchBuscar(body) {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  };
-
-  return fetch('http://localhost:3000/listarCidadesWhere', requestOptions)
-  .then(data => {
-  return data;
-  });
-}
-
-var pais_cidade = pais;
-
-const response = await fetchBuscar({
-  pais_cidade: pais_cidade
-  });
-const data = await response.json();
-
-if (data.status === "SUCCESS") {
-  const cidades = data.payload;
-
-  const cidadeDropdown1 = document.getElementById('cidadeDropdown1');
-  cidadeDropdown1.innerHTML = '';
-  const defaultOption = document.createElement('option');
-  defaultOption.textContent = 'Escolha uma cidade';
-  defaultOption.disabled = true;
-  defaultOption.selected = true;
-  cidadeDropdown1.appendChild(defaultOption);
-
-  cidades.forEach(cidade => {
-    const option1 = document.createElement('option');
-    option1.value = cidade[2]; 
-    const nome1 = cidade[2];
-    option1.textContent = nome1; 
-    cidadeDropdown1.appendChild(option1);
-  });
-
-  cidadeDropdown1.addEventListener('change', handleDropdownChangeIda);
-  } 
-  else {
-  showStatusMessage("Erro ao buscar dados " + data.message, true);
-  console.log(resultado.message);
-  }
-}
-
-async function listarCidadeVolta(pais) {
-
-function fetchBuscar(body) {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  };
-
-  return fetch('http://localhost:3000/listarCidadesWhere', requestOptions)
-  .then(data => {
-  return data;
-  });
-}
-
-var pais_cidade = pais;
-
-const response = await fetchBuscar({
-  pais_cidade: pais_cidade
-  });
-const data = await response.json();
-
-if (data.status === "SUCCESS") {
-  const cidades = data.payload;
-
-  const cidadeDropdown2 = document.getElementById('cidadeDropdown2');
-  cidadeDropdown2.innerHTML = '';
-  const defaultOption = document.createElement('option');
-  defaultOption.textContent = 'Escolha uma cidade';
-  defaultOption.disabled = true;
-  defaultOption.selected = true;
-  cidadeDropdown2.appendChild(defaultOption);
-
-  cidades.forEach(cidade => {
-    const option1 = document.createElement('option');
-    option1.value = cidade[2]; 
-    const nome1 = cidade[2];
-    option1.textContent = nome1; 
-    cidadeDropdown2.appendChild(option1);
-  });
-
-  cidadeDropdown2.addEventListener('change', handleDropdownChangeVolta);
-  } 
-  else {
-  showStatusMessage("Erro ao buscar dados " + data.message, true);
-  console.log(resultado.message);
-  }
-}
-
-//Funcoes listar aeroporto depois de escolher cidade
-async function listarAeroportosCidadeIda(cidade) {
-
-      function fetchBuscar(body) {
-        const requestOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        };
-
-        return fetch('http://localhost:3000/listarAeroportosWhere', requestOptions)
-        .then(data => {
-        return data;
-        });
+      function limparForm() {
+          document.getElementById("cadastro-form").reset();
       }
 
-      var cidade_aeroporto = cidade;
+      function cancelarCadastro() {
+        alert("Cadastro cancelado");
+      }
 
-      const response = await fetchBuscar({
-        cidade_aeroporto: cidade_aeroporto
-        });
-      const data = await response.json();
+      const todosaeroportos = "";
 
-      if (data.status === "SUCCESS") {
-        const aeroportos = data.payload;
+      function updatePreviewTrecho() {
+        const valoresPaisPartida = document.getElementById("paisDropdown1").value;
+        const valoresPaisChegada = document.getElementById("paisDropdown2").value;
+        const paisPartida = valoresPaisPartida.split(',')[1];
+        const paisChegada = valoresPaisChegada.split(',')[1];         
+        const cidadePartida = document.getElementById("cidadeDropdown1").value;
+        const aeroportoPartida = document.getElementById("aeroportoDropdown1").value.split(',')[0];
+        const cidadeChegada = document.getElementById("cidadeDropdown2").value;
+        const aeroportoChegada = document.getElementById("aeroportoDropdown2").value.split(',')[0];
 
-        const aeroportosDropdown1 = document.getElementById('aeroportoDropdown1');
-        aeroportosDropdown1.innerHTML = '';
-        const defaultOption = document.createElement('option');
-        defaultOption.textContent = 'Escolha um aeroporto';
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
-        aeroportosDropdown1.appendChild(defaultOption);
+        const previewDiv = document.getElementById("previewTrecho");
+        previewDiv.textContent = `${paisPartida}:${cidadePartida}:${aeroportoPartida} --> ${paisChegada}:${cidadeChegada}: ${aeroportoChegada}`;
+      }
 
-        aeroportos.forEach(aeroporto => {
-          const option1 = document.createElement('option');
-          option1.value = [aeroporto[1], aeroporto[2]]; 
-          const nome1 = [aeroporto[1]];
-          option1.textContent = nome1; 
-          aeroportosDropdown1.appendChild(option1);
-        });
+      //FUNCOES VALIDACAO
+      function selecionouCidade1(){
+      let resultado = false; 
+      var listacidades1 = document.getElementById("cidadeDropdown1");
+      var valorSelecionado = listacidades1.value;
 
-        aeroportosDropdown1.addEventListener('change', handleDropdownChangeAeroportos);
-        } 
-        else {
-        showStatusMessage("Erro ao buscar dados " + data.message, true);
-        console.log(resultado.message);
+      if (valorSelecionado !== "Escolha uma cidade"){
+        resultado = true;
+      }
+      return resultado;
+      }
+      
+      function selecionouCidade2(){
+        let resultado = false; 
+        var listacidades2 = document.getElementById("cidadeDropdown2");
+        var valorSelecionado = listacidades2.value;
+
+        if (valorSelecionado !== "Escolha uma cidade"){
+          resultado = true;
         }
-}
+        return resultado;
+      }
+      
+      function selecionouAeroporto1(){
+        let resultado = false; 
+        var listaAeroportos1 = document.getElementById("aeroportoDropdown1");
+        var valorSelecionado = listaAeroportos1.value;
 
-async function listarAeroportosCidadeVolta(cidade) {
+        if (valorSelecionado !== "Escolha um aeroporto"){
+          resultado = true;
+        }
+        return resultado;
+      }
+      
+      function selecionouAeroporto2(){
+        let resultado = false; 
+        var listaAeroportos2 = document.getElementById("aeroportoDropdown2");
+        var valorSelecionado = listaAeroportos2.value;
 
-function fetchBuscar(body) {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  };
+        if (valorSelecionado !== "Escolha um aeroporto"){
+          resultado = true;
+        }
+        return resultado;
+      }
 
-  return fetch('http://localhost:3000/listarAeroportosWhere', requestOptions)
-  .then(data => {
-  return data;
-  });
-}
+      // Função para buscar dados da API e exibir na página
+      async function listarPaises() {
+          const response = await fetch('http://localhost:3000/listarPais');
+          const data = await response.json();
 
-var cidade_aeroporto = cidade;
+          if (data.status === 'SUCCESS') {
 
-const response = await fetchBuscar({
-  cidade_aeroporto: cidade_aeroporto
-  });
-const data = await response.json();
 
-if (data.status === "SUCCESS") {
+
+              const paisDiv1 = document.getElementById('pais1');
+              const paisDropdown1 = document.getElementById('paisDropdown1');
+              const paisDiv2 = document.getElementById('pais2');
+              const paisDropdown2 = document.getElementById('paisDropdown2');
+              const paises = data.payload;
+              
+
+              
+              const defaultOption1 = document.createElement('option');
+              defaultOption1.textContent = 'Escolha um Pais';
+              defaultOption1.disabled = true;
+              defaultOption1.selected = true;
+              paisDropdown1.appendChild(defaultOption1);
+
+              
+              const defaultOption2 = document.createElement('option');
+              defaultOption2.textContent = 'Escolha um Pais';
+              defaultOption2.value = ['Escolha um Pais','Escolha um Pais'];
+              defaultOption2.disabled = true;
+              defaultOption2.selected = true;
+              paisDropdown2.appendChild(defaultOption2);
+
+            
+              paises.forEach(pais => {
+                  const option1 = document.createElement('option');
+                  option1.value = [pais[1],pais[2]];
+                  const nome1 = pais[1];
+                  option1.textContent = nome1; 
+                  paisDropdown1.appendChild(option1);
+              });
+
+              
+              paises.forEach(pais => {
+                  const option2 = document.createElement('option');
+                  option2.value = [pais[1],pais[2]]; 
+                  const nome2 = pais[1];
+                  option2.textContent = nome2; 
+                  paisDropdown2.appendChild(option2);
+              });
+
+              
+              paisDropdown1.addEventListener('change', handleDropdownChangeCidadeIda);
+              paisDropdown2.addEventListener('change', handleDropdownChangeCidadeVolta);
+              
+          } else {
+              console.error('Erro ao buscar dados de cidades:', data.message);
+          }
+      }
+      
+      //Funcoes listar cidades depois de escolher pais
+      async function listarCidadeIda(pais) {
+        function fetchBuscar(body) {
+          const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          };
+
+          return fetch('http://localhost:3000/listarCidadesWhere', requestOptions)
+          .then(data => {
+          return data;
+          });
+        }
+
+        var pais_cidade = pais;
+
+        const response = await fetchBuscar({
+          pais_cidade: pais_cidade
+          });
+        const data = await response.json();
+
+        if (data.status === "SUCCESS") {
+          const cidades = data.payload;
+
+          const cidadeDropdown1 = document.getElementById('cidadeDropdown1');
+          cidadeDropdown1.innerHTML = '';
+          const defaultOption = document.createElement('option');
+          defaultOption.textContent = 'Escolha uma cidade';
+          defaultOption.disabled = true;
+          defaultOption.selected = true;
+          cidadeDropdown1.appendChild(defaultOption);
+
+          cidades.forEach(cidade => {
+            const option1 = document.createElement('option');
+            option1.value = cidade[2]; 
+            const nome1 = cidade[2];
+            option1.textContent = nome1; 
+            cidadeDropdown1.appendChild(option1);
+          });
+
+          cidadeDropdown1.addEventListener('change', handleDropdownChangeIda);
+          } 
+          else {
+          showStatusMessage("Erro ao buscar dados " + data.message, true);
+          console.log(resultado.message);
+          }
+      }
+
+      async function listarCidadeVolta(pais) {
+        function fetchBuscar(body) {
+          const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          };
+
+          return fetch('http://localhost:3000/listarCidadesWhere', requestOptions)
+          .then(data => {
+          return data;
+          });
+        }
+
+        var pais_cidade = pais;
+
+        const response = await fetchBuscar({
+          pais_cidade: pais_cidade
+          });
+        const data = await response.json();
+
+        if (data.status === "SUCCESS") {
+          const cidades = data.payload;
+
+          const cidadeDropdown2 = document.getElementById('cidadeDropdown2');
+          cidadeDropdown2.innerHTML = '';
+          const defaultOption = document.createElement('option');
+          defaultOption.textContent = 'Escolha uma cidade';
+          defaultOption.disabled = true;
+          defaultOption.selected = true;
+          cidadeDropdown2.appendChild(defaultOption);
+
+          cidades.forEach(cidade => {
+            const option1 = document.createElement('option');
+            option1.value = cidade[2]; 
+            const nome1 = cidade[2];
+            option1.textContent = nome1; 
+            cidadeDropdown2.appendChild(option1);
+          });
+
+          cidadeDropdown2.addEventListener('change', handleDropdownChangeVolta);
+          } 
+          else {
+          showStatusMessage("Erro ao buscar dados " + data.message, true);
+          console.log(resultado.message);
+          }
+        }
+
+      //Funcoes listar aeroporto depois de escolher cidade
+      async function listarAeroportosCidadeIda(cidade) {
+
+            function fetchBuscar(body) {
+              const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+              };
+
+              return fetch('http://localhost:3000/listarAeroportosWhere', requestOptions)
+              .then(data => {
+              return data;
+              });
+            }
+
+            var cidade_aeroporto = cidade;
+
+            const response = await fetchBuscar({
+              cidade_aeroporto: cidade_aeroporto
+              });
+            const data = await response.json();
+
+            if (data.status === "SUCCESS") {
+              const aeroportos = data.payload;
+
+              const aeroportosDropdown1 = document.getElementById('aeroportoDropdown1');
+              aeroportosDropdown1.innerHTML = '';
+              const defaultOption = document.createElement('option');
+              defaultOption.textContent = 'Escolha um aeroporto';
+              defaultOption.disabled = true;
+              defaultOption.selected = true;
+              aeroportosDropdown1.appendChild(defaultOption);
+
+              aeroportos.forEach(aeroporto => {
+                const option1 = document.createElement('option');
+                option1.value = [aeroporto[1], aeroporto[2]]; 
+                const nome1 = [aeroporto[1]];
+                option1.textContent = nome1; 
+                aeroportosDropdown1.appendChild(option1);
+              });
+
+              aeroportosDropdown1.addEventListener('change', handleDropdownChangeAeroportos);
+              } 
+              else {
+              showStatusMessage("Erro ao buscar dados " + data.message, true);
+              console.log(resultado.message);
+              }
+        }
+
+      async function listarAeroportosCidadeVolta(cidade) {
+
+        function fetchBuscar(body) {
+          const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          };
+
+          return fetch('http://localhost:3000/listarAeroportosWhere', requestOptions)
+          .then(data => {
+          return data;
+          });
+        }
+
+        var cidade_aeroporto = cidade;
+
+        const response = await fetchBuscar({
+          cidade_aeroporto: cidade_aeroporto
+          });
+        const data = await response.json();
+
+        if (data.status === "SUCCESS") {
+                
+                const aeroportos = data.payload;
+
+                const aeroportosDropdown2 = document.getElementById('aeroportoDropdown2');
+                aeroportosDropdown2.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = 'Escolha um aeroporto';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                aeroportosDropdown2.appendChild(defaultOption);
+
+                aeroportos.forEach(aeroporto => {
+                  const option1 = document.createElement('option');
+                  option1.value = [aeroporto[1], aeroporto[2]]; 
+                  const nome1 = [aeroporto[1]];
+                  option1.textContent = nome1; 
+                  aeroportosDropdown2.appendChild(option1);
+                });
+
+                aeroportosDropdown2.addEventListener('change', handleDropdownChangeAeroportos);
+                } 
+                else {
+                showStatusMessage("Erro ao Buscar informacoes " + data.message, true);
+                console.log(resultado.message);
+                }
+        }
+
+      //
+      //Funcoes para detectar mudanças no dropdown
+      async function handleDropdownChangeIda(event) {
+          const CidadeIdaData = event.target.value;
+
+          await listarAeroportosCidadeIda(CidadeIdaData);
+          updatePreviewTrecho();
         
-        const aeroportos = data.payload;
+      }
 
-        const aeroportosDropdown2 = document.getElementById('aeroportoDropdown2');
-        aeroportosDropdown2.innerHTML = '';
-        const defaultOption = document.createElement('option');
-        defaultOption.textContent = 'Escolha um aeroporto';
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
-        aeroportosDropdown2.appendChild(defaultOption);
-
-        aeroportos.forEach(aeroporto => {
-          const option1 = document.createElement('option');
-          option1.value = [aeroporto[1], aeroporto[2]]; 
-          const nome1 = [aeroporto[1]];
-          option1.textContent = nome1; 
-          aeroportosDropdown2.appendChild(option1);
-        });
-
-        aeroportosDropdown2.addEventListener('change', handleDropdownChangeAeroportos);
-        } 
-        else {
-        showStatusMessage("Erro ao Buscar informacoes " + data.message, true);
-        console.log(resultado.message);
-        }
-}
-
-//
-//Funcoes para detectar mudanças no dropdown
-async function handleDropdownChangeIda(event) {
-    const CidadeIdaData = event.target.value;
-
-    await listarAeroportosCidadeIda(CidadeIdaData);
-    updatePreviewTrecho();
-   
-}
-
-async function handleDropdownChangeVolta(event) {
-    const CidadeVoltaData = event.target.value;
-  
-    await listarAeroportosCidadeVolta(CidadeVoltaData);
-    updatePreviewTrecho();
-   
-}
-
-async function handleDropdownChangeCidadeIda(event) {
-    const PaisIdaData = event.target.value.split(',')[0];
-
-    await listarCidadeIda(PaisIdaData);
-    updatePreviewTrecho();
-   
-}
-
-async function handleDropdownChangeCidadeVolta(event) {
-  const PaisVoltaData = event.target.value.split(',')[0];
-
-await listarCidadeVolta(PaisVoltaData);
-updatePreviewTrecho();
-
-}
-
-
-
-async function handleDropdownChangeCidades(event) {
-
-updatePreviewTrecho();
-
-}
-
-async function handleDropdownChangeAeroportos(event) {
-
-    updatePreviewTrecho();
-   
-}
-
-
-window.onload = async () => {
-await listarPaises();
-};
-
-
-
-// FUNCOES PARA INSERIR O TRECHO
-
-function showStatusMessage(msg, error) {
-    var pStatus = document.getElementById("status");
-    if (error === true) {
-        pStatus.className = "statusError";
-    } else {
-        pStatus.className = "statusSuccess";
-    }
-    pStatus.textContent = msg;
-}
-
-function fetchInserir(body) {
-    const requestOptions = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-    };
-
-    return fetch('http://localhost:3000/inserirTrecho', requestOptions)
-        .then(response => response.json())
-        .catch(error => {
-            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-            console.log("Falha grave ao cadastrar:", error);
-        });
-}
-
-function inserirTrecho() {
-
-    
-if(!selecionouCidade1()){
-  showStatusMessage("Selecione a Cidade de Partida...", true);  
-  return;
-}
-if(!selecionouCidade2()){
-  showStatusMessage("Selecione a Cidade de chegada...", true);  
-  return;
-}
-if(!selecionouAeroporto1()){
-  showStatusMessage("Selecione o Aeroporto de partida...", true);  
-  return;
-}
-if(!selecionouAeroporto2()){
-  showStatusMessage("Selecione o Aeroporto de chegada...", true);  
-  return;
-}
-
-
-
-
-    const valoresPaisPartida = document.getElementById("paisDropdown1").value;
-    const valoresPaisChegada = document.getElementById("paisDropdown2").value;
-    const valoresAeroportoPartida = document.getElementById("aeroportoDropdown1").value;
-    const valoresAeroportoChegada = document.getElementById("aeroportoDropdown2").value;
-   
-
-    const siglaPaisPartida = valoresPaisPartida.split(',')[1];
-    const siglaPaisChegada = valoresPaisChegada.split(',')[1];
-    const cidadePartida = document.getElementById("cidadeDropdown1").value;
-    const cidadeChegada = document.getElementById("cidadeDropdown2").value;
-    const aeroportoPartida = valoresAeroportoPartida.split(',')[0];
-    const aeroportoChegada = valoresAeroportoChegada.split(',')[0];
-    const paispartida = valoresPaisPartida.split(',')[0];
-    const paischegada = valoresPaisChegada.split(',')[0];
-    const trecho = siglaPaisPartida + ":" + cidadePartida + ":" + aeroportoPartida + " --> " + siglaPaisChegada + ":" + cidadeChegada + ":" + aeroportoChegada;
-   
-    
-    fetchInserir({
-        paispartida : paispartida,
-        paischegada : paischegada,
-        cidadepartida: cidadePartida,
-        cidadechegada: cidadeChegada,
-        aeroportopartida: aeroportoPartida,
-        aeroportochegada: aeroportoChegada,
-        trecho: trecho
-    }).then(resultado => {
+      async function handleDropdownChangeVolta(event) {
+          const CidadeVoltaData = event.target.value;
         
-        if (resultado.status === "SUCCESS") {
-            showStatusMessage("Trecho cadastrado...", false);
-        } else {
-            showStatusMessage("Erro ao cadastrar Trecho: " + resultado.message, true);
-            console.log(resultado.message);
-        }
-    });
-}
+          await listarAeroportosCidadeVolta(CidadeVoltaData);
+          updatePreviewTrecho();
+        
+      }
+
+      async function handleDropdownChangeCidadeIda(event) {
+          const PaisIdaData = event.target.value.split(',')[0];
+
+          await listarCidadeIda(PaisIdaData);
+          updatePreviewTrecho();
+        
+      }
+
+      async function handleDropdownChangeCidadeVolta(event) {
+        const PaisVoltaData = event.target.value.split(',')[0];
+
+      await listarCidadeVolta(PaisVoltaData);
+      updatePreviewTrecho();
+
+      }
+
+
+
+      async function handleDropdownChangeCidades(event) {
+
+      updatePreviewTrecho();
+
+      }
+
+      async function handleDropdownChangeAeroportos(event) {
+
+          updatePreviewTrecho();
+        
+      }
+
+
+      window.onload = async () => {
+      await listarPaises();
+      };
+
+
+
+      // FUNCOES PARA INSERIR O TRECHO
+
+      function showStatusMessage(msg, error) {
+          var pStatus = document.getElementById("status");
+          if (error === true) {
+              pStatus.className = "statusError";
+          } else {
+              pStatus.className = "statusSuccess";
+          }
+          pStatus.textContent = msg;
+      }
+
+      function fetchInserir(body) {
+          const requestOptions = {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body)
+          };
+
+          return fetch('http://localhost:3000/inserirTrecho', requestOptions)
+              .then(response => response.json())
+              .catch(error => {
+                  showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
+                  console.log("Falha grave ao cadastrar:", error);
+              });
+      }
+
+      function inserirTrecho() {
+
+          
+      if(!selecionouCidade1()){
+        showStatusMessage("Selecione a Cidade de Partida...", true);  
+        return;
+      }
+      if(!selecionouCidade2()){
+        showStatusMessage("Selecione a Cidade de chegada...", true);  
+        return;
+      }
+      if(!selecionouAeroporto1()){
+        showStatusMessage("Selecione o Aeroporto de partida...", true);  
+        return;
+      }
+      if(!selecionouAeroporto2()){
+        showStatusMessage("Selecione o Aeroporto de chegada...", true);  
+        return;
+      }
+
+
+
+
+          const valoresPaisPartida = document.getElementById("paisDropdown1").value;
+          const valoresPaisChegada = document.getElementById("paisDropdown2").value;
+          const valoresAeroportoPartida = document.getElementById("aeroportoDropdown1").value;
+          const valoresAeroportoChegada = document.getElementById("aeroportoDropdown2").value;
+        
+
+          const siglaPaisPartida = valoresPaisPartida.split(',')[1];
+          const siglaPaisChegada = valoresPaisChegada.split(',')[1];
+          const cidadePartida = document.getElementById("cidadeDropdown1").value;
+          const cidadeChegada = document.getElementById("cidadeDropdown2").value;
+          const aeroportoPartida = valoresAeroportoPartida.split(',')[0];
+          const aeroportoChegada = valoresAeroportoChegada.split(',')[0];
+          const paispartida = valoresPaisPartida.split(',')[0];
+          const paischegada = valoresPaisChegada.split(',')[0];
+          const trecho = siglaPaisPartida + ":" + cidadePartida + ":" + aeroportoPartida + " --> " + siglaPaisChegada + ":" + cidadeChegada + ":" + aeroportoChegada;
+        
+          
+          fetchInserir({
+              paispartida : paispartida,
+              paischegada : paischegada,
+              cidadepartida: cidadePartida,
+              cidadechegada: cidadeChegada,
+              aeroportopartida: aeroportoPartida,
+              aeroportochegada: aeroportoChegada,
+              trecho: trecho
+          }).then(resultado => {
+              
+              if (resultado.status === "SUCCESS") {
+                  showStatusMessage("Trecho cadastrado...", false);
+              } else {
+                  showStatusMessage("Erro ao cadastrar Trecho: " + resultado.message, true);
+                  console.log(resultado.message);
+              }
+          });
+      }
 
     </script>
 

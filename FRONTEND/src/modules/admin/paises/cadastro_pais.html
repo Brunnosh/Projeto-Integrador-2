@@ -7,35 +7,32 @@
     <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/cadastro_cidades.css">
 
     <script>
-        function limparForm() {
+      function limparForm() {
             document.getElementById("cadastro-form").reset();
         }
 
-        function cancelarCadastro() {
-            alert("Cadastro cancelado");
+      function cancelarCadastro() {
+          alert("Cadastro cancelado");
         }
-
         
-        
-        function preencheuNome(){
-            let resultado = false;
-            const modeloInformado = document.getElementById("nome").value;
-            if(modeloInformado.length > 0){
-            resultado = true;
-            }
-            return resultado;
+      function preencheuNome(){
+        let resultado = false;
+        const modeloInformado = document.getElementById("nome").value;
+        if(modeloInformado.length > 0){
+          resultado = true;
+        }
+        return resultado;
         }
 
-        function preencheuSigla(){
-            let resultado = false;
-            const modeloInformado = document.getElementById("sigla").value;
-            if(modeloInformado.length > 0){
-            resultado = true;
-            }
-            return resultado;
+      function preencheuSigla(){
+        let resultado = false;
+        const modeloInformado = document.getElementById("sigla").value;
+        if(modeloInformado.length > 0){
+          resultado = true;
+        }
+        return resultado;
         }
 
-  
       function showStatusMessage(msg, error){
         var pStatus = document.getElementById("status");
         if (error === true){
@@ -56,8 +53,7 @@
         return fetch('http://localhost:3000/inserirPais', requestOptions)
         .then(T => T.json())
       }
-
-      
+ 
       function inserirPais(){
 
         if(!preencheuNome()){
@@ -95,11 +91,6 @@
         
       }
     
-
-   
-
-
-
     </script>
 
 
