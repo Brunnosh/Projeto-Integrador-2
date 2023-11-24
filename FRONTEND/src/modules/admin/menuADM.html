@@ -7,51 +7,175 @@
     <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/inicio.css">
 </head>
 <body class="center-content">
-    <div class="container">
-        <h1>Menu Administrativo</h1>
-        
-        <div class="main-buttons">
-            <button class="btn" onclick="aeronaves()">Aeronaves</button>
-            <button class="btn" onclick="aeroportos()">Aeroportos</button>
-            <button class="btn" onclick="cidades()">Cidades</button>
-            <p></p>
-            <button class="btn" onclick="paises()">Paises</button>
-            <button class="btn" onclick="trechos()">Trechos</button>
-            <button class="btn" onclick="voos()">Voos</button>
-            <button class="btn" onclick="assentos()">Assentos</button>
-        </div>
-    </div>
+    
+    
+        <div class="titulo"><h2>MENU ADMINISTRATIVO</h2></div>
+        <div class="containeresq">
+            
+            <div class="container">
+                <h1>Menu Aeronaves</h1>
+                <div class="main-buttons">
+                    <button class="btn" onclick="cadastrarAeronave()">cadastrar</button>
+                    <button class="btn" onclick="deletarAeronave()">deletar</button>
+                    <button class="btn" onclick="listarAeronave()">listar</button>
+                </div>
+            </div>
 
-    <script>
-        function aeronaves() {
-            window.open('/FRONTEND/src/modules/admin/aeronaves/menuAERONAVES.html');
-            
-        }
-        function aeroportos() {
-            window.open('/FRONTEND/src/modules/admin/aeroportos/menuAEROPORTOS.html');
-            
-        }
-        function cidades() {
-            window.open('/FRONTEND/src/modules/admin/Cidades/menuCIDADES.html');
-            
-        }
-        function paises() {
-            window.open('/FRONTEND/src/modules/admin/paises/menuPAISES.html');
-            
-        }
-        function trechos() {
-            window.open('/FRONTEND/src/modules/admin/trechos/menuTRECHOS.html');
-            
-        }
-        function voos() {
-            window.open('/FRONTEND/src/modules/admin/voo/menuVOOS.html');
-            
-        }
-        function assentos() {
-            window.open('/FRONTEND/src/modules/admin/assentos/menuASSENTOS.html');
-            
-        }
+            <div class="container">
+                <h1>Menu Aeroportos</h1>
+                <div class="main-buttons">
+                    <button class="btn" onclick="cadastrarAeroporto()">cadastrar</button>
+                    <button class="btn" onclick="deletarAeroporto()">deletar</button>
+                    <button class="btn" onclick="">listar</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <h1>Menu Cidades</h1>
+                <div class="main-buttons">
+                    <button class="btn" onclick="cadastrarCidades()">cadastrar</button>
+                    <button class="btn" onclick="deletarCidades()">deletar</button>
+                    <button class="btn" onclick="">listar</button>
+                </div>
+            </div>
+
+
+        </div>
         
+        <div class="containerdir">
+            <div class="container">
+                <h1>Menu Paises</h1>
+                <div class="main-buttons">
+                    <button class="btn" onclick="cadastrarPaises()">cadastrar</button>
+                    <button class="btn" onclick="deletarPaises()">deletar</button>
+                    <button class="btn" onclick="">listar</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <h1>Menu Trechos</h1>
+                <div class="main-buttons">
+                    <button class="btn" onclick="cadastrarTrecho()">cadastrar</button>
+                    <button class="btn" onclick="deletarTrecho()">deletar</button>
+                    <button class="btn" onclick="">listar</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <h1>Menu Voos</h1>
+                <div class="main-buttons">
+                    <button class="btn" onclick="cadastrarVoo()">cadastrar</button>
+                    <button class="btn" onclick="deletarVoo()">deletar</button>
+                    <button class="btn" onclick="">listar</button>
+                </div>
+            </div>
+        </div>
+        <div class="containerdir">
+            <div class="container">
+                <h1>Menu Assentos</h1>
+                <div class="main-buttons">
+                    <button class="btn" onclick="cadastrarVoo()">cadastrar</button>
+                    <button class="btn" onclick="deletarVoo()">deletar</button>
+                    <button class="btn" onclick="">listar</button>
+                </div>
+            </div>
+            <div class="container">
+                <h3>Voltar</h3>
+                <div class="button-voltar">
+                    <button class="btnvoltar" onclick="Voltar()">Voltar</button>
+                </div>
+            </div>
+        </div>
+        
+        
+    
+    
+    <script>
+        //FUNCTIONS CADASTRAR
+        function cadastrarAeronave() {
+            window.open('/FRONTEND/src/modules/admin/aeronaves/cadastro_aeronave.html');
+            
+        }
+
+        function cadastrarAeroporto() {
+            window.open('/FRONTEND/src/modules/admin/aeroportos/cadastro_aeroportos.html');
+            
+        }
+
+        function cadastrarAssento() {
+            window.open('/FRONTEND/src/modules/admin/assentos/cadastro_assentos.html');
+            
+        }
+
+        function cadastrarCidades() {
+            window.open('/FRONTEND/src/modules/admin/Cidades/cadastro_cidades.html');
+            
+        }
+
+        function cadastrarPaises() {
+            window.open('/FRONTEND/src/modules/admin/paises/cadastro_pais.html');
+            
+        }
+
+        function cadastrarTrecho() {
+            window.open('/FRONTEND/src/modules/admin/trechos/cadastro_trechos.html');
+            
+        }
+
+        function cadastrarVoo() {
+            window.open('/FRONTEND/src/modules/admin/voo/cadastro_voos.html');
+            
+        }
+        //
+
+        //FUNCTIONS DELETAR
+        function deletarAeronave() {
+            window.open('/FRONTEND/src/modules/admin/aeronaves/deletar_aeronave.html');
+            
+        }
+
+        function deletarAeroporto() {
+            window.open('/FRONTEND/src/modules/admin/aeroportos/excluir_aeroportos.html');
+            
+        }
+
+        function deletarAssento() {
+            window.open('/FRONTEND/src/modules/admin/assentos/excluir_assentos.html');
+            
+        }
+
+        function deletarCidades() {
+            window.open('/FRONTEND/src/modules/admin/Cidades/excluir_cidades.html');
+            
+        }
+
+        function deletarPaises() {
+            window.open('/FRONTEND/src/modules/admin/paises/excluir_pais.html');
+            
+        }
+
+        function deletarTrecho() {
+            window.open('/FRONTEND/src/modules/admin/trechos/excluir_trechos.html');
+            
+        }
+
+        function deletarVoo() {
+            window.open('/FRONTEND/src/modules/admin/voo/excluir_voos.html');
+            
+        }
+
+        //
+        //FUNCTIONS LISTAR
+        function listarAeronave() {
+            window.open('/FRONTEND/src/modules/admin/aeronaves/listagemaeronave.html');
+            
+        }
+        //
+        
+        function Voltar() {
+            window.location.href = "/FRONTEND/src/modules/inicio.html";
+            
+        }
 
     </script>
 </body>
