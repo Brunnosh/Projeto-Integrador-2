@@ -27,6 +27,12 @@ INTEGRANTES DO GRUPO DE PI - 2:
     Vinicius Gasparoto - 23011585
     Lucca Kenichi Lima - 23010484
   --------------------------------
-  
+Como utilizar o programa:  
+    Clone o repositório para qualquer pasta, ou faça o download e extraia os arquivos.  
+    Abra o VsCode e certifique-se de ter instalado a extensão Live Server e de ter NodeJs instalado em seu computador (link para download no final da página).  
+    abra o terminal e vá até a pasta "/BACKEND/".  
+    No terminal, dentro da pasta /BACKEND/ digite "npm start", certifique-se de estar com a VPN da puc funcionando.  
+    Após o terminal falar "Servidor HTTP funcionando" é só abrir o "inicio.html" com o Live Server.  
+      
   Programas necessários para o projeto  
   NodeJs: https://nodejs.org/pt-br/download
