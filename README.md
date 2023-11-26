@@ -13,22 +13,20 @@ orientando os grupos em qual direção devem seguir. Não é papel do professor 
 disciplina, programar junto com a equipe, resolver problemas ou dúvidas técnicas. As equipes
 deverão ser autogerenciáveis no aspecto técnico
 ---------------------------
-Tecnologias do Projeto
-O projeto faz uso das seguintes tecnologias:
-
-HTML
-CSS
-JavaScript/TypeScript
-SQL Developer
-
+Tecnologias do Projeto :  
+  HTML    
+  CSS  
+  JavaScript/TypeScript  
+  SQL Developer  
+  
 INTEGRANTES DO GRUPO DE PI - 2:
-
-  Bruno Tasso Savoia - 22000354
-  Tiago Mello - 23014024
-  Thomas Fidelis - 23013133
-  Vinicius Gasparoto - 23011585
-  Lucca Kenichi Lima - 23010484
---------------------------------
-
-Programas necessários para o projeto
-NodeJs: https://nodejs.org/pt-br/download
+  
+    Bruno Tasso Savoia - 22000354
+    Tiago Mello - 23014024
+    Thomas Fidelis - 23013133
+    Vinicius Gasparoto - 23011585
+    Lucca Kenichi Lima - 23010484
+  --------------------------------
+  
+  Programas necessários para o projeto  
+  NodeJs: https://nodejs.org/pt-br/download
