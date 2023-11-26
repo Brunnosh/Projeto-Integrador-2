@@ -9,10 +9,10 @@
 <body class="center-content">
     <div class="container">
         <h1>Bem-vindo ao AirPucc</h1>
-        <p>Escolha como deseja entrar:</p>
+        
         <div class="main-buttons">
-            <button class="btn" onclick="entrarComoAdministrador()">Entrar como Administrador</button>
-            <button class="btn" onclick="entrarComoCliente()">Entrar como Cliente</button>
+            <button class="btn" onclick="entrarComoAdministrador()">Área Administrativa</button>
+            <button class="btn" onclick="entrarComoCliente()">Reservar Passagem</button>
         </div>
     </div>
 
@@ -23,7 +23,7 @@
         }
 
         function entrarComoCliente() {
-            window.location.href = "/FRONTEND/src/modules/cliente/menuCLIENTE.html"; 
+            window.location.href = "/FRONTEND/src/modules/cliente/escolherVoo.html"; 
             
         }
     </script>

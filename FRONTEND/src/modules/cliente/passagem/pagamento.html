@@ -15,122 +15,47 @@
     </style>
     <script>
 
-
+    var clientesBuscados = [];
     const aeronaveEscolhida = sessionStorage.getItem("aeronaveEscolhida");
-    const assentosEscolhidos = sessionStorage.getItem("assentosEscolhidos");
+    const assentosEscolhidos = JSON.parse(sessionStorage.getItem("assentosEscolhidos"));
+    const infoPassageiros = JSON.parse(sessionStorage.getItem("infoPassageiros"));
     const ndeAssentos = sessionStorage.getItem("ndeAssentos");
-    const cpfPassageiro = sessionStorage.getItem("cpfPassageiro");
     const vooEscolhido = sessionStorage.getItem("vooEscolhido");
+
     const custo = ndeAssentos * 150;
     const custodisplay = custo + "R$"
 
-    
-    
-    //Funções não especificas
-    
-    //deixa os inputs de nome e cpf invisiveis caso checkado a opção
-    document.addEventListener("DOMContentLoaded", async function () {
+    console.log(infoPassageiros)
+    console.log(assentosEscolhidos)
+    console.log(vooEscolhido)
+    console.log(aeronaveEscolhida)
+
+    document.addEventListener('DOMContentLoaded', function() {
+
         var divCusto =  document.getElementById("custo");
         divCusto.textContent = custodisplay;
-
-        if(ndeAssentos > 1){
-            const divcheckbox = document.getElementById("divcheckbox");
-            divcheckbox.style.display = "block";
-        }
-        if(ndeAssentos > 1)
-        {   
-            const checkbox = document.getElementById("assentosunico")
-            if(checkbox.checked){
-                addElement(ndeAssentos);
-            }
+            const input = document.querySelector('#cpf');
             
-        }
+            input.addEventListener('keypress', () => {
+                const inputValue = event.key;
 
-        
+                if (!/\d/.test(inputValue)) {
+                event.preventDefault(); // Impede a inserção do caractere na caixa de texto
+                }
 
+                let inputLength = input.value.length;
+                
+                // MAX LENGTH 14 CPF
+                if (inputLength === 3 || inputLength === 7) {
+                    input.value = input.value + '.';
+                } else if (inputLength === 11) {
+                    input.value = input.value + '-';
+                }
+            
+            });
+        });
 
-
-    });
     
-    //funcão para formatar o cpf
-    document.addEventListener('DOMContentLoaded', function() {
-    document.addEventListener('input', function(event) {
-        const target = event.target;
-
-        if (target.classList.contains('cpf-input')) {
-            const inputValue = event.data;
-
-            if (!/\d/.test(inputValue)) {
-                // Remove caracteres não numéricos
-                target.value = target.value.replace(/\D/g, '');
-            }
-
-            let inputLength = target.value.length;
-
-            // Formatação do CPF
-            if (inputLength === 3 || inputLength === 7) {
-                target.value = target.value + '.';
-            } else if (inputLength === 11) {
-                target.value = target.value + '-';
-            }
-        }
-    });
-});
-
-    //função para adicionar os campos de nome e cpf
-    function addElement(n){
-        const divAssentos = document.getElementById("divAssentos");
-        divAssentos.innerHTML = "";
-        for (let i = 0; i < n; i++) {
-            const newDiv = document.createElement("div");
-            const nameLabel = document.createElement("label");
-            const nameInput = document.createElement("input");
-            const cpfLabel = document.createElement("label");
-            const cpfInput = document.createElement("input");
-
-            nameLabel.textContent = "Nome:" + (i + 1);
-            nameInput.type = "text";
-            nameInput.name = `nomeAssento${i + 1}`; // Correção aqui
-            
-
-            cpfLabel.textContent = "CPF:" + (i + 1);
-            cpfInput.type = "text";
-            cpfInput.placeholder = "123.456.789-01";
-            cpfInput.name = `cpfAssento${i + 1}`; // Correção aqui
-            cpfInput.maxLength = 14;
-            cpfInput.classList.add('cpf-input');
-           
-            newDiv.appendChild(nameLabel);
-            newDiv.appendChild(nameInput);
-            newDiv.appendChild(document.createElement("br")); // Adiciona uma quebra de linha
-            newDiv.appendChild(cpfLabel);
-            newDiv.appendChild(cpfInput);
-            divAssentos.appendChild(newDiv);
-            
-
-            }
-        
-    }
-    
-    function atualizarStatusDisponibilidade() {
-        
-        const divAssentos = document.getElementById("divAssentos");
-        const divs = divAssentos.querySelectorAll("div");
-        var checkbox = document.getElementById("assentosunico");
-        var statusSpan = document.getElementById("statusDisponibilidade");
-
-        divs.forEach(div => {
-        div.style.display = checkbox.checked ? "none" : "block";
-    });
-
-
-        if (checkbox.checked) {
-            statusSpan.textContent = "Sim";
-            
-        } else {
-            statusSpan.textContent = "Não";
-        }
-        }
 
     function showStatusMessage(msg, error) {
         var pStatus = document.getElementById("status");
@@ -157,20 +82,19 @@
 
     function preencheuTudo(){
             let resultado = true; 
-            for(let i=0;i<ndeAssentos;i++){
-                const cpfInput = document.querySelector(`input[name="cpfAssento${i + 1}"]`);
-                const nomeInput = document.querySelector(`input[name="nomeAssento${i + 1}"]`);
+            const nome = document.getElementById("nome");
+            const cpf = document.getElementById("cpf");
+            const email = document.getElementById("email");
 
-                console.log(`CPF ${i + 1}: "${cpfInput.value}"`);
-                console.log(`Nome ${i + 1}: "${nomeInput.value}"`);
+           
 
-                if (cpfInput.value.trim() == "" || nomeInput.value.trim() == "") {
+                if (nome.value.length == 0 || cpf.value.length == 0 || email.value.length == 0 ) {
                     console.log("bunda")
                     resultado = false;
-                break;
+                
                 }
-            }
-            console.log(resultado)
+            
+           
             return resultado;
     }
 
@@ -211,90 +135,28 @@
         .then(T => T.json())
     }
 
-    function fetchListarCliente(body) {
-        const requestOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        };
-
-        return fetch('http://localhost:3000/loginCliente', requestOptions)
-        .then(data => {
-        return data;
-        });
-      }
-
     //
 
-    //Funções criadas para limpar outras funções
-    async function inserirCadastro(cpfinserirlogin,nomeinserirlogin){
-        console.log(cpfinserirlogin,nomeinserirlogin)
-                
-            fetchCadastro({
-            nome: nomeinserirlogin, 
-            cpf: cpfinserirlogin
-            })
-            .then(resultado => {
-            
-            if(resultado.status === "SUCCESS"){
 
-            }else{
-                showStatusMessage("Erro ao criar conta " + message, true);
-                console.log(resultado.message);
-            }
-            })
-            .catch(()=>{
-            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-            console.log("Falha grave ao cadastrar.")
-            });
-    }
+    async function listarClientes(){
 
-    async function reservarAssento(isADM,assentoEscolhido, cpfassento){
-        fetchReservarAssento({
-                isADM: isADM, 
-                aeronave: aeronaveEscolhida,
-                assento: assentoEscolhido, 
-                cpfpassageiro: cpfassento,
-                numvoo : vooEscolhido
-                })
-                .then(resultado => {
-                        
-                if(resultado.status === "SUCCESS"){
-                            
-                                }else{
-                showStatusMessage("Erro ao criar conta " + message, true);
-                console.log(resultado.message);
-                }
-                })
-                .catch(()=>{
-                showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-                console.log("Falha grave ao cadastrar.")
-            });
-    }
-
-    async function listarCliente(nomeassentos,cpfassentos){
-        var nomeinserirlogin  = nomeassentos;
-        var cpfinserirlogin = cpfassentos;
-
-        for(let i = 0; i<ndeAssentos;i++)
-            {
-                const response = await fetchListarCliente({
-                cpf: cpfassentos[i]
-                });
-                const data = await response.json();
-
+        const response = await fetch('http://localhost:3000/listarClientes');
+        const data = await response.json();
+        console.log("bundona")
                 if (data.status === "SUCCESS") {
-                    if(data.payload.length == 0){
-                        continue;
-                    }
-                    // se encontrou conta com CPF
-                    // remover cpf e o nome das listas para inserir
-                    const cliente = data.payload[0];
-                    const nomecliente = cliente[0].toUpperCase();
+                    console.log("saco")
+                    const clientes = data.payload;
+                    
+                    clientes.forEach(cliente => {
+                        clientesBuscados.push({
+                        nome: cliente[0],
+                        cpf: cliente[1],   
+                        email: cliente[2]
+                });
+                    });
 
             
-                    nomeinserirlogin = nomeinserirlogin.filter(nome => nome !== nomecliente);
-                    cpfinserirlogin = cpfinserirlogin.filter(cpf => cpf !== cpfassentos[i]);
+
 
                     } 
                     else {
@@ -302,22 +164,19 @@
                     
                     }
 
-                    console.log(cpfinserirlogin,nomeinserirlogin)
-            }
-            return { nomeinserirlogin, cpfinserirlogin };
+                    
+            
+            
     }
 
-    //
+    async function inserirPagamento(){
 
-    //Função que realiza tudo
-    async function pagarassentos1()
-    {
-        const isADM = 0;
+        const cpf = document.getElementById("cpf").value;
         var radial = document.querySelector('input[name="modoPagamento"]:checked');
         var modo_pagamento = radial.id;
 
         await fetchInserirPagamento({
-        cpf: cpfPassageiro, 
+        cpf: cpf, 
         custo: custo,
         qtd_paga: custo, 
         modo_pagamento: modo_pagamento
@@ -325,195 +184,120 @@
         .then(resultado => {
         
         if(resultado.status === "SUCCESS"){
-            fetchReservarAssento({
-            isADM: isADM, 
-            aeronave: aeronaveEscolhida,
-            assento: assentosEscolhidos, 
-            cpfpassageiro: cpfPassageiro,
-            numvoo : vooEscolhido
-            })
-            .then(resultado => {
-        
-            if(resultado.status === "SUCCESS"){
-            alert("Compra efetuada e assentos reservados!");
-            window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
-            
-                }else{
-            showStatusMessage("Erro ao criar conta " + message, true);
-            console.log(resultado.message);
-            }
-            })
-            .catch(()=>{
-            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-            console.log("Falha grave ao cadastrar.")
-            });
-            
+            console.log("pagamento inserido com sucesso");
         }else{
-            showStatusMessage("Erro ao criar conta " + message, true);
-            console.log(resultado.message);
+            showStatusMessage("Erro ao inserir pagamento " + message, true);
+            
         }
         })
         .catch(()=>{
-        showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-        console.log("Falha grave ao cadastrar.")
+        showStatusMessage("Erro técnico ao inserir pagamento... Contate o suporte.", true);
+        console.log("Falha grave ao inserir pagamento.")
         });
 
+    }
 
+    async function inserirPassageiros(){
+        console.log(infoPassageiros);
+        console.log(clientesBuscados);
+        const passageirosUnicos = infoPassageiros.filter(passageiro =>!clientesBuscados.some(cliente => cliente.cpf === passageiro.cpf));
 
+        console.log( passageirosUnicos);
+
+        for(let i =0; i<passageirosUnicos.length ; i++)
+        {
+            const passageiro = passageirosUnicos[i];
+
+            await fetchCadastro({
+                nome: passageiro.nome, 
+                cpf: passageiro.cpf,
+                email: passageiro.email, 
+                
+                })
+                .then(resultado => {
+                
+                if(resultado.status === "SUCCESS"){
+                    console.log("Novos Passageiros inserido com sucesso");
+                }else{
+                    showStatusMessage("Erro ao inserir passageiro " + message, true);
+                    
+                }
+                })
+                .catch(()=>{
+                showStatusMessage("Erro ao inserir passageiro... Contate o suporte.", true);
+                console.log("Falha grave ao inserir passageiro.")
+                });
+        }
 
     }
-    
-    async function pagarassentosmaisq1()
-    {
+
+    async function reservarAssentos(){
         const isADM = 0;
-        var radial = document.querySelector('input[name="modoPagamento"]:checked');
-        var modo_pagamento = radial.id;
-        const checkbox = document.getElementById("assentosunico")
 
-        if(checkbox.checked){
-            await fetchInserirPagamento({
-                cpf: cpfPassageiro, 
-                custo: custo,
-                qtd_paga: custo, 
-                modo_pagamento: modo_pagamento
+        for(let i =0; i<infoPassageiros.length ; i++)
+        {
+            const passageiro = infoPassageiros[i];
+            console.log(passageiro)
+
+            await fetchReservarAssento({
+                isADM: isADM, 
+                aeronave: aeronaveEscolhida,
+                assento: assentosEscolhidos[i], 
+                cpfpassageiro: passageiro.cpf,
+                numvoo : vooEscolhido
+                
                 })
                 .then(resultado => {
                 
                 if(resultado.status === "SUCCESS"){
-                    for (let i = 0; i < ndeAssentos; i++) {
-                        fetchReservarAssento({
-                            isADM: isADM, 
-                            aeronave: aeronaveEscolhida,
-                            assento: JSON.parse(assentosEscolhidos)[i], 
-                            cpfpassageiro: cpfPassageiro,
-                            numvoo : vooEscolhido
-                            })
-                            .then(resultado => {
-                        
-                            if(resultado.status === "SUCCESS"){
-                            
-                                }else{
-                            showStatusMessage("Erro ao criar conta " + message, true);
-                            console.log(resultado.message);
-                            }
-                            })
-                            .catch(()=>{
-                            showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-                            console.log("Falha grave ao cadastrar.")
-                            });
-                    }
-                    
+                    console.log("Assentos Reservados com sucesso");
                 }else{
-                    showStatusMessage("Erro ao criar conta " + message, true);
-                    console.log(resultado.message);
+                    showStatusMessage("Erro ao reservar assento " + message, true);
+                    
                 }
                 })
                 .catch(()=>{
                 showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-                console.log("Falha grave ao cadastrar.")
+                console.log("Erro ao reservar assento.")
                 });
-
-            alert("Compra efetuada e assentos reservados!");
-            window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
-        }
-        
-        if(!checkbox.checked){
-            var cpfassentos = []
-            var nomeassentos = []
-            for(let i = 0; i<ndeAssentos;i++)
-            {
-                cpfassentos.push(document.querySelector(`input[name="cpfAssento${i + 1}"]`).value)
-                nomeassentos.push(document.querySelector(`input[name="nomeAssento${i + 1}"]`).value)
-            }
-
-            nomeassentos = nomeassentos.map(function(string) {
-                return string.toUpperCase();
-            });
-
-            
-            const { nomeinserirlogin, cpfinserirlogin } = await listarCliente(nomeassentos, cpfassentos);
-
-            for(let i =0; i< cpfinserirlogin.length ; i++)
-            {
-                inserirCadastro(cpfinserirlogin[i],nomeinserirlogin[i]);
-            }
-
-            await fetchInserirPagamento({
-                cpf: cpfPassageiro, 
-                custo: custo,
-                qtd_paga: custo, 
-                modo_pagamento: modo_pagamento
-                })
-                .then(resultado => {
-                
-                if(resultado.status === "SUCCESS"){
-                    for (let i = 0; i < ndeAssentos; i++) {
-                        reservarAssento(isADM,JSON.parse(assentosEscolhidos)[i],cpfassentos[i]);
-
-                    }
-                    
-                }else{
-                    showStatusMessage("Erro ao criar conta " + message, true);
-                    console.log(resultado.message);
-                }
-                })
-                .catch(()=>{
-                showStatusMessage("Erro técnico ao cadastrar... Contate o suporte.", true);
-                console.log("Falha grave ao cadastrar.")
-                });
-
-
-            alert("Compra efetuada e assentos reservados!");
-            window.location.href = "/FRONTEND/src/modules/cliente/menucliente.html";
-
         }
 
     }
 
-    //
-
-    //Funcão final que governa o que acontecerá com base no numero de assentos reservados
+    
     async function pagar(){
+
+        
 
         if(!selecionouPagamento()){
           showStatusMessage("Selecione metodo de pagamento...", true);  
           return;
         }
+        
+        if(!preencheuTudo()){
+          showStatusMessage("Preencha todos os campos...", true);  
+          return;
+        }
+        
+        await inserirPassageiros();
+
+        await inserirPagamento();
+
+        await reservarAssentos();
+
+      
 
         
+
         
-
-        if(ndeAssentos == 1){
-            await pagarassentos1();
-        }
-
-        if(ndeAssentos > 1){
-            const checkbox = document.getElementById("assentosunico")
-            if(checkbox.checked){
-                await pagarassentosmaisq1();
-            }
-            if(!checkbox.checked){
-                if(!preencheuTudo()){
-                showStatusMessage("Preencha todos os campos...", true);  
-                return;
-                await pagarassentosmaisq1();
-            }
-
-
-        }
-
-            
-
-        }
 
 
     }
 
     //
 
-    window.onload = function () {
-        addElement(ndeAssentos);
-        atualizarStatusDisponibilidade();
+    window.onload = async function () {
+        await listarClientes();
     }
     </script>
     
@@ -528,6 +312,10 @@
         <form id="cadastro-form">
 
             <div class="form-group">
+                <div>
+                    <p>Quantia a pagar:</p>
+                    <div id="custo"></div>
+                </div>
                 <p>Modo de Pagamento:</p>
                 <div class="radio-group">
                     <label for="pix">Pix :</label>
@@ -541,10 +329,21 @@
                     <label for="debito">Débito:</label>
                     <input type="radio" name="modoPagamento" id="debito" value="debito"/>
                 </div>
-                <div>
-                    <p>Quantia a pagar:</p>
-                    <div id="custo"></div>
+                <div><p></p></div>
+                <div class="form-group">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" required>
                 </div>
+                <div class="form-group">
+                    <label for="cpf">CPF:</label>
+                    <input type="text" id="cpf" name="cpf" placeholder="123.456.789-01"  maxlength="14" required>
+                    
+                </div>
+                <div class="form-group">
+                    <label for="email">E-Mail:</label>
+                    <input type="text" id="email" name="email">
+                </div>
+ 
                 <div class="radio-group" style="display: none" id="divcheckbox">
                     <label for="assentosunico">Todos os assentos são seus? :</label>
                     <input type="checkbox" id="assentosunico" onchange="atualizarStatusDisponibilidade()"/>

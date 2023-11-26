@@ -1171,7 +1171,6 @@ app.put("/inserirCliente", (req, res) => __awaiter(void 0, void 0, void 0, funct
     const nome = req.body.nome;
     const cpf = req.body.cpf;
     const email = req.body.email;
-    const senha = req.body.senha;
     let cr = {
         status: "ERROR",
         message: "",
@@ -1185,10 +1184,10 @@ app.put("/inserirCliente", (req, res) => __awaiter(void 0, void 0, void 0, funct
             connectionString: process.env.ORACLE_CONN_STR,
         });
         const cmdInsertVoo = `INSERT INTO PASSAGEIROS 
-    (nome, cpf, email, senha)
+    (nome, cpf, email)
     VALUES
-    (:1, :2, :3, :4)`;
-        const dados = [nome, cpf, email, senha];
+    (:1, :2, :3)`;
+        const dados = [nome, cpf, email];
         let resInsert = yield conn.execute(cmdInsertVoo, dados);
         yield conn.commit();
         const rowsInserted = resInsert.rowsAffected;
@@ -1236,6 +1235,34 @@ app.post("/loginCliente", (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
         else {
             cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+        }
+    }
+    finally {
+        res.send(cr);
+    }
+}));
+app.get("/listarClientes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let cr = { status: "ERROR", message: "", payload: undefined, };
+    try {
+        const connAttibs = {
+            user: process.env.ORACLE_DB_USER,
+            password: process.env.ORACLE_DB_PASSWORD,
+            connectionString: process.env.ORACLE_CONN_STR,
+        };
+        const connection = yield oracledb_1.default.getConnection(connAttibs);
+        let resultadoConsulta = yield connection.execute("SELECT * FROM PASSAGEIROS");
+        yield connection.close();
+        cr.status = "SUCCESS";
+        cr.message = "Dados obtidos";
+        cr.payload = resultadoConsulta.rows;
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            cr.message = e.message;
+            console.log(e.message);
+        }
+        else {
+            cr.message = "Erro ao conectar ao oracle. Sem detalhes";
         }
     }
     finally {

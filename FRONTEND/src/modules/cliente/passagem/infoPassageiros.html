@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/pagamento.css">
+    <style>
+        .statusError{
+           color:red;
+        }
+        .statusSuccess{
+          color:blue;
+        }
+    </style>
+    <script>
+
+
+    const ndeAssentos = sessionStorage.getItem("ndeAssentos");
+
+
+    
+    
+    //Funções não especificas
+    
+    //deixa os inputs de nome e cpf invisiveis caso checkado a opção
+    document.addEventListener("DOMContentLoaded", async function () {
+
+
+        if(ndeAssentos > 1){
+            const divcheckbox = document.getElementById("divcheckbox");
+            divcheckbox.style.display = "block";
+        }
+        if(ndeAssentos > 1)
+        {   
+            const checkbox = document.getElementById("assentosunico")
+            if(checkbox.checked){
+                addElement(ndeAssentos);
+            }
+            
+        }
+
+        
+
+
+
+    });
+    
+    //funcão para formatar o cpf
+    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('input', function(event) {
+            const target = event.target;
+
+            if (target.classList.contains('cpf-input')) {
+                const inputValue = event.data;
+
+                if (!/\d/.test(inputValue)) {
+                    // Remove caracteres não numéricos
+                    target.value = target.value.replace(/\D/g, '');
+                }
+
+                let inputLength = target.value.length;
+
+                // Formatação do CPF
+                if (inputLength === 3 || inputLength === 7) {
+                    target.value = target.value + '.';
+                } else if (inputLength === 11) {
+                    target.value = target.value + '-';
+                }
+            }
+        });
+});
+
+    //função para adicionar os campos de nome e cpf
+    function addElement(n){
+        const divAssentos = document.getElementById("divAssentos");
+        divAssentos.innerHTML = "";
+        for (let i = 0; i < n; i++) {
+            const newDiv = document.createElement("div");
+            const nameLabel = document.createElement("label");
+            const nameInput = document.createElement("input");
+            const cpfLabel = document.createElement("label");
+            const cpfInput = document.createElement("input");
+            const emailLabel = document.createElement("label");
+            const emailInput = document.createElement("input");
+
+            nameLabel.textContent = "Nome:" + (i + 1);
+            nameInput.type = "text";
+            nameInput.name = `nomeAssento${i + 1}`;
+            
+            emailLabel.textContent = "Email:" + (i + 1);
+            emailInput.type = "text";
+            emailInput.name = `emailAssento${i + 1}`;
+
+            cpfLabel.textContent = "CPF:" + (i + 1);
+            cpfInput.type = "text";
+            cpfInput.placeholder = "123.456.789-01";
+            cpfInput.name = `cpfAssento${i + 1}`; // Correção aqui
+            cpfInput.maxLength = 14;
+            cpfInput.classList.add('cpf-input');
+           
+            newDiv.appendChild(nameLabel);
+            newDiv.appendChild(nameInput);
+            newDiv.appendChild(document.createElement("br"));
+            newDiv.appendChild(emailLabel);
+            newDiv.appendChild(emailInput);
+            newDiv.appendChild(document.createElement("br")); // Adiciona uma quebra de linha
+            newDiv.appendChild(cpfLabel);
+            newDiv.appendChild(cpfInput);
+            newDiv.appendChild(document.createElement("br")); 
+            newDiv.appendChild(document.createElement("br")); 
+            divAssentos.appendChild(newDiv);
+            
+
+            }
+        
+    }
+    
+    function atualizarStatusDisponibilidade() {
+        
+        const divAssentos = document.getElementById("divAssentos");
+        const divs = divAssentos.querySelectorAll("div");
+        var checkbox = document.getElementById("assentosunico");
+        var statusSpan = document.getElementById("statusDisponibilidade");
+
+        divs.forEach(div => {
+        div.style.display = checkbox.checked ? "none" : "block";
+    });
+
+
+        if (checkbox.checked) {
+            statusSpan.textContent = "Sim";
+            
+        } else {
+            statusSpan.textContent = "Não";
+        }
+        }
+
+    function showStatusMessage(msg, error) {
+        var pStatus = document.getElementById("status");
+        if (error === true) {
+            pStatus.className = "statusError";
+        } else {
+            pStatus.className = "statusSuccess";
+        }
+        pStatus.textContent = msg;
+    }
+
+    //
+    //Funções de validação
+
+    function preencheuTudo(){
+            let resultado = true; 
+            for(let i=0;i<ndeAssentos;i++){
+                const cpfInput = document.querySelector(`input[name="cpfAssento${i + 1}"]`);
+                const nomeInput = document.querySelector(`input[name="nomeAssento${i + 1}"]`);
+                const emailInput = document.querySelector(`input[name="emailAssento${i + 1}"]`);
+
+
+                if (cpfInput.value.trim() == "" || nomeInput.value.trim() == "" || emailInput.value.trim() == "") {
+                    console.log("bunda")
+                    resultado = false;
+                break;
+                }
+            }
+            console.log(resultado)
+            return resultado;
+    }
+
+    //
+
+
+    //Funcão final que governa o que acontecerá com base no numero de assentos reservados
+    async function continuar(){
+
+        var checkbox = document.getElementById("assentosunico");
+        if(!preencheuTudo() || checkbox.checked){
+          showStatusMessage("Selecione metodo de pagamento...", true);  
+          return;
+        }
+
+        const infoPassageiros = [];
+    
+
+        for(let i=0;i<ndeAssentos;i++){
+                const cpfInput = document.querySelector(`input[name="cpfAssento${i + 1}"]`);
+                const nomeInput = document.querySelector(`input[name="nomeAssento${i + 1}"]`);
+                const emailInput = document.querySelector(`input[name="emailAssento${i + 1}"]`);
+
+
+
+                infoPassageiros.push({
+                    cpf: cpfInput.value,
+                    nome: nomeInput.value,
+                    email: emailInput.value
+                });
+
+
+            }
+            sessionStorage.setItem("infoPassageiros",JSON.stringify(infoPassageiros));
+
+            window.location.href = "/FRONTEND/src/modules/cliente/passagem/pagamento.html";
+        
+
+
+
+    }
+
+    //
+
+    window.onload = function () {
+        addElement(ndeAssentos);
+        atualizarStatusDisponibilidade();
+    }
+    </script>
+    
+
+</head>
+<body >
+
+
+
+    <div class="container">
+        <h1>Informações dos Passageiros</h1>
+        <form id="cadastro-form">
+
+            <div class="form-group">
+                
+
+                <div class="radio-group" style="display: none" id="divcheckbox">
+                    <label for="assentosunico">Todos os assentos são seus? :</label>
+                    <input type="checkbox" id="assentosunico" onchange="atualizarStatusDisponibilidade()"/>
+                    <span id="statusDisponibilidade"></span>    
+                </div>
+                <div id="divAssentos"></div>
+                <div class="btn-group">
+                    <button type="button" class="btn" onclick="continuar()">Prosseguir para o pagamento</button>
+                </div>
+            </div>
+            <p id="status" class="statusError"></p>
+        </form>
+    </div>
+
+
+</body>
+</html>
