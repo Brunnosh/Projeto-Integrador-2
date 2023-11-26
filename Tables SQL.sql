@@ -58,12 +58,12 @@ create table AERONAVES(
 
 create table MAPA_ASSENTOS(
     aeronave int NOT NULL,
-    banco int PRIMARY KEY NOT NULL,
+    banco int NOT NULL,
     disponivel int NOT NULL,
     custo int DEFAULT 150 NOT NULL,
     cpf_passageiro varchar2(14) NOT NULL,
     numero_voo int NOT NULL,
-    unique(banco,numero_voo),
+    CONSTRAINT PK_banco_numero_voo PRIMARY KEY (banco, numero_voo),
     constraint FK_assento_aeronave FOREIGN KEY (aeronave) references AERONAVES (codigo_aeronave) ON DELETE CASCADE,
     constraint FK_cpf_passageiro_assento FOREIGN KEY (cpf_passageiro) references PASSAGEIROS (cpf) ON DELETE CASCADE,
     constraint FK_numero_voo_assento FOREIGN KEY (numero_voo) references VOOS (codigo_voo) ON DELETE CASCADE
@@ -95,21 +95,18 @@ create table VOOS(
 create table PASSAGEIROS(
     nome varchar2(30),
     cpf varchar2(14) PRIMARY KEY,
-    email varchar2(50),
-    senha varchar2(15)
-    
+    email varchar2(50)  
 );
 
 create table PAGAMENTOS(
     cpf_cliente varchar2(14),
     custo float,
     qtd_paga float,
-    modo_pagamento varchar2(15),
-    constraint FK_cpf_passageiro_pagamento FOREIGN KEY (cpf_cliente) references PASSAGEIROS (cpf)
+    modo_pagamento varchar2(15)
     
 );
 
-alter table voos drop constraint FK_trecho_volta;
+
 
 drop table paises;
 drop table cidades;
@@ -125,7 +122,7 @@ select * from mapa_assentos;
 select * from pagamentos;
 select * from passageiros;
 
-delete from passageiros;
+
 
 //TABLES BUGADAS
 
