@@ -53,7 +53,7 @@ body {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
     background-color: #fff;
@@ -72,8 +72,8 @@ h1 {
 }
 
 #voosTable th, #voosTable td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    border: 3px solid #ddd;
+    padding: 25px;
     text-align: left;
 }
 
