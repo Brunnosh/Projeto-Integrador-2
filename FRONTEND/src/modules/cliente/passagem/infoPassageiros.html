@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagamento</title>
-    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/pagamento.css">
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/info_passageiro.css">
     <style>
         .statusError{
            color:red;
@@ -123,8 +123,11 @@
         var checkbox = document.getElementById("assentosunico");
         var statusSpan = document.getElementById("statusDisponibilidade");
 
-        divs.forEach(div => {
-        div.style.display = checkbox.checked ? "none" : "block";
+        divs.forEach((div, index) => {
+            if(index == 0){
+                div.style.display = "block";
+            }else{div.style.display = checkbox.checked ? "none" : "block";}
+        
     });
 
 
@@ -151,7 +154,22 @@
 
     function preencheuTudo(){
             let resultado = true; 
-            for(let i=0;i<ndeAssentos;i++){
+            var checkbox = document.getElementById("assentosunico");
+
+            if (checkbox.checked){
+                const nome = (document.querySelector(`input[name="nomeAssento1"]`).value)
+                const cpf = (document.querySelector(`input[name="cpfAssento1"]`).value)
+                const email = (document.querySelector(`input[name="emailAssento1"]`).value)
+
+                if (nome.trim() == "" || cpf.trim() == "" || email.trim() == "") {
+                    console.log("bunda")
+                    resultado = false;
+                
+                }
+
+            }
+            if(!checkbox.checked){
+                for(let i=0;i<ndeAssentos;i++){
                 const cpfInput = document.querySelector(`input[name="cpfAssento${i + 1}"]`);
                 const nomeInput = document.querySelector(`input[name="nomeAssento${i + 1}"]`);
                 const emailInput = document.querySelector(`input[name="emailAssento${i + 1}"]`);
@@ -163,6 +181,8 @@
                 break;
                 }
             }
+            }
+
             console.log(resultado)
             return resultado;
     }
@@ -174,15 +194,40 @@
     async function continuar(){
 
         var checkbox = document.getElementById("assentosunico");
-        if(!preencheuTudo() || checkbox.checked){
-          showStatusMessage("Selecione metodo de pagamento...", true);  
+        if(!preencheuTudo()){
+          showStatusMessage("Preencha todos os campos...", true);  
           return;
         }
 
+        var checkbox = document.getElementById("assentosunico");
+
         const infoPassageiros = [];
     
+        
 
-        for(let i=0;i<ndeAssentos;i++){
+        if(checkbox.checked){
+            for(let i=0;i<ndeAssentos;i++){
+                const cpfInput = document.querySelector(`input[name="cpfAssento1"]`);
+                const nomeInput = document.querySelector(`input[name="nomeAssento1"]`);
+                const emailInput = document.querySelector(`input[name="emailAssento1"]`);
+
+
+                infoPassageiros.push({
+                    cpf: cpfInput.value,
+                    nome: nomeInput.value,
+                    email: emailInput.value
+                });
+
+
+            }
+            sessionStorage.setItem("infoPassageiros",JSON.stringify(infoPassageiros));
+
+            window.location.href = "/FRONTEND/src/modules/cliente/passagem/pagamento.html";
+        
+        }
+
+        if(!checkbox.checked){
+            for(let i=0;i<ndeAssentos;i++){
                 const cpfInput = document.querySelector(`input[name="cpfAssento${i + 1}"]`);
                 const nomeInput = document.querySelector(`input[name="nomeAssento${i + 1}"]`);
                 const emailInput = document.querySelector(`input[name="emailAssento${i + 1}"]`);
@@ -201,6 +246,9 @@
 
             window.location.href = "/FRONTEND/src/modules/cliente/passagem/pagamento.html";
         
+
+        }
+
 
 
 
@@ -232,6 +280,7 @@
                     <input type="checkbox" id="assentosunico" onchange="atualizarStatusDisponibilidade()"/>
                     <span id="statusDisponibilidade"></span>    
                 </div>
+                <div><p></p></div>
                 <div id="divAssentos"></div>
                 <div class="btn-group">
                     <button type="button" class="btn" onclick="continuar()">Prosseguir para o pagamento</button>

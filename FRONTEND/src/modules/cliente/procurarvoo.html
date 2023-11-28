@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Procurar Passagem</title>
+        <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/procuravoo.css">
+    
+        <style>
+            align-right {
+                text-align: right;
+            }
+            .statusError{
+                 color:red;
+              }
+            .statusSuccess{
+                color:blue;
+              }
+        </style>
+
+        <script>
+            
+            document.addEventListener('DOMContentLoaded', function() {
+            const input = document.querySelector('#cpf');
+            
+            input.addEventListener('keypress', () => {
+                const inputValue = event.key;
+
+                if (!/\d/.test(inputValue)) {
+                event.preventDefault(); // Impede a inserção do caractere na caixa de texto
+                }
+
+                let inputLength = input.value.length;
+                
+                // MAX LENGTH 14 CPF
+                if (inputLength === 3 || inputLength === 7) {
+                    input.value = input.value + '.';
+                } else if (inputLength === 11) {
+                    input.value = input.value + '-';
+                }
+            
+            });
+        });
+
+
+        function preencheucpf(){
+        let resultado = false;
+        const cpf = document.getElementById("cpf");
+        
+        if (cpf.value.trim() !== ""){
+            
+            resultado = true;
+        }
+        console.log(resultado)
+        return resultado; 
+        }
+
+        function showStatusMessage(msg, error){
+            var pStatus = document.getElementById("status");
+            if (error === true){
+            pStatus.className = "statusError";
+            }else{
+            pStatus.className = "statusSuccess";
+            }
+            pStatus.textContent = msg;
+            }
+
+        function fetchBuscarAssento(body) {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+        };
+
+        return fetch('http://localhost:3000/listarAssentosWhereCpf', requestOptions)
+        .then(data => {
+        return data;
+        });
+    }
+
+
+    async function procurar() {
+
+        if(!preencheucpf()){
+          showStatusMessage("Preencha cpf...", true);  
+          return;
+        }
+
+    const cpf = document.getElementById("cpf").value;
+
+    const response = await fetchBuscarAssento({
+        cpf: cpf
+    });
+    const data = await response.json();
+
+    if (data.status === "SUCCESS") {
+    
+    const mapassentos = data.payload;
+    console.log(mapassentos)
+
+
+    mapassentos.forEach(assento => {
+                    const row = voosBody.insertRow();
+                    
+                    console.log(assento[2])
+
+                    assento.splice(2,1);
+
+                    
+
+
+                    // Adiciona as células da linha
+                    for (const key in assento) {
+                        const cell = row.insertCell();
+                        cell.textContent = assento[key];
+                    }
+
+                 
+                });
+    
+
+    } 
+    else {
+    showStatusMessage("Erro ao buscar dados " + data.message, true);
+
+    }
+    }
+
+
+        </script>
+    
+    </head>
+<body class="center-content">
+    <div class="container">
+        <h1>Procurar Passagem</h1>
+        <div class="form-group">
+            <label for="cpf">Digite seu CPF:</label>
+            <input type="text" id="cpf" name="cpf" placeholder="123.456.789-01"  maxlength="14" required>
+            
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn" onclick="procurar()">Procurar</button>
+
+        </div>
+        <p id="status" class="statusError"></p>
+        
+        <table id="voosTable">
+            <thead>
+                <tr>
+                    <th>Aeronave</th>
+                    <th>Assento</th>
+                    <th>Custo</th>
+                    <th>Cpf Passageiro</th>
+                    <th>Numero Voo</th>
+
+                </tr>
+            </thead>
+            <tbody id="voosBody"></tbody>
+        </table>
+    </div>
+</body>
+</html>

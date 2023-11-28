@@ -16,6 +16,11 @@
       </style>
 
     <script>
+            function Voltar() {
+            window.location.href = "/FRONTEND/src/modules/admin/menuADM.html";
+            
+        }
+
       function limparForm() {
           document.getElementById("cadastro-form").reset();
       }
@@ -539,7 +544,7 @@
             <div class="btn-group">
                 <button type="button" class="btn" onclick="inserirTrecho()">Cadastrar</button>
                 <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
-                <button type="button" class="btn btn-cancel" onclick="cancelarCadastro()">Cancelar</button>
+                <button type="button" class="btn btn-cancel" onclick="Voltar()">Voltar</button>
             </div>
             <p id="status" class="statusError"></p>
         </form>

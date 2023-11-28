@@ -10,7 +10,7 @@ body.center-content {
 }
 
 .container {
-    width: 450px;
+    width: 500px;
     margin: 10px;
     padding: 20px;
     background-color: #fff;
@@ -19,44 +19,10 @@ body.center-content {
     text-align: center;
 }
 
-.containeresq {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    max-width:100%;
-    margin: 10px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    align-items: center;
-}
 
-.containerdir {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    max-width:100%;
-    margin: 10px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    align-items: center;
-}
 
-.containerTudo {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    max-width:100%;
-    margin: 10px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    align-items: center;
-}
+
+
 
 h1 {
     font-size: 2.5em;
@@ -64,17 +30,7 @@ h1 {
     color: #007bff;
 }
 
-h2 {
-    font-size: 4em;
-    margin-bottom: 20px;
-    color: #000000;
-}
 
-h3 {
-    font-size: 2.5em;
-    margin-bottom: 20px;
-    color: #ff5100;
-}
 
 .main-buttons {
     display: flex;
@@ -94,35 +50,11 @@ h3 {
     font-size: 1.2em;
 }
 
-.btnvoltar {
-    padding: 15px 30px;
-    background-color: #dc3545;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 0 10px 10px 0;
-    font-size: 1.2em;
-}
 
-.button-voltar {
-    
-    align-items: center;
-}
+
+
 
 .btn:hover {
     background-color: #0056b3;
 }
 
-.btnvoltar:hover {
-    background-color: #791721;
-}
-
-/* Botões adicionais */
-.btn-cancel {
-    background-color: #dc3545;
-}
-
-.btn-clear {
-    background-color: #ffc107;
-}

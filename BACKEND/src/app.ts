@@ -1309,6 +1309,45 @@ app.post("/listarAssentosWhere", async(req,res)=>{
   }
 });
 
+app.post("/listarAssentosWhereCpf", async(req,res)=>{
+
+  let cr: CustomResponse = {status: "ERROR", message: "", payload: undefined,};
+
+  try {
+    const connAttibs = {
+      user: process.env.ORACLE_DB_USER,
+      password: process.env.ORACLE_DB_PASSWORD,
+      connectionString: process.env.ORACLE_CONN_STR,
+    };
+
+    const connection = await oracledb.getConnection(connAttibs);
+
+    const cpf_passageiro = req.body.cpf
+    
+
+    const result = await connection.execute(
+      "SELECT * FROM MAPA_ASSENTOS WHERE cpf_passageiro = :cpf_passageiro",
+      { cpf_passageiro: { val: cpf_passageiro }} 
+    );
+
+    await connection.close();
+
+    cr.status = "SUCCESS";
+    cr.message = "Dados obtidos";
+    cr.payload = result.rows;
+
+  } catch (e) {
+    if (e instanceof Error) {
+      cr.message = e.message;
+      console.log(e.message);
+    } else {
+      cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+    }
+  } finally {
+    res.send(cr);
+  }
+});
+
 app.delete("/excluirAssentoUnico", async(req,res)=>{
   const aeronave = req.body.aeronave as number;
   const assento = req.body.assento as number;
@@ -1575,6 +1614,7 @@ app.put("/atualizarCliente", async(req,res)=>{
     res.send(cr);  
   }
 });
+
 
 //SERVICOS PAGAMENTO
 

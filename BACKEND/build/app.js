@@ -1085,6 +1085,35 @@ app.post("/listarAssentosWhere", (req, res) => __awaiter(void 0, void 0, void 0,
         res.send(cr);
     }
 }));
+app.post("/listarAssentosWhereCpf", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let cr = { status: "ERROR", message: "", payload: undefined, };
+    try {
+        const connAttibs = {
+            user: process.env.ORACLE_DB_USER,
+            password: process.env.ORACLE_DB_PASSWORD,
+            connectionString: process.env.ORACLE_CONN_STR,
+        };
+        const connection = yield oracledb_1.default.getConnection(connAttibs);
+        const cpf_passageiro = req.body.cpf;
+        const result = yield connection.execute("SELECT * FROM MAPA_ASSENTOS WHERE cpf_passageiro = :cpf_passageiro", { cpf_passageiro: { val: cpf_passageiro } });
+        yield connection.close();
+        cr.status = "SUCCESS";
+        cr.message = "Dados obtidos";
+        cr.payload = result.rows;
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            cr.message = e.message;
+            console.log(e.message);
+        }
+        else {
+            cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+        }
+    }
+    finally {
+        res.send(cr);
+    }
+}));
 app.delete("/excluirAssentoUnico", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const aeronave = req.body.aeronave;
     const assento = req.body.assento;
