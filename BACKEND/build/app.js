@@ -891,6 +891,35 @@ app.get("/listarVoos", (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.send(cr);
     }
 }));
+app.post("/listarVooAeronave", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let cr = { status: "ERROR", message: "", payload: undefined, };
+    try {
+        const connAttibs = {
+            user: process.env.ORACLE_DB_USER,
+            password: process.env.ORACLE_DB_PASSWORD,
+            connectionString: process.env.ORACLE_CONN_STR,
+        };
+        const connection = yield oracledb_1.default.getConnection(connAttibs);
+        const codigo_aeronave = req.body.codigo_aeronave;
+        const result = yield connection.execute("SELECT * FROM VOOS WHERE AERONAVE = :codigo_aeronave ", { codigo_aeronave: { val: codigo_aeronave } });
+        yield connection.close();
+        cr.status = "SUCCESS";
+        cr.message = "Dados obtidos";
+        cr.payload = result.rows;
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            cr.message = e.message;
+            console.log(e.message);
+        }
+        else {
+            cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+        }
+    }
+    finally {
+        res.send(cr);
+    }
+}));
 app.delete("/excluirVoo", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const codigo = req.body.codigo;
     let cr = {
@@ -936,11 +965,18 @@ app.put("/inserirAssento", (req, res) => __awaiter(void 0, void 0, void 0, funct
     const isADM = req.body.isADM;
     const aeronave = req.body.aeronave;
     const assento = req.body.assento;
-    const cpfpassageiro = req.body.cpfpassageiro;
+    var cpfpassageiro = req.body.cpfpassageiro;
     const numvoo = req.body.numvoo;
     const disponivel = 0;
+    console.log(isADM);
     //Se a inserção estiver vindo de uma tela de ADM
     if (isADM == 1) {
+        cpfpassageiro = "0";
+        const custo = 0;
+        console.log(aeronave);
+        console.log(assento);
+        console.log(cpfpassageiro);
+        console.log(numvoo);
         let cr = {
             status: "ERROR",
             message: "",
@@ -954,10 +990,10 @@ app.put("/inserirAssento", (req, res) => __awaiter(void 0, void 0, void 0, funct
                 connectionString: process.env.ORACLE_CONN_STR,
             });
             const cmdInsertVoo = `INSERT INTO MAPA_ASSENTOS
-    (aeronave, banco, disponivel)
+    (aeronave, banco, disponivel, custo, cpf_passageiro, numero_voo)
     VALUES
-    (:1, :2, :3)`;
-            const dados = [aeronave, assento, disponivel];
+    (:1, :2, :3, :4, :5, :6)`;
+            const dados = [aeronave, assento, disponivel, custo, cpfpassageiro, numvoo];
             let resInsert = yield conn.execute(cmdInsertVoo, dados);
             yield conn.commit();
             const rowsInserted = resInsert.rowsAffected;

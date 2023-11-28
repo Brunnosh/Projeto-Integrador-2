@@ -1081,6 +1081,46 @@ app.get("/listarVoos", async(req,res)=>{
 
 });
 
+app.post("/listarVooAeronave", async(req,res)=>{
+
+  let cr: CustomResponse = {status: "ERROR", message: "", payload: undefined,};
+
+  try {
+    const connAttibs = {
+      user: process.env.ORACLE_DB_USER,
+      password: process.env.ORACLE_DB_PASSWORD,
+      connectionString: process.env.ORACLE_CONN_STR,
+    };
+
+    const connection = await oracledb.getConnection(connAttibs);
+
+    const codigo_aeronave = req.body.codigo_aeronave
+    
+    
+    const result = await connection.execute(
+      "SELECT * FROM VOOS WHERE AERONAVE = :codigo_aeronave ",
+      { codigo_aeronave: { val: codigo_aeronave } } 
+    );
+
+    await connection.close();
+
+    cr.status = "SUCCESS";
+    cr.message = "Dados obtidos";
+    cr.payload = result.rows;
+
+  } catch (e) {
+    if (e instanceof Error) {
+      cr.message = e.message;
+      console.log(e.message);
+    } else {
+      cr.message = "Erro ao conectar ao Oracle. Sem detalhes";
+    }
+  } finally {
+    res.send(cr);
+  }
+});
+
+
 app.delete("/excluirVoo", async(req,res)=>{
   const codigo = req.body.codigo as number;
 
@@ -1134,13 +1174,20 @@ app.put("/inserirAssento", async(req,res)=>{
   const isADM = req.body.isADM as number;
   const aeronave = req.body.aeronave as number;
   const assento = req.body.assento as number;
-  const cpfpassageiro = req.body.cpfpassageiro as string;
+  var cpfpassageiro = req.body.cpfpassageiro as string;
   const numvoo = req.body.numvoo as number;
   const disponivel = 0;
-
+  console.log(isADM)
   //Se a inserção estiver vindo de uma tela de ADM
   if(isADM == 1){
-    
+    cpfpassageiro = "0"
+    const custo = 0;
+
+    console.log(aeronave)
+    console.log(assento)
+    console.log(cpfpassageiro)
+    console.log(numvoo)
+
   let cr: CustomResponse = {
     status: "ERROR",
     message: "",
@@ -1157,11 +1204,11 @@ app.put("/inserirAssento", async(req,res)=>{
     });
 
     const cmdInsertVoo = `INSERT INTO MAPA_ASSENTOS
-    (aeronave, banco, disponivel)
+    (aeronave, banco, disponivel, custo, cpf_passageiro, numero_voo)
     VALUES
-    (:1, :2, :3)`
+    (:1, :2, :3, :4, :5, :6)`
 
-    const dados = [aeronave, assento, disponivel];
+    const dados = [aeronave, assento, disponivel, custo, cpfpassageiro, numvoo];
     let resInsert = await conn.execute(cmdInsertVoo, dados);
 
     await conn.commit();
