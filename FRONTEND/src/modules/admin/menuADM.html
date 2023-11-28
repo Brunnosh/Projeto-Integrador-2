@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu Administrativo</title>
-    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/inicio.css">
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/menuADM.css">
 </head>
 <body class="center-content">
     
@@ -66,7 +66,8 @@
                 <div class="main-buttons">
                     <button class="btn" onclick="cadastrarVoo()">cadastrar</button>
                     <button class="btn" onclick="deletarVoo()">deletar</button>
-                    <button class="btn" onclick="">listar</button>
+                    <button class="btn" onclick="listarVoo()">Listar</button>
+                    
                 </div>
             </div>
         </div>
@@ -74,8 +75,8 @@
             <div class="container">
                 <h1>Menu Assentos</h1>
                 <div class="main-buttons">
-                    <button class="btn" onclick="cadastrarVoo()">cadastrar</button>
-                    <button class="btn" onclick="deletarVoo()">deletar</button>
+                    <button class="btn" onclick="cadastrarAssento()">cadastrar</button>
+                    <button class="btn" onclick="deletarAssento()">deletar</button>
                     <button class="btn" onclick="">listar</button>
                 </div>
             </div>
@@ -168,6 +169,11 @@
         //FUNCTIONS LISTAR
         function listarAeronave() {
             window.open('/FRONTEND/src/modules/admin/aeronaves/listagemaeronave.html');
+            
+        }
+
+        function listarVoo() {
+            window.open('/FRONTEND/src/modules/admin/voo/listar_voos.html');
             
         }
         //

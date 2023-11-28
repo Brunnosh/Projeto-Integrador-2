@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Lista de Voos</title>
+    <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/listar_voo.css">
+</head>
+<body class="center-content">
+    <div class="container">
+        <h1>Lista de Voos</h1>
+        
+        <table id="voosTable">
+            <thead>
+                <tr>
+                    <th>Código do Voo</th>
+                    <th>Dia Ida</th>
+                    <th>Dia Volta</th>
+                    <th>Horário Ida</th>
+                    <th>Horário Volta</th>
+                    <th>Aeronave</th>
+                    <th>Trecho Ida</th>
+                    <th>Trecho Volta</th>
+                    <th>Ida/Volta</th>
+                </tr>
+            </thead>
+            <tbody id="voosBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+
+
+
+        async function listarVoos() {
+            const response = await fetch('http://localhost:3000/listarVoos');
+            const data = await response.json();
+
+            if (data.status === 'SUCCESS') {
+                const voosBody = document.getElementById('voosBody');
+                const voos = data.payload;
+
+                voos.forEach(voo => {
+                    const row = voosBody.insertRow();
+                    
+                    console.log(voo[8])
+
+                    if(voo[8] !== 1)
+                    {
+                        voo[2] = "N/A";
+                        voo[4] = "N/A";
+                        voo[7] = "N/A";
+                    }
+
+                    // Adiciona as células da linha
+                    for (const key in voo) {
+                        const cell = row.insertCell();
+                        cell.textContent = voo[key];
+                    }
+
+                 
+                });
+            } else {
+                console.error('Erro ao buscar dados de voos:', data.message);
+            }
+        }
+
+        window.onload = async function (){
+            await listarVoos()
+
+
+        }
+
+    </script>
+</body>
+</html>
