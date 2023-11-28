@@ -62,7 +62,7 @@
                 cidades.forEach(cidade => {
                     const option = document.createElement('option');
                     option.value = cidade[2]; 
-                    const nome = cidade[2];
+                    const nome = [cidade[2], cidade[1]];
                     option.textContent = nome; 
                     cidadesDropdown.appendChild(option);
                 });
