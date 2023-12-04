@@ -30,6 +30,8 @@
     console.log(vooEscolhido)
     console.log(aeronaveEscolhida)
 
+
+    //mascara CPF
     document.addEventListener('DOMContentLoaded', function() {
 
         var divCusto =  document.getElementById("custo");
@@ -89,7 +91,7 @@
            
 
                 if (nome.value.length == 0 || cpf.value.length == 0 || email.value.length == 0 ) {
-                    console.log("bunda")
+                    
                     resultado = false;
                 
                 }
@@ -142,9 +144,9 @@
 
         const response = await fetch('http://localhost:3000/listarClientes');
         const data = await response.json();
-        console.log("bundona")
+        
                 if (data.status === "SUCCESS") {
-                    console.log("saco")
+                    
                     const clientes = data.payload;
                     
                     clientes.forEach(cliente => {
@@ -303,12 +305,12 @@
     
 
 </head>
-<body>
+<body class="center-content">
     <div id="seat-map"></div>
 
 
     <div class="container">
-        <h1>Pagamento</h1>
+        <h1> Pagamento </h1>
         <form id="cadastro-form">
 
             <div class="form-group">

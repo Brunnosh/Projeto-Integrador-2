@@ -1,188 +1,174 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Configurações básicas da página -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu Administrativo</title>
+
+    <!-- Inclusão do arquivo de estilo CSS -->
     <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/menuADM.css">
 </head>
 <body class="center-content">
-    
-    
-        <div class="titulo"><h2>MENU ADMINISTRATIVO</h2></div>
-        <div class="containeresq">
-            
-            <div class="container">
-                <h1>Menu Aeronaves</h1>
-                <div class="main-buttons">
-                    <button class="btn" onclick="cadastrarAeronave()">cadastrar</button>
-                    <button class="btn" onclick="deletarAeronave()">deletar</button>
-                    <button class="btn" onclick="listarAeronave()">listar</button>
-                </div>
-            </div>
+    <!-- Cabeçalho da Página -->
+    <div class="titulo"><h2>MENU ADMINISTRATIVO</h2></div>
 
-            <div class="container">
-                <h1>Menu Aeroportos</h1>
-                <div class="main-buttons">
-                    <button class="btn" onclick="cadastrarAeroporto()">cadastrar</button>
-                    <button class="btn" onclick="deletarAeroporto()">deletar</button>
-                    <button class="btn" onclick="">listar</button>
-                </div>
-            </div>
-
-            <div class="container">
-                <h1>Menu Cidades</h1>
-                <div class="main-buttons">
-                    <button class="btn" onclick="cadastrarCidades()">cadastrar</button>
-                    <button class="btn" onclick="deletarCidades()">deletar</button>
-                    <button class="btn" onclick="">listar</button>
-                </div>
-            </div>
-
-
-        </div>
-        
-        <div class="containerdir">
-            <div class="container">
-                <h1>Menu Paises</h1>
-                <div class="main-buttons">
-                    <button class="btn" onclick="cadastrarPaises()">cadastrar</button>
-                    <button class="btn" onclick="deletarPaises()">deletar</button>
-                    <button class="btn" onclick="">listar</button>
-                </div>
-            </div>
-
-            <div class="container">
-                <h1>Menu Trechos</h1>
-                <div class="main-buttons">
-                    <button class="btn" onclick="cadastrarTrecho()">cadastrar</button>
-                    <button class="btn" onclick="deletarTrecho()">deletar</button>
-                    <button class="btn" onclick="">listar</button>
-                </div>
-            </div>
-
-            <div class="container">
-                <h1>Menu Voos</h1>
-                <div class="main-buttons">
-                    <button class="btn" onclick="cadastrarVoo()">cadastrar</button>
-                    <button class="btn" onclick="deletarVoo()">deletar</button>
-                    <button class="btn" onclick="listarVoo()">Listar</button>
-                    
-                </div>
+    <!-- Contêiner da Esquerda com Menus -->
+    <div class="containeresq">
+        <!-- Menu Aeronaves -->
+        <div class="container">
+            <h1>Aeronaves</h1>
+            <div class="main-buttons">
+                <button class="btn" onclick="cadastrarAeronave()">cadastrar</button>
+                <button class="btn" onclick="deletarAeronave()">deletar</button>
+                <button class="btn" onclick="listarAeronave()">listar</button>
             </div>
         </div>
-        <div class="containerdir">
-            <div class="container">
-                <h1>Menu Assentos</h1>
-                <div class="main-buttons">
-                    <button class="btn" onclick="cadastrarAssento()">cadastrar</button>
-                    <button class="btn" onclick="deletarAssento()">deletar</button>
-                    <button class="btn" onclick="">listar</button>
-                </div>
-            </div>
-            <div class="container">
-                <h3>Voltar</h3>
-                <div class="button-voltar">
-                    <button class="btnvoltar" onclick="Voltar()">Voltar</button>
-                </div>
+
+        <!-- Menu Aeroportos -->
+        <div class="container">
+            <h1>Aeroportos</h1>
+            <div class="main-buttons">
+                <button class="btn" onclick="cadastrarAeroporto()">cadastrar</button>
+                <button class="btn" onclick="deletarAeroporto()">deletar</button>
+                <button class="btn" onclick="">listar</button>
             </div>
         </div>
-        
-        
-    
-    
+
+        <!-- Menu Cidades -->
+        <div class="container">
+            <h1>Cidades</h1>
+            <div class="main-buttons">
+                <button class="btn" onclick="cadastrarCidades()">cadastrar</button>
+                <button class="btn" onclick="deletarCidades()">deletar</button>
+                <button class="btn" onclick="">listar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contêiner da Direita com Menus -->
+    <div class="containerdir">
+        <!-- Menu Paises -->
+        <div class="container">
+            <h1>Paises</h1>
+            <div class="main-buttons">
+                <button class="btn" onclick="cadastrarPaises()">cadastrar</button>
+                <button class="btn" onclick="deletarPaises()">deletar</button>
+                <button class="btn" onclick="">listar</button>
+            </div>
+        </div>
+
+        <!-- Menu Trechos -->
+        <div class="container">
+            <h1>Trechos</h1>
+            <div class="main-buttons">
+                <button class="btn" onclick="cadastrarTrecho()">cadastrar</button>
+                <button class="btn" onclick="deletarTrecho()">deletar</button>
+                <button class="btn" onclick="">listar</button>
+            </div>
+        </div>
+
+        <!-- Menu Voos -->
+        <div class="container">
+            <h1>Voos</h1>
+            <div class="main-buttons">
+                <button class="btn" onclick="cadastrarVoo()">cadastrar</button>
+                <button class="btn" onclick="deletarVoo()">deletar</button>
+                <button class="btn" onclick="listarVoo()">Listar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contêiner da Direita com Menus Adicionais -->
+    <div class="containerdir">
+        <!-- Menu Assentos -->
+        <div class="container">
+            <h1>Assentos</h1>
+            <div class="main-buttons">
+                <button class="btn" onclick="cadastrarAssento()">cadastrar</button>
+                <button class="btn" onclick="deletarAssento()">deletar</button>
+                <button class="btn" onclick="">listar</button>
+            </div>
+        </div>
+        <!-- Botão de Voltar -->
+        <div class="container">
+            <h3>Voltar</h3>
+            <div class="button-voltar">
+                <button class="btnvoltar" onclick="Voltar()">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script JavaScript com Funções -->
     <script>
-        //FUNCTIONS CADASTRAR
+        // Funções para abrir páginas específicas
         function cadastrarAeronave() {
             window.open('/FRONTEND/src/modules/admin/aeronaves/cadastro_aeronave.html');
-            
         }
 
         function cadastrarAeroporto() {
             window.open('/FRONTEND/src/modules/admin/aeroportos/cadastro_aeroportos.html');
-            
         }
 
         function cadastrarAssento() {
             window.open('/FRONTEND/src/modules/admin/assentos/cadastro_assentos.html');
-            
         }
 
         function cadastrarCidades() {
             window.open('/FRONTEND/src/modules/admin/Cidades/cadastro_cidades.html');
-            
         }
 
         function cadastrarPaises() {
             window.open('/FRONTEND/src/modules/admin/paises/cadastro_pais.html');
-            
         }
 
         function cadastrarTrecho() {
             window.open('/FRONTEND/src/modules/admin/trechos/cadastro_trechos.html');
-            
         }
 
         function cadastrarVoo() {
             window.open('/FRONTEND/src/modules/admin/voo/cadastro_voos.html');
-            
         }
-        //
 
-        //FUNCTIONS DELETAR
         function deletarAeronave() {
             window.open('/FRONTEND/src/modules/admin/aeronaves/deletar_aeronave.html');
-            
         }
 
         function deletarAeroporto() {
             window.open('/FRONTEND/src/modules/admin/aeroportos/excluir_aeroportos.html');
-            
         }
 
         function deletarAssento() {
             window.open('/FRONTEND/src/modules/admin/assentos/excluir_assentos.html');
-            
         }
 
         function deletarCidades() {
             window.open('/FRONTEND/src/modules/admin/Cidades/excluir_cidades.html');
-            
         }
 
         function deletarPaises() {
             window.open('/FRONTEND/src/modules/admin/paises/excluir_pais.html');
-            
         }
 
         function deletarTrecho() {
             window.open('/FRONTEND/src/modules/admin/trechos/excluir_trechos.html');
-            
         }
 
         function deletarVoo() {
             window.open('/FRONTEND/src/modules/admin/voo/excluir_voos.html');
-            
         }
 
-        //
-        //FUNCTIONS LISTAR
         function listarAeronave() {
             window.open('/FRONTEND/src/modules/admin/aeronaves/listagemaeronave.html');
-            
         }
 
         function listarVoo() {
             window.open('/FRONTEND/src/modules/admin/voo/listar_voos.html');
-            
-        }
-        //
-        
-        function Voltar() {
-            window.location.href = "/FRONTEND/src/modules/inicio.html";
-            
         }
 
+        function Voltar() {
+            window.location.href = "/FRONTEND/src/modules/inicio.html";
+        }
     </script>
 </body>
 </html>
