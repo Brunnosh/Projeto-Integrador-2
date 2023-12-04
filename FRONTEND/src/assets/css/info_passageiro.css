@@ -99,3 +99,17 @@ input[type="text"] {
   box-sizing: border-box; /* Include padding and border in the width */
   margin-bottom: 10px; /* Add some space between inputs */
 }
+
+
+body.center-content {
+  font-family: Arial, sans-serif;
+  background-image: url('/FRONTEND/src/assets/images/ceuback.jpg');
+  background-repeat: no-repeat;
+  background-size: cover; /* Ajusta o tamanho da imagem para cobrir todo o elemento */
+  background-position: center; /* Centraliza a imagem */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}

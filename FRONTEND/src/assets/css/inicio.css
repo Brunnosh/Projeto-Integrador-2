@@ -1,7 +1,9 @@
 body.center-content {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-
+    background-image: url('/FRONTEND/src/assets/images/background1.jpg');
+    background-repeat: no-repeat;
+    background-size: cover; /* Ajusta o tamanho da imagem para cobrir todo o elemento */
+    background-position: center; /* Centraliza a imagem */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -20,18 +22,6 @@ body.center-content {
 }
 
 
-
-
-
-
-h1 {
-    font-size: 2.5em;
-    margin-bottom: 20px;
-    color: #007bff;
-}
-
-
-
 .main-buttons {
     display: flex;
     flex-direction: row;
@@ -41,13 +31,14 @@ h1 {
 
 .btn {
     padding: 15px 30px;
-    background-color: #007bff;
+    background-color: #203D4A;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     margin: 0 10px 10px 0;
     font-size: 1.2em;
+    transition: background-color 0.3s ease;
 }
 
 

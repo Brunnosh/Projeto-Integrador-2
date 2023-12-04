@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo ao AirPucc</title>
+    <title>AirPucc</title>
     <link rel="stylesheet" type="text/css" href="/FRONTEND/src/assets/css/inicio.css">
+    <style>
+        img{
+            width: 50%;
+        }
+    </style>
 </head>
 <body class="center-content">
     <div class="container">
-        <h1>Bem-vindo ao AirPucc</h1>
-        
+        <img src="/FRONTEND/src/assets/images/logo.png" alt="AirPucc Logo" class="logo">
+    
         <div class="main-buttons">
             <button class="btn" onclick="entrarComoAdministrador()">Área Administrativa</button>
             <button class="btn" onclick="entrarComoCliente()">Reservar Passagem</button>
-            <button class="btn" onclick="verPassagem()">Procurar seu ticket</button>
+            <button class="btn" onclick="verPassagem()">Procurar Passagem</button>
         </div>
     </div>
 
@@ -29,7 +34,7 @@
         }
 
         function verPassagem() {
-            window.location.href = "/FRONTEND/src/modules/cliente/procurarvoo.html"; 
+            window.location.href = "/FRONTEND/src/modules/cliente/procurarpassagem.html"; 
             
         }
     </script>

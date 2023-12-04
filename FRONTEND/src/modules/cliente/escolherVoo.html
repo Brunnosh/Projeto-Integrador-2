@@ -17,6 +17,10 @@
 
 <script>
 
+function Voltar() {
+            window.location.href = "/FRONTEND/src/modules/inicio.html";
+        }
+
     
     var todosvoos;
     var voosfiltrados;
@@ -262,6 +266,7 @@
 
         var cidade_ida = document.getElementById('cidadeDropdown1').value;
         var cidade_chegada = document.getElementById('cidadeDropdown2').value;
+        trechospesquisado = [];
 
         const response = await fetchBuscar({
             cidade_ida : cidade_ida,
@@ -465,7 +470,7 @@
             const AERONAVE = voo[3];
             const TRECHO = voo[4];
             const IDAVOLTA = voo[5];
-            option.textContent = [CODIGO];
+            option.textContent = "Voo " + [CODIGO] + " | " + DIA;
             voosDropdown.appendChild(option);
 
         });
@@ -507,7 +512,7 @@
     </script>
 
 </head>
-<body>
+<body class="center-content">
     <div class="container">
         <h1>Comprar Passagem</h1>
         <form id="cadastro-form">
@@ -565,7 +570,7 @@
 
             <div class="btn-group">
                 <button type="button" class="btn" onclick="Continuar()">Ir para Assentos</button>
-                <button type="button" class="btn btn-clear" onclick="limparForm()">Limpar</button>
+                <button type="button" class="btnvoltar" onclick="Voltar()">Voltar</button>
                 
             </div>
             
