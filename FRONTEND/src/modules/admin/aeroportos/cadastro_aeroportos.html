@@ -42,10 +42,80 @@
             }
             return resultado;
         }
+        async function listarPaises() {
+          const response = await fetch('http://localhost:3000/listarPais');
+          const data = await response.json();
 
-        async function listarCidades() {
-            const response = await fetch('http://localhost:3000/listarCidades');
-            const data = await response.json();
+          if (data.status === 'SUCCESS') {
+
+
+
+              const paisDiv1 = document.getElementById('pais');
+              const paisDropdown1 = document.getElementById('paisDropdown');
+              const paises = data.payload;
+              
+
+              
+              const defaultOption1 = document.createElement('option');
+              defaultOption1.textContent = 'Escolha um Pais';
+              defaultOption1.disabled = true;
+              defaultOption1.selected = true;
+              paisDropdown1.appendChild(defaultOption1);
+
+              
+
+            
+              paises.forEach(pais => {
+                  const option1 = document.createElement('option');
+                  option1.value = [pais[1],pais[2]];
+                  const nome1 = pais[1];
+                  option1.textContent = nome1; 
+                  paisDropdown1.appendChild(option1);
+              });
+
+              
+              
+              paisDropdown1.addEventListener('change', handleDropdownChangeCidade);
+              
+              
+          } else {
+              console.error('Erro ao buscar dados de cidades:', data.message);
+          }
+      }
+        
+      async function handleDropdownChangeCidade(event) {
+          const PaisIdaData = event.target.value.split(',')[0];
+
+          const cidadedropdown = document.getElementById('cidadeDropdown');
+          cidadedropdown.innerHTML = '';
+          
+
+          await listarCidades(PaisIdaData);
+          
+        
+      }
+
+
+        async function listarCidades(pais) {
+            function fetchBuscar(body) {
+          const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          };
+
+          return fetch('http://localhost:3000/listarCidadesWhere', requestOptions)
+          .then(data => {
+          return data;
+          });
+        }
+
+        var pais_cidade = pais;
+
+        const response = await fetchBuscar({
+          pais_cidade: pais_cidade
+          });
+        const data = await response.json();
 
             if (data.status === 'SUCCESS') {
                 const cidadesDiv = document.getElementById('cidade');
@@ -62,7 +132,7 @@
                 cidades.forEach(cidade => {
                     const option = document.createElement('option');
                     option.value = cidade[2]; 
-                    const nome = [cidade[2], cidade[1]];
+                    const nome = [cidade[2]];
                     option.textContent = nome; 
                     cidadesDropdown.appendChild(option);
                 });
@@ -82,7 +152,7 @@
         }
 
         window.onload = async () => {
-            await listarCidades();
+            await listarPaises();
         };
 
         function showStatusMessage(msg, error) {
@@ -157,6 +227,12 @@
     <div class="container">
         <h1>Cadastro de Aeroporto</h1>
         <form id="cadastro-form">
+            <div class="form-group">
+                <label for="paisDropdown">Pais de Partida:</label>
+                <select id="paisDropdown"></select>
+                
+                <div id="pais"></div>
+            </div>
             <div class="form-group">
                 <label for="cidadeDropdown">Cidade:</label>
                 <select id="cidadeDropdown"></select>
